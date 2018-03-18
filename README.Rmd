@@ -11,6 +11,9 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+library(magrittr)
+library(foolbox)
 ```
 
 # Function manipulation toolbox
@@ -27,10 +30,12 @@ knitr::opts_chunk$set(
 [![Coverage Status](http://coveralls.io/repos/github/mailund/foolbox/badge.svg?branch=master)](https://coveralls.io/github/mailund/foolbox?branch=master)
 
 
-The `foolbox` package implements functionality for manipulating R functions by rewriting the components they consist of. FIXME: more documentation.
+The `foolbox` package implements functionality for manipulating R functions by rewriting the components they consist of. The package provides various ways of rewriting functions using metaprogramming callbacks and how to combine such transformations.
+
 
 ## Installation
 
+<!--
 You can install the released version of foolbox from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -38,6 +43,7 @@ install.packages("foolbox")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
+-->
 
 ``` r
 # install.packages("devtools")
@@ -46,4 +52,81 @@ devtools::install_github("mailund/foolbox")
 
 ## Examples
 
+The `pmatch` package implements a function for translating `cases`-calling function into functions that use `if`-`else`-statements instead. The full implementation looks like this:
 
+```{r}
+library(pmatch)
+
+transform_cases_call <- function(expr) {
+    stopifnot(rlang::call_name(expr) == "cases")
+
+    args <- rlang::call_args(expr)
+    value <- args[[1]]
+    patterns <- args[-1]
+    eval(rlang::expr(cases_expr(!!value, !!!patterns)))
+}
+
+transform_cases_function_rec <- function(expr) {
+    if (rlang::is_atomic(expr) || rlang::is_pairlist(expr) ||
+        rlang::is_symbol(expr) || rlang::is_primitive(expr)) {
+        expr
+    } else {
+        stopifnot(rlang::is_lang(expr))
+        call_args <- rlang::call_args(expr)
+        for (i in seq_along(call_args)) {
+            expr[[i + 1]] <- transform_cases_function_rec(call_args[[i]])
+        }
+        if (rlang::call_name(expr) == "cases") {
+            expr <- transform_cases_call(expr)
+        }
+        expr
+    }
+}
+
+transform_cases_function <- function(fun) {
+    if (!rlang::is_closure(fun)) {
+        err <- simpleError("Function must be a closure to be transformed")
+        stop(err)
+    }
+    body(fun) <- transform_cases_function_rec(body(fun))
+    fun
+}
+```
+
+where the `cases_expr` is a function provided by the package.
+
+If we have a function that calls `pmatch::cases`, like this one
+
+```{r}
+tree := L(val) | T(left : tree, right : tree)
+is_leaf <- function(tree) cases(tree, L(v) -> TRUE, otherwise -> FALSE)
+is_leaf(L(2))
+is_leaf(T(L(1), L(2)))
+```
+
+we can transform it using
+
+```{r}
+is_leaf_tr <- transform_cases_function(is_leaf)
+is_leaf_tr
+is_leaf_tr(L(2))
+is_leaf_tr(T(L(1), L(2)))
+```
+
+Using `foolbox` we can implement this simpler using a single callback function
+
+```{r}
+transform_cases_cb <- function(expr, env, param) {
+    args <- rlang::call_args(expr)
+    value <- args[[1]]
+    patterns <- args[-1]
+    eval(rlang::expr(cases_expr(!!value, !!!patterns)))
+}
+transform_cases <- callbacks() %>% 
+    add_call_callback(pmatch::cases, transform_cases_cb) %>% 
+    make_transform_function
+
+is_leaf_foolbox <- transform_cases(is_leaf)
+
+body(is_leaf_tr) == body(is_leaf_foolbox)
+```
