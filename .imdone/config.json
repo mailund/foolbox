@@ -21,12 +21,6 @@
       "MARK"
     ]
   },
-  "languages": {
-    ".R": {
-      "name": "r",
-      "symbol": "#"
-    }
-  },
   "lists": [],
   "marked": {
     "gfm": true,
@@ -40,5 +34,11 @@
     "id": "5aae35e7660e430b0f339a99",
     "name": "mailund/foolbox",
     "useImdoneioForPriority": true
+  },
+  "languages": {
+    ".R": {
+      "name": "r",
+      "symbol": "#"
+    }
   }
 }
