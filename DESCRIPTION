@@ -9,8 +9,11 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)
 Imports: 
     magrittr, 
     rlang (>= 0.2.0)
 Suggests: 
     testthat
+URL: https://github.com/mailund/foolbox
+BugReports: https://github.com/mailund/foolbox/issues

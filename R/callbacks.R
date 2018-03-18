@@ -1,3 +1,12 @@
+#' A callback that does not do any transformation.
+#'
+#' @param expr  The expression to (not) transform.
+#' @param evn   The environment of the function the expression is inside.
+#' @param param The formal parameters of the function.
+#' @return `expr`
+#' @export
+identity_callback <- function(expr, env, param) expr
+
 #' Default expression-transformation callbacks.
 #'
 #' @seealso with_atomic_callback
@@ -5,13 +14,13 @@
 #' @seealso with_symbol_callback
 #' @seealso with_primitive_callback
 #' @seealso with_call_callback
-#'  @export
+#' @export
 callbacks <- list(
-    atomic = identity,
-    pairlist = identity,
-    symbol = identity,
-    primitive = identity,
-    call = identity
+    atomic = identity_callback,
+    pairlist = identity_callback,
+    symbol = identity_callback,
+    primitive = identity_callback,
+    call = identity_callback
 )
 
 #' Create a function for setting callbacks.
