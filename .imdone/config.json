@@ -21,6 +21,12 @@
       "MARK"
     ]
   },
+  "languages": {
+    ".R": {
+      "name": "r",
+      "symbol": "#"
+    }
+  },
   "lists": [],
   "marked": {
     "gfm": true,
