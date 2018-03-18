@@ -23,18 +23,24 @@ identity_callback <- function(expr, env, params) expr
 #' @seealso with_primitive_callback
 #' @seealso with_call_callback
 #' @export
-callbacks <- list(
-    atomic = identity_callback,
-    pairlist = identity_callback,
-    symbol = identity_callback,
-    primitive = identity_callback,
-    call = identity_callback
-)
+# I'm using a function here, although it would be more natural to just use the
+# value, because somehow the function identity gets messed up in covr
+callbacks <- function() list(
+        atomic = identity_callback,
+        pairlist = identity_callback,
+        symbol = identity_callback,
+        primitive = identity_callback,
+        call = identity_callback
+    )
 
 #' Create a function for setting callbacks.
 #'
 #' @param cb_name The name of the callback to set
 #' @return A function that can be used in a pipe to set a callback.
+# I disable coverage here since it only tracks the closure body
+# and not the actual function in the tests (the function is called)
+# before the tests are run, when the package is built.
+# nocov start
 make_with_callback <- function(cb_name) {
     force(cb_name)
     function(callbacks, fn) {
@@ -42,6 +48,7 @@ make_with_callback <- function(cb_name) {
         callbacks
     }
 }
+# nocov end
 
 #' @describeIn callbacks Set the atomic callback function.
 #' @export

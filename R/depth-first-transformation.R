@@ -15,14 +15,18 @@
 #' @seealso depth_first_rewrite_function
 #' @export
 depth_first_rewrite_expr <- function(expr, callbacks, env, params) {
-    if (rlang::is_atomic(expr))
+    if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(expr, env, params))
-    if (rlang::is_pairlist(expr))
+    }
+    if (rlang::is_pairlist(expr)) {
         return(callbacks$pairlist(expr, env, params))
-    if (rlang::is_symbol(expr))
+    }
+    if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(expr, env, params))
-    if (rlang::is_primitive(expr))
+    }
+    if (rlang::is_primitive(expr)) {
         return(callbacks$primitive(expr, env, params))
+    }
 
     stopifnot(rlang::is_lang(expr))
     call_args <- rlang::call_args(expr)

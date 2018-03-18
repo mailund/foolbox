@@ -16,7 +16,7 @@ test_that("we can do simple transformations", {
             rlang::UQ(call_expr)
         })
     }
-    cb <- callbacks %>% with_call_callback(log_calls_transform)
+    cb <- callbacks() %>% with_call_callback(log_calls_transform)
 
     f <- function(x) {
         if (x > 0) f(x - 1)
@@ -25,4 +25,34 @@ test_that("we can do simple transformations", {
     f <- depth_first_rewrite_function(f, cb)
     f(3)
     expect_equal(calls, c("f", "f", "f"))
+})
+
+test_that("we call callback on pairlist", {
+    pairlist_called <- FALSE
+    pairlist_cb <- function(call_expr, env, params) {
+        pairlist_called <<- TRUE
+        call_expr
+    }
+    f <- function() function(x, y) x + y
+    expect_equal(f()(2, 2), 4)
+
+    expect_false(pairlist_called)
+    cb <- callbacks() %>% with_pairlist_callback(pairlist_cb)
+    g <- depth_first_rewrite_function(f, cb)
+    expect_true(pairlist_called)
+    expect_equal(g()(2, 2), 4)
+})
+
+test_that("we call callback on primitive", {
+    # it is actually pretty hard to see a "primitive" when
+    # traversing quoted expressions, so this is the only
+    # way I could think of to test this
+    primitive_called <- FALSE
+    primitive_cb <- function(call_expr, env, params) {
+        primitive_called <<- TRUE
+        call_expr
+    }
+    cb <- callbacks() %>% with_primitive_callback(primitive_cb)
+    depth_first_rewrite_expr(`if`, cb, environment(), list())
+    expect_true(primitive_called)
 })
