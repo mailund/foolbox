@@ -4,14 +4,14 @@
 \alias{depth_first_rewrite_expr}
 \title{Transform an expression.}
 \usage{
-depth_first_rewrite_expr(expr, callbacks, env, param)
+depth_first_rewrite_expr(expr, callbacks, env, params)
 }
 \arguments{
 \item{expr}{An R expression}
 
 \item{callbacks}{List of callbacks to apply.}
 
-\item{fun_env}{The environment of the function
+\item{env}{The environment of the function
 the expression will be evaluated in.}
 
 \item{params}{The formal parameters of the function

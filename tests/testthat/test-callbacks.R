@@ -1,7 +1,10 @@
 context("Callbacks")
 
 test_that("We can set callbacks", {
-    f <- function(x) { print("f") ; x }
+    f <- function(x) {
+        print("f")
+        x
+    }
     cb <- callbacks %>% with_atomic_callback(f)
     expect_equal(cb$atomic, f)
     expect_equal(cb$pairlist, identity_callback)

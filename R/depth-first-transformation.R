@@ -4,7 +4,7 @@
 #'
 #' @param expr      An R expression
 #' @param callbacks List of callbacks to apply.
-#' @param fun_env   The environment of the function
+#' @param env       The environment of the function
 #'                  the expression will be evaluated in.
 #' @param params    The formal parameters of the function
 #'                  the expression is evaluated in.
@@ -14,19 +14,19 @@
 #' @seealso callbacks
 #' @seealso depth_first_rewrite_function
 #' @export
-depth_first_rewrite_expr <- function(expr, callbacks, env, param) {
-    if (rlang::is_atomic(expr)) return(callbacks$atomic(expr, env, param))
-    if (rlang::is_pairlist(expr)) return(callbacks$pairlist(expr, env, param))
-    if (rlang::is_symbol(expr)) return(callbacks$symbol(expr, env, param))
-    if (rlang::is_primitive(expr)) return(callbacks$primitive(expr, env, param))
+depth_first_rewrite_expr <- function(expr, callbacks, env, params) {
+    if (rlang::is_atomic(expr)) return(callbacks$atomic(expr, env, params))
+    if (rlang::is_pairlist(expr)) return(callbacks$pairlist(expr, env, params))
+    if (rlang::is_symbol(expr)) return(callbacks$symbol(expr, env, params))
+    if (rlang::is_primitive(expr)) return(callbacks$primitive(expr, env, params))
     stopifnot(rlang::is_lang(expr))
     call_args <- rlang::call_args(expr)
     for (i in seq_along(call_args)) {
         expr[[i + 1]] <- depth_first_rewrite_expr(
-            call_args[[i]], callbacks, env, param
+            call_args[[i]], callbacks, env, params
         )
     }
-    callbacks$call(expr, env, param)
+    callbacks$call(expr, env, params)
 }
 
 #' Transform the body of function.
@@ -68,4 +68,3 @@ depth_first_rewrite_function <- function(fn, callbacks) {
     )
     fn
 }
-

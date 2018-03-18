@@ -4,14 +4,14 @@
 \alias{identity_callback}
 \title{A callback that does not do any transformation.}
 \usage{
-identity_callback(expr, env, param)
+identity_callback(expr, env, params)
 }
 \arguments{
 \item{expr}{The expression to (not) transform.}
 
-\item{param}{The formal parameters of the function.}
+\item{env}{The environment of the function the expression is inside.}
 
-\item{evn}{The environment of the function the expression is inside.}
+\item{params}{The formal parameters of the function.}
 }
 \value{
 \code{expr}

@@ -23,8 +23,16 @@ with_primitive_callback(callbacks, fn)
 
 with_call_callback(callbacks, fn)
 }
+\arguments{
+\item{callbacks}{The list of callbacks}
+
+\item{fn}{A function to install as a callback.}
+}
 \description{
-Default expression-transformation callbacks.
+Callbacks must be functions that take three arguments: The expression
+to rewrite, the environment of the function we are rewriting (i.e. the
+environment it is defined in, not the function call frame), and a list of
+formal parameters of the function we are translating.
 }
 \section{Functions}{
 \itemize{

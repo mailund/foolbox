@@ -5,3 +5,5 @@
 ^appveyor\.yml$
 ^_pkgdown\.yml$
 ^docs$
+^.imdone$
+^cleanup.R$

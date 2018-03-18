@@ -2,9 +2,9 @@ context("Depth first transformation")
 
 test_that("we can do simple transformations", {
     calls <- c() # I put this here so lintr can see it, but
-                 # it is actually in the *transformed* function's
-                 # scope it will be found and not the transformator's.
-                 # In this test it is the same, though.
+    # it is actually in the *transformed* function's
+    # scope it will be found and not the transformator's.
+    # In this test it is the same, though.
 
     log_calls_transform <- function(call_expr, env, params) {
         call_fn <- eval(call_expr[[1]], envir = env)
