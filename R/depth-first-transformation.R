@@ -64,7 +64,7 @@ depth_first_rewrite_expr <- function(expr, callbacks, env, params) {
 #'     else print("Done")
 #' }
 #'
-#' cb <- callbacks %>% with_call_callback(log_calls_transformation)
+#' cb <- callbacks() %>% with_call_callback(log_calls_transformation)
 #' f <- depth_first_rewrite_function(f, cb)
 #'
 #' @seealso depth_first_rewrite_expr
