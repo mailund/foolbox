@@ -56,3 +56,65 @@ test_that("we call callback on primitive", {
     depth_first_rewrite_expr(`if`, cb, environment(), list())
     expect_true(primitive_called)
 })
+
+test_that("we can call a callback for a specific function", {
+    f <- function(x) x
+    g <- function(y) y + f(y)
+    f_cb <- function(expr, env, param) {
+        call_fn <- eval(expr[[1]], env)
+        stopifnot(identical(call_fn, f))
+        quote(2 + x)
+    }
+
+    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+    g_tr <- depth_first_rewrite_function(g, cb)
+    expect_equal(body(g_tr), quote(y + (2 + x)))
+
+    h <- function(z) 3 * z
+    g <- function(y) h(y + f(y))
+    g_tr <- depth_first_rewrite_function(g, cb)
+    expect_equal(body(g_tr), quote(h(y + (2 + x))))
+
+    h_cb <- function(expr, env, params) {
+        rlang::expr(3 * rlang::UQ(expr[[2]]))
+    }
+    cb <- cb %>% add_call_callback(fn = h, h_cb)
+    g_tr <- depth_first_rewrite_function(g, cb)
+    expect_equal(body(g_tr), quote(3 * (y + (2 + x))))
+})
+
+test_that("we can handle call-callbacks when there are local functions", {
+    f <- function(x) x
+
+    f_cb <- function(expr, env, param) {
+        call_fn <- eval(expr[[1]], env)
+        stopifnot(identical(call_fn, f))
+        quote(2 + x)
+    }
+    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+
+    g <- function(y) y + f(y)
+    g_tr <- depth_first_rewrite_function(g, cb)
+    expect_equal(body(g_tr), quote(y + (2 + x)))
+
+    h <- function(f, y) y + f(y)
+    h_tr <- depth_first_rewrite_function(h, cb)
+    expect_equal(body(h_tr), quote(y + f(y)))
+})
+
+test_that("we warn when we see unknown functions", {
+    f <- function(x) x
+    f_cb <- function(expr, env, param) {
+        call_fn <- eval(expr[[1]], env)
+        stopifnot(identical(call_fn, f))
+        quote(2 + x)
+    }
+    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+
+    g <- function(y) h(y) + f(y)
+    g_tr <- expect_warning(
+        depth_first_rewrite_function(g, cb),
+        "The function h .*"
+    )
+    expect_equal(body(g_tr), quote(h(y) + (2 + x)))
+})

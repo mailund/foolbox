@@ -65,3 +65,49 @@ with_primitive_callback <- make_with_callback("primitive")
 #' @describeIn callbacks Set the call callback function.
 #' @export
 with_call_callback <- make_with_callback("call")
+
+#' Add a function-specific callback to the call callbacks.
+#'
+#' This function adds to the existing call callback, rather than replace it,
+#' by putting a callback in front of it to be tested first. The callback will
+#' be invoked when the traversal sees a call to a specific function.
+#'
+#' @param callbacks The existing callbacks.
+#' @param fn        The function to which calls should be modified.
+#' @param cb        The callback function to invoke.
+#'
+#' @return          The updated callbacks.
+#' @export
+add_call_callback <- function(callbacks, fn, cb) {
+    next_cb <- callbacks$call
+    force(fn)
+    force(cb)
+    closure <- function(call_expr, env, params) {
+        # make sure the call is not to a local variable--if it is,
+        # we can't evaluate it at transformation time. We propagate
+        # to the next callback.
+        call_name <- call_expr[[1]]
+        if (as.character(call_name) %in% names(params)) {
+            return(next_cb(call_expr, env, params))
+        }
+
+        # now try to get the actual function by evaluating it
+        err_fun <- function(e) {
+            warning(paste0(
+                "The function ", as.character(call_name),
+                " could not be evaluated to an actual funcion in ",
+                "this scope."
+            ))
+            NULL
+        }
+        fun <- tryCatch(eval(call_name, env), error = err_fun)
+        if (!is.null(fun) && identical(fun, fn)) {
+            return(cb(call_expr, env, params))
+        } else {
+            # default for closure: try the next in line
+            next_cb(call_expr, env, params)
+        }
+    }
+    callbacks$call <- closure
+    callbacks
+}
