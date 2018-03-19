@@ -7,7 +7,7 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--18-green.svg)](/commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--19-green.svg)](/commits/master)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.0.0.9000-green.svg?style=flat-square)](commits/master)
 
 [![Travis build
@@ -19,10 +19,9 @@ Status](http://img.shields.io/codecov/c/github/mailund/foolbox/master.svg)](http
 [![Coverage
 Status](http://coveralls.io/repos/github/mailund/foolbox/badge.svg?branch=master)](https://coveralls.io/github/mailund/foolbox?branch=master)
 
-The `foolbox` package implements functionality for manipulating R
-functions by rewriting the components they consist of. The package
-provides various ways of rewriting functions using metaprogramming
-callbacks and how to combine such transformations.
+The `foolbox` package implements functionality for static analysis of R
+functions and for manipulating functions by rewriting the components
+they consist of.
 
 ## Installation
 
@@ -127,9 +126,59 @@ transform_cases_cb <- function(expr, env, param) {
 transform_cases <- callbacks() %>% 
     add_call_callback(pmatch::cases, transform_cases_cb) %>% 
     make_transform_function
+```
 
+Using this function has exactly the same effect as using the longer
+verison,
+
+``` r
 is_leaf_foolbox <- transform_cases(is_leaf)
 
 body(is_leaf_tr) == body(is_leaf_foolbox)
 #> [1] TRUE
 ```
+
+*and* has the added benefit that the dispathing to the callback is done
+on function *identity* and not *name*. With this function, we recognize
+`cases` as the one in scope where we define the function–the global
+scope where `cases` is currently `pmatch::cases`
+
+``` r
+leaf_sum <- function(t) {
+    cases(
+        t,
+        L(v) -> v,
+        T(left, right) -> leaf_sum(left) + leaf_sum(right)
+    )
+}
+transform_cases(leaf_sum)
+#> function (t) 
+#> {
+#>     if (!rlang::is_null(..match_env <- pmatch::test_pattern(t, 
+#>         L(v)))) 
+#>         with(..match_env, v)
+#>     else if (!rlang::is_null(..match_env <- pmatch::test_pattern(t, 
+#>         T(left, right)))) 
+#>         with(..match_env, leaf_sum(left) + leaf_sum(right))
+#> }
+```
+
+while in this function
+
+``` r
+f <- function(cases, x, y, z) cases(x, y, z)
+f(ifelse, TRUE, 1, 2)
+#> [1] 1
+```
+
+we recognize that `cases` is a parameter and we do not transform it:
+
+``` r
+transform_cases(f)
+#> function (cases, x, y, z) 
+#> cases(x, y, z)
+```
+
+Since the transformation is done before we know the concrete arguments,
+this of course also means that the transformation isn’t applied even if
+you later on *do* use `cases`.
