@@ -14,6 +14,7 @@ Imports:
     magrittr, 
     rlang (>= 0.2.0)
 Suggests: 
+    covr,
     testthat
 URL: https://github.com/mailund/foolbox
 BugReports: https://github.com/mailund/foolbox/issues
