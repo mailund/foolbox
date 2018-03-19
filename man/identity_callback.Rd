@@ -4,18 +4,21 @@
 \alias{identity_callback}
 \title{A callback that does not do any transformation.}
 \usage{
-identity_callback(expr, env, params)
+identity_callback(expr, ...)
 }
 \arguments{
 \item{expr}{The expression to (not) transform.}
 
-\item{env}{The environment of the function the expression is inside.}
-
-\item{params}{The formal parameters of the function.}
+\item{...}{Additional named parameters.}
 }
 \value{
 \code{expr}
 }
 \description{
-A callback that does not do any transformation.
+Callbacks have one required argument, \code{expr}, but will actually
+be called with more. The additional named parameters are:
+\itemize{
+\item \strong{env} The function environment of the function we are transforming
+\item \strong{params} The formal parameters of the function we are transforming
+}
 }

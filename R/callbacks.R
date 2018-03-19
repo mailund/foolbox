@@ -1,11 +1,19 @@
 #' A callback that does not do any transformation.
 #'
+#' Callbacks have one required argument, `expr`, but will actually
+#' be called with more. The additional named parameters are:
+#' - **env**      The function environment of the function we are transforming
+#' - **params**   The formal parameters of the function we are transforming
+#' - **topdown**  Data passed top-down in the traversal.
+#' - **buttomup** Data collected by depth-first traversals before a callback
+#'                is called.
+#' - **user**     User data.
+#'
 #' @param expr   The expression to (not) transform.
-#' @param env    The environment of the function the expression is inside.
-#' @param params The formal parameters of the function.
+#' @param ...    Additional named parameters.
 #' @return `expr`
 #' @export
-identity_callback <- function(expr, env, params) expr
+identity_callback <- function(expr, ...) expr
 
 #' Default expression-transformation callbacks.
 #'
@@ -82,13 +90,13 @@ add_call_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$call
     force(fn)
     force(cb)
-    closure <- function(call_expr, env, params) {
+    closure <- function(call_expr, env, params, ...) {
         # make sure the call is not to a local variable--if it is,
         # we can't evaluate it at transformation time. We propagate
         # to the next callback.
         call_name <- call_expr[[1]]
         if (as.character(call_name) %in% names(params)) {
-            return(next_cb(call_expr, env, params))
+            return(next_cb(call_expr, env = env, params = params, ...))
         }
 
         # now try to get the actual function by evaluating it
@@ -102,10 +110,10 @@ add_call_callback <- function(callbacks, fn, cb) {
         }
         fun <- tryCatch(eval(call_name, env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr, env, params))
+            return(cb(call_expr, env, params, ...))
         } else {
             # default for closure: try the next in line
-            next_cb(call_expr, env, params)
+            next_cb(call_expr, env, params, ...)
         }
     }
     callbacks$call <- closure
