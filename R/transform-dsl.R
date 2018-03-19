@@ -5,5 +5,5 @@
 #' @export
 make_transform_function <- function(callbacks) {
     force(callbacks)
-    function(fun) depth_first_rewrite_function(fun, callbacks)
+    function(fun, ...) depth_first_rewrite_function(fun, callbacks, ...)
 }

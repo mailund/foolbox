@@ -6,7 +6,7 @@ test_that("we can do simple transformations", {
     # scope it will be found and not the transformator's.
     # In this test it is the same, though.
 
-    log_calls_transform <- function(call_expr, env, params) {
+    log_calls_transform <- function(call_expr, env, ...) {
         call_fn <- eval(call_expr[[1]], envir = env)
         if (rlang::is_primitive(call_fn)) return(call_expr)
         if (!rlang::is_symbol(call_expr[[1]])) return(call_expr)
@@ -29,7 +29,7 @@ test_that("we can do simple transformations", {
 
 test_that("we call callback on pairlist", {
     pairlist_called <- FALSE
-    pairlist_cb <- function(call_expr, env, params) {
+    pairlist_cb <- function(call_expr, ...) {
         pairlist_called <<- TRUE
         call_expr
     }
@@ -48,9 +48,9 @@ test_that("we call callback on primitive", {
     # traversing quoted expressions, so this is the only
     # way I could think of to test this
     primitive_called <- FALSE
-    primitive_cb <- function(call_expr, env, params) {
+    primitive_cb <- function(expr, ...) {
         primitive_called <<- TRUE
-        call_expr
+        expr
     }
     cb <- callbacks() %>% with_primitive_callback(primitive_cb)
     depth_first_rewrite_expr(`if`, cb, environment(), list())
@@ -60,7 +60,7 @@ test_that("we call callback on primitive", {
 test_that("we can call a callback for a specific function", {
     f <- function(x) x
     g <- function(y) y + f(y)
-    f_cb <- function(expr, env, param) {
+    f_cb <- function(expr, env, ...) {
         call_fn <- eval(expr[[1]], env)
         stopifnot(identical(call_fn, f))
         quote(2 + x)
@@ -75,7 +75,7 @@ test_that("we can call a callback for a specific function", {
     g_tr <- depth_first_rewrite_function(g, cb)
     expect_equal(body(g_tr), quote(h(y + (2 + x))))
 
-    h_cb <- function(expr, env, params) {
+    h_cb <- function(expr, ...) {
         rlang::expr(3 * rlang::UQ(expr[[2]]))
     }
     cb <- cb %>% add_call_callback(fn = h, h_cb)
@@ -86,7 +86,7 @@ test_that("we can call a callback for a specific function", {
 test_that("we can handle call-callbacks when there are local functions", {
     f <- function(x) x
 
-    f_cb <- function(expr, env, param) {
+    f_cb <- function(expr, env, ...) {
         call_fn <- eval(expr[[1]], env)
         stopifnot(identical(call_fn, f))
         quote(2 + x)
@@ -104,7 +104,7 @@ test_that("we can handle call-callbacks when there are local functions", {
 
 test_that("we warn when we see unknown functions", {
     f <- function(x) x
-    f_cb <- function(expr, env, param) {
+    f_cb <- function(expr, env, ...) {
         call_fn <- eval(expr[[1]], env)
         stopifnot(identical(call_fn, f))
         quote(2 + x)
@@ -117,4 +117,17 @@ test_that("we warn when we see unknown functions", {
         "The function h .*"
     )
     expect_equal(body(g_tr), quote(h(y) + (2 + x)))
+})
+
+test_that("we can pass user-data along in traversals", {
+    f <- function(x) x
+
+    f_cb <- function(expr, env, n, ...) {
+        rlang::expr(!!n + x)
+    }
+    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+
+    g <- function(y) y + f(y)
+    g_tr <- depth_first_rewrite_function(g, cb, n = 2)
+    expect_equal(body(g_tr), quote(y + (2 + x)))
 })

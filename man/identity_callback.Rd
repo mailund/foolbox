@@ -18,7 +18,11 @@ identity_callback(expr, ...)
 Callbacks have one required argument, \code{expr}, but will actually
 be called with more. The additional named parameters are:
 \itemize{
-\item \strong{env} The function environment of the function we are transforming
-\item \strong{params} The formal parameters of the function we are transforming
+\item \strong{env}      The function environment of the function we are transforming
+\item \strong{params}   The formal parameters of the function we are transforming
+\item \strong{topdown}  Data passed top-down in the traversal.
+\item \strong{buttomup} Data collected by depth-first traversals before a callback
+is called.
+plus whatever the user provide to \code{\link[=depth_first_rewrite_function]{depth_first_rewrite_function()}}.
 }
 }

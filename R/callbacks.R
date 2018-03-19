@@ -7,7 +7,7 @@
 #' - **topdown**  Data passed top-down in the traversal.
 #' - **buttomup** Data collected by depth-first traversals before a callback
 #'                is called.
-#' - **user**     User data.
+#' plus whatever the user provide to [depth_first_rewrite_function()].
 #'
 #' @param expr   The expression to (not) transform.
 #' @param ...    Additional named parameters.
