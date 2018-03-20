@@ -131,3 +131,70 @@ test_that("we can pass user-data along in traversals", {
     g_tr <- depth_first_rewrite_function(g, cb, n = 2)
     expect_equal(body(g_tr), quote(y + (2 + x)))
 })
+
+# FIXME: this should be part of an analysis traversal not a rewrite
+# traversal, but I would need to handle Issue #12 before I can implement
+# that test.
+test_that("we can collect top-down information down a traversal", {
+    collect_bound_variables <- function(expr, topdown, ...) {
+        if (expr[[1]] == "<-" && rlang::is_symbol(expr[[2]])) {
+            # FIXME: This doesn't actually work because the local variable
+            # is not set in a top-level nesting level but a sibling level...
+            topdown$bound_vars <- c(as.character(expr[[2]]), topdown$bound_vars)
+        } else if (expr[[1]] == "function") {
+            topdown$bound_vars <- c(names(expr[[2]]), topdown$bound_vars)
+        }
+        topdown
+    }
+    unbound <- c() # FIXME: don't use this in a static analysis traversal.
+    collect_unbound_variables <- function(expr, topdown, ...) {
+        var <- as.character(expr)
+        if (!(var %in% topdown$bound_vars)) {
+              unbound <<- c(var, unbound)
+          }
+        expr # FIXME: not necessary in after implementing issue #12.
+    }
+
+    cb <- callbacks() %>%
+        with_symbol_callback(collect_unbound_variables) %>%
+        with_topdown_callback(collect_bound_variables)
+
+    traverse <- function(fun)
+        depth_first_rewrite_function(
+            fun, cb,
+            topdown = list(bound_vars = names(formals(fun)))
+        )
+
+    f <- function(x, y) x + y
+    traverse(f)
+    expect_equal(unbound, c())
+
+    unbound <- c()
+    f <- function(x) x + y
+    traverse(f)
+    expect_equal(unbound, c("y"))
+
+    unbound <- c()
+    f <- function() x + y
+    traverse(f)
+    expect_equal(unbound, c("y", "x"))
+
+    unbound <- c()
+    f <- function() function(x) x + y
+    traverse(f)
+    expect_equal(unbound, c("y"))
+
+    unbound <- c()
+    f <- function() function(x) function(y) x + y
+    traverse(f)
+    expect_equal(unbound, c())
+
+    unbound <- c()
+    f <- function(x) {
+        y <- 2 * x
+        x + y
+    }
+    traverse(f)
+    # FIXME: I want this to be c() but requires sibling info
+    expect_equal(unbound, c("y"))
+})

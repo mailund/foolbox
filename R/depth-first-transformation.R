@@ -4,6 +4,7 @@
 #'
 #' @param expr      An R expression
 #' @param callbacks List of callbacks to apply.
+#' @param topdown   A list of additional information gathered in the traversal.
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
 #' @return A modified expression.
@@ -12,28 +13,36 @@
 #' @seealso identity_callback
 #' @seealso depth_first_rewrite_function
 #' @export
-depth_first_rewrite_expr <- function(expr, callbacks, ...) {
+depth_first_rewrite_expr <- function(expr, callbacks, topdown, ...) {
     if (rlang::is_atomic(expr)) {
-        return(callbacks$atomic(expr, ...))
+        return(callbacks$atomic(expr, topdown = topdown, ...))
     }
     if (rlang::is_pairlist(expr)) {
-        return(callbacks$pairlist(expr, ...))
+        return(callbacks$pairlist(expr, topdown = topdown, ...))
     }
     if (rlang::is_symbol(expr)) {
-        return(callbacks$symbol(expr, ...))
+        return(callbacks$symbol(expr, topdown = topdown, ...))
     }
     if (rlang::is_primitive(expr)) {
-        return(callbacks$primitive(expr, ...))
+        return(callbacks$primitive(expr, topdown = topdown, ...))
     }
 
     stopifnot(rlang::is_lang(expr))
+    # collect topdown info.
+    topdown <- callbacks$topdown(expr, topdown = topdown, ...)
+    # FIXME: have a way to terminate the traversal at this level.
+
+    # handle depth first
     call_args <- rlang::call_args(expr)
     for (i in seq_along(call_args)) {
         expr[[i + 1]] <- depth_first_rewrite_expr(
-            call_args[[i]], callbacks, ...
+            call_args[[i]], callbacks,
+            topdown = topdown, ...
         )
     }
-    callbacks$call(expr, ...)
+
+    # then handle the actual call
+    callbacks$call(expr, topdown = topdown, ...)
 }
 
 #' Transform the body of function.
@@ -69,10 +78,11 @@ depth_first_rewrite_expr <- function(expr, callbacks, ...) {
 #' @seealso depth_first_rewrite_expr
 #' @seealso callbacks
 #' @export
-depth_first_rewrite_function <- function(fn, callbacks, ...) {
+depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
     body(fn) <- depth_first_rewrite_expr(
         body(fn), callbacks,
         env = environment(fn), params = formals(fn),
+        topdown = topdown,
         ...
     )
     fn

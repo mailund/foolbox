@@ -4,12 +4,14 @@
 \alias{depth_first_rewrite_expr}
 \title{Transform an expression.}
 \usage{
-depth_first_rewrite_expr(expr, callbacks, ...)
+depth_first_rewrite_expr(expr, callbacks, topdown, ...)
 }
 \arguments{
 \item{expr}{An R expression}
 
 \item{callbacks}{List of callbacks to apply.}
+
+\item{topdown}{A list of additional information gathered in the traversal.}
 
 \item{...}{Additional data that will be passed along to callbacks.}
 }

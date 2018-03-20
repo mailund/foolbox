@@ -3,7 +3,7 @@ context("API/DSL for specifying transformation functions")
 test_that("we can call a callback for a specific function", {
     f <- function(x) 2 + x
     tr <- callbacks() %>%
-        add_call_callback(f, function(expr, env, param) {
+        add_call_callback(f, function(expr, ...) {
             quote(2 + x)
         }) %>%
         make_transform_function()
@@ -18,10 +18,10 @@ test_that("we can call a callback for a specific function", {
     expect_equal(body(tr(g)), quote(h(y + (2 + x))))
 
     tr <- callbacks() %>%
-        add_call_callback(f, function(expr, env, param) {
+        add_call_callback(f, function(expr, ...) {
             quote(2 + x)
         }) %>%
-        add_call_callback(h, function(expr, env, params) {
+        add_call_callback(h, function(expr, ...) {
             rlang::expr(3 * rlang::UQ(expr[[2]]))
         }) %>%
         make_transform_function()
@@ -31,7 +31,7 @@ test_that("we can call a callback for a specific function", {
 test_that("we can handle call-callbacks when there are local functions", {
     f <- function(x) x
     tr <- callbacks() %>%
-        add_call_callback(f, function(expr, env, param) {
+        add_call_callback(f, function(expr, ...) {
             quote(2 + x)
         }) %>%
         make_transform_function()

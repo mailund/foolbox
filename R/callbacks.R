@@ -15,6 +15,17 @@
 #' @export
 identity_callback <- function(expr, ...) expr
 
+#' Top-down analysis callback.
+#'
+#' @param expr    The expression before we modify it.
+#' @param topdown Information from further up the expression tree.
+#' @para ...      Additional data that might be passed along
+#' @return Updated `topdown` information.
+#' @export
+nop_topdown_callback <- function(expr, topdown, ...) topdown
+
+# FIXME: better documentation for the callbacks.
+
 #' Default expression-transformation callbacks.
 #'
 #' Callbacks must be functions that take three arguments: The expression
@@ -30,6 +41,7 @@ identity_callback <- function(expr, ...) expr
 #' @seealso with_symbol_callback
 #' @seealso with_primitive_callback
 #' @seealso with_call_callback
+#' @seealso with_topdown_callback
 #' @export
 # I'm using a function here, although it would be more natural to just use the
 # value, because somehow the function identity gets messed up in covr
@@ -38,7 +50,8 @@ callbacks <- function() list(
         pairlist = identity_callback,
         symbol = identity_callback,
         primitive = identity_callback,
-        call = identity_callback
+        call = identity_callback,
+        topdown = nop_topdown_callback
     )
 
 #' Create a function for setting callbacks.
@@ -73,6 +86,9 @@ with_primitive_callback <- make_with_callback("primitive")
 #' @describeIn callbacks Set the call callback function.
 #' @export
 with_call_callback <- make_with_callback("call")
+#' @describeIn cllbacks Set the topdown information passing callback function.
+#' @export
+with_topdown_callback <- make_with_callback("topdown")
 
 #' Add a function-specific callback to the call callbacks.
 #'
@@ -119,3 +135,5 @@ add_call_callback <- function(callbacks, fn, cb) {
     callbacks$call <- closure
     callbacks
 }
+
+# FIXME: Add an `add_topdown_callback`?

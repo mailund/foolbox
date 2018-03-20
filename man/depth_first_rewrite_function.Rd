@@ -4,7 +4,7 @@
 \alias{depth_first_rewrite_function}
 \title{Transform the body of function.}
 \usage{
-depth_first_rewrite_function(fn, callbacks, ...)
+depth_first_rewrite_function(fn, callbacks, topdown = list(), ...)
 }
 \arguments{
 \item{fn}{A (closure) function.}
