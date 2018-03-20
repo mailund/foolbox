@@ -30,7 +30,7 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown, ...) {
     stopifnot(rlang::is_lang(expr))
     # collect topdown info.
     topdown <- callbacks$topdown(expr, topdown = topdown, ...)
-    # FIXME: have a way to terminate the traversal at this level.
+    # FIXME: have a way to terminate the traversal at this level. id:6 gh:20 ic:gh
 
     # handle depth first
     call_args <- rlang::call_args(expr)

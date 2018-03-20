@@ -132,13 +132,13 @@ test_that("we can pass user-data along in traversals", {
     expect_equal(body(g_tr), quote(y + (2 + x)))
 })
 
-# FIXME: this should be part of an analysis traversal not a rewrite
+# FIXME: this should be part of an analysis traversal not a rewrite id:4 gh:18 ic:gh
 # traversal, but I would need to handle Issue #12 before I can implement
 # that test.
 test_that("we can collect top-down information down a traversal", {
     collect_bound_variables <- function(expr, topdown, ...) {
         if (expr[[1]] == "<-" && rlang::is_symbol(expr[[2]])) {
-            # FIXME: This doesn't actually work because the local variable
+            # FIXME: This doesn't actually work because the local variable id:2 gh:16 ic:gh
             # is not set in a top-level nesting level but a sibling level...
             topdown$bound_vars <- c(as.character(expr[[2]]), topdown$bound_vars)
         } else if (expr[[1]] == "function") {
@@ -146,13 +146,13 @@ test_that("we can collect top-down information down a traversal", {
         }
         topdown
     }
-    unbound <- c() # FIXME: don't use this in a static analysis traversal.
+    unbound <- c() # FIXME: don't use this in a static analysis traversal. id:7 gh:21 ic:gh
     collect_unbound_variables <- function(expr, topdown, ...) {
         var <- as.character(expr)
         if (!(var %in% topdown$bound_vars)) {
               unbound <<- c(var, unbound)
           }
-        expr # FIXME: not necessary in after implementing issue #12.
+        expr # FIXME: not necessary in after implementing issue #12. id:5 gh:19 ic:gh
     }
 
     cb <- callbacks() %>%
@@ -195,6 +195,6 @@ test_that("we can collect top-down information down a traversal", {
         x + y
     }
     traverse(f)
-    # FIXME: I want this to be c() but requires sibling info
+    # FIXME: I want this to be c() but requires sibling info id:3 gh:17 ic:gh
     expect_equal(unbound, c("y"))
 })
