@@ -1,11 +1,30 @@
 #' A callback that does not do any transformation.
 #'
+#' Callbacks have one required argument, `expr`, but will actually
+#' be called with more. The additional named parameters are:
+#' - **env**      The function environment of the function we are transforming
+#' - **params**   The formal parameters of the function we are transforming
+#' - **topdown**  Data passed top-down in the traversal.
+#' - **buttomup** Data collected by depth-first traversals before a callback
+#'                is called.
+#' plus whatever the user provide to [depth_first_rewrite_function()].
+#'
 #' @param expr   The expression to (not) transform.
-#' @param env    The environment of the function the expression is inside.
-#' @param params The formal parameters of the function.
+#' @param ...    Additional named parameters.
 #' @return `expr`
 #' @export
-identity_callback <- function(expr, env, params) expr
+identity_callback <- function(expr, ...) expr
+
+#' Top-down analysis callback.
+#'
+#' @param expr    The expression before we modify it.
+#' @param topdown Information from further up the expression tree.
+#' @param ...      Additional data that might be passed along
+#' @return Updated `topdown` information.
+#' @export
+nop_topdown_callback <- function(expr, topdown, ...) topdown
+
+# FIXME: better documentation for the callbacks.
 
 #' Default expression-transformation callbacks.
 #'
@@ -22,6 +41,7 @@ identity_callback <- function(expr, env, params) expr
 #' @seealso with_symbol_callback
 #' @seealso with_primitive_callback
 #' @seealso with_call_callback
+#' @seealso with_topdown_callback
 #' @export
 # I'm using a function here, although it would be more natural to just use the
 # value, because somehow the function identity gets messed up in covr
@@ -30,7 +50,8 @@ callbacks <- function() list(
         pairlist = identity_callback,
         symbol = identity_callback,
         primitive = identity_callback,
-        call = identity_callback
+        call = identity_callback,
+        topdown = nop_topdown_callback
     )
 
 #' Create a function for setting callbacks.
@@ -65,6 +86,9 @@ with_primitive_callback <- make_with_callback("primitive")
 #' @describeIn callbacks Set the call callback function.
 #' @export
 with_call_callback <- make_with_callback("call")
+#' @describeIn callbacks Set the topdown information passing callback function.
+#' @export
+with_topdown_callback <- make_with_callback("topdown")
 
 #' Add a function-specific callback to the call callbacks.
 #'
@@ -82,13 +106,13 @@ add_call_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$call
     force(fn)
     force(cb)
-    closure <- function(call_expr, env, params) {
+    closure <- function(call_expr, env, params, ...) {
         # make sure the call is not to a local variable--if it is,
         # we can't evaluate it at transformation time. We propagate
         # to the next callback.
         call_name <- call_expr[[1]]
         if (as.character(call_name) %in% names(params)) {
-            return(next_cb(call_expr, env, params))
+            return(next_cb(call_expr, env = env, params = params, ...))
         }
 
         # now try to get the actual function by evaluating it
@@ -102,12 +126,14 @@ add_call_callback <- function(callbacks, fn, cb) {
         }
         fun <- tryCatch(eval(call_name, env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr, env, params))
+            return(cb(call_expr, env, params, ...))
         } else {
             # default for closure: try the next in line
-            next_cb(call_expr, env, params)
+            next_cb(call_expr, env, params, ...)
         }
     }
     callbacks$call <- closure
     callbacks
 }
+
+# FIXME: Add an `add_topdown_callback`?

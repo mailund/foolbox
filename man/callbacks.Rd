@@ -7,6 +7,7 @@
 \alias{with_symbol_callback}
 \alias{with_primitive_callback}
 \alias{with_call_callback}
+\alias{with_topdown_callback}
 \title{Default expression-transformation callbacks.}
 \usage{
 callbacks()
@@ -20,6 +21,8 @@ with_symbol_callback(callbacks, fn)
 with_primitive_callback(callbacks, fn)
 
 with_call_callback(callbacks, fn)
+
+with_topdown_callback(callbacks, fn)
 }
 \arguments{
 \item{callbacks}{The list of callbacks}
@@ -43,6 +46,8 @@ formal parameters of the function we are translating.
 \item \code{with_primitive_callback}: Set the primitive callback function.
 
 \item \code{with_call_callback}: Set the call callback function.
+
+\item \code{with_topdown_callback}: Set the topdown information passing callback function.
 }}
 
 \seealso{
@@ -55,4 +60,6 @@ with_symbol_callback
 with_primitive_callback
 
 with_call_callback
+
+with_topdown_callback
 }

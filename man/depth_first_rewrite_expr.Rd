@@ -4,18 +4,16 @@
 \alias{depth_first_rewrite_expr}
 \title{Transform an expression.}
 \usage{
-depth_first_rewrite_expr(expr, callbacks, env, params)
+depth_first_rewrite_expr(expr, callbacks, topdown, ...)
 }
 \arguments{
 \item{expr}{An R expression}
 
 \item{callbacks}{List of callbacks to apply.}
 
-\item{env}{The environment of the function
-the expression will be evaluated in.}
+\item{topdown}{A list of additional information gathered in the traversal.}
 
-\item{params}{The formal parameters of the function
-the expression is evaluated in.}
+\item{...}{Additional data that will be passed along to callbacks.}
 }
 \value{
 A modified expression.
@@ -25,6 +23,8 @@ Traverses the expression \code{expr} depth-first and transform it using \code{ca
 }
 \seealso{
 callbacks
+
+identity_callback
 
 depth_first_rewrite_function
 }

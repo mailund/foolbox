@@ -4,12 +4,17 @@
 \alias{depth_first_rewrite_function}
 \title{Transform the body of function.}
 \usage{
-depth_first_rewrite_function(fn, callbacks)
+depth_first_rewrite_function(fn, callbacks, topdown = list(), ...)
 }
 \arguments{
 \item{fn}{A (closure) function.}
 
 \item{callbacks}{List of callbacks to apply.}
+
+\item{topdown}{A list of additional information that will be considerd
+top-down in the traversal.}
+
+\item{...}{Additional data that will be passed along to callbacks.}
 }
 \value{
 A new function similar to \code{fn} but with a transformed body.
@@ -18,7 +23,7 @@ A new function similar to \code{fn} but with a transformed body.
 Traverses the body of \code{fn} and rewrite it based on \code{callbacks}.
 }
 \examples{
-log_calls_transformation <- function(call_expr, env, param) {
+log_calls_transformation <- function(call_expr, env, param, ...) {
     call_fn <- eval(call_expr[[1]], envir = env)
     if (rlang::is_primitive(call_fn)) return(call_expr)
     if (!rlang::is_symbol(call_expr[[1]])) return(call_expr)
