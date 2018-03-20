@@ -10,6 +10,8 @@ nop_topdown_callback(expr, topdown, ...)
 \item{expr}{The expression before we modify it.}
 
 \item{topdown}{Information from further up the expression tree.}
+
+\item{...}{Additional data that might be passed along}
 }
 \value{
 Updated \code{topdown} information.

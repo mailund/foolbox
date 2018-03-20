@@ -19,7 +19,7 @@ identity_callback <- function(expr, ...) expr
 #'
 #' @param expr    The expression before we modify it.
 #' @param topdown Information from further up the expression tree.
-#' @para ...      Additional data that might be passed along
+#' @param ...      Additional data that might be passed along
 #' @return Updated `topdown` information.
 #' @export
 nop_topdown_callback <- function(expr, topdown, ...) topdown
@@ -86,7 +86,7 @@ with_primitive_callback <- make_with_callback("primitive")
 #' @describeIn callbacks Set the call callback function.
 #' @export
 with_call_callback <- make_with_callback("call")
-#' @describeIn cllbacks Set the topdown information passing callback function.
+#' @describeIn callbacks Set the topdown information passing callback function.
 #' @export
 with_topdown_callback <- make_with_callback("topdown")
 

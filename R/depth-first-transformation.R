@@ -51,6 +51,8 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown, ...) {
 #'
 #' @param fn        A (closure) function.
 #' @param callbacks List of callbacks to apply.
+#' @param topdown   A list of additional information that will be considerd
+#'                  top-down in the traversal.
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
 #' @return A new function similar to `fn` but with a transformed body.
