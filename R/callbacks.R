@@ -5,15 +5,64 @@
 #' - **env**      The function environment of the function we are transforming
 #' - **params**   The formal parameters of the function we are transforming
 #' - **topdown**  Data passed top-down in the traversal.
-#' - **buttomup** Data collected by depth-first traversals before a callback
+#' - **bottomup** Data collected by depth-first traversals before a callback
 #'                is called.
-#' plus whatever the user provide to [depth_first_rewrite_function()].
+#' plus whatever the user provide to [depth_first_rewrite_function()]
+#' or [depth_first_analyse_function()].
+#'
+#' In bottom up analyses, the [merge_bottomup()] function can be used to
+#' collectd the results of several recursive calls.
 #'
 #' @param expr   The expression to (not) transform.
 #' @param ...    Additional named parameters.
 #' @return `expr`
+#'
+#' @seealso merge_bottomup
+#'
+#' @describeIn identity_rewrite_callback Identity for expression rewriting
 #' @export
-identity_callback <- function(expr, ...) expr
+identity_rewrite_callback <- function(expr, ...) expr
+
+#' Merge the results of several bottomup results.
+#'
+#' The `bottomup` parameter in callbacks will be calculated for all parameters
+#' of `call`` expressions. The parameter to the callbacks are thus a list of
+#' lists. This function merges these lists into one that contain a list for
+#' each named component in the `buttomup` parameter. If results are not
+#' named in the `bottomup` list, they are discarted.
+#'
+#' The vectors from `bottomup` are concatenated, so one level of lists
+#' will be flattened. Use more lists, like `list(list(2), list(3))`
+#' if you want to prevent this.
+#'
+#' @param bottomup List of bottom up analysis results.
+#'
+#' @seealso depth_first_analyse_function
+#' @seeals depth_first_analyse_expr
+#'
+#' @export
+merge_bottomup <- function(bottomup) {
+    components <- lapply(bottomup, names) %>% unlist() %>% unique()
+    result <- vector("list", length = length(components))
+    names(result) <- components
+
+    # processing in reverse order to keep the order of results
+    # even though we are prepending to lists.
+    for (sublist in rev(bottomup)) {
+        for (name in names(sublist)) {
+            result[[name]] <- c(sublist[[name]], result[[name]])
+        }
+    }
+
+    result
+}
+
+
+#' @describeIn identity_rewrite_callback Identity for expression rewriting
+#' @export
+identity_analysis_callback <-
+    function(expr, bottomup, ...) merge_bottomup(bottomup)
+
 
 #' Top-down analysis callback.
 #'
@@ -46,14 +95,28 @@ nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 #' @seealso with_call_callback
 #' @seealso with_topdown_callback
 #' @export
+
 # I'm using a function here, although it would be more natural to just use the
 # value, because somehow the function identity gets messed up in covr
-callbacks <- function() list(
-        atomic = identity_callback,
-        pairlist = identity_callback,
-        symbol = identity_callback,
-        primitive = identity_callback,
-        call = identity_callback,
+
+#' @describeIn rewrite_callbacks Default callbacks for rewriting expressions
+rewrite_callbacks <- function() list(
+        atomic = identity_rewrite_callback,
+        pairlist = identity_rewrite_callback,
+        symbol = identity_rewrite_callback,
+        primitive = identity_rewrite_callback,
+        call = identity_rewrite_callback,
+        topdown = nop_topdown_callback
+    )
+
+#' @describeIn rewrite_callbacks Default callbacks for analysing expressions
+#' @export
+analysis_callbacks <- function() list(
+        atomic = identity_analysis_callback,
+        pairlist = identity_analysis_callback,
+        symbol = identity_analysis_callback,
+        primitive = identity_analysis_callback,
+        call = identity_analysis_callback,
         topdown = nop_topdown_callback
     )
 
@@ -74,22 +137,22 @@ make_with_callback <- function(cb_name) {
 }
 # nocov end
 
-#' @describeIn callbacks Set the atomic callback function.
+#' @describeIn rewrite_callbacks Set the atomic callback function.
 #' @export
 with_atomic_callback <- make_with_callback("atomic")
-#' @describeIn callbacks Set the pairlist callback function.
+#' @describeIn rewrite_callbacks Set the pairlist callback function.
 #' @export
 with_pairlist_callback <- make_with_callback("pairlist")
-#' @describeIn callbacks Set the symbol callback function.
+#' @describeIn rewrite_callbacks Set the symbol callback function.
 #' @export
 with_symbol_callback <- make_with_callback("symbol")
-#' @describeIn callbacks Set the primitive callback function.
+#' @describeIn rewrite_callbacks Set the primitive callback function.
 #' @export
 with_primitive_callback <- make_with_callback("primitive")
-#' @describeIn callbacks Set the call callback function.
+#' @describeIn rewrite_callbacks Set the call callback function.
 #' @export
 with_call_callback <- make_with_callback("call")
-#' @describeIn callbacks Set the topdown information passing callback function.
+#' @describeIn rewrite_callbacks Set the topdown information passing callback function.
 #' @export
 with_topdown_callback <- make_with_callback("topdown")
 

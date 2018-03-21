@@ -16,7 +16,7 @@ test_that("we can do simple transformations", {
             rlang::UQ(call_expr)
         })
     }
-    cb <- callbacks() %>% with_call_callback(log_calls_transform)
+    cb <- rewrite_callbacks() %>% with_call_callback(log_calls_transform)
 
     f <- function(x) {
         if (x > 0) f(x - 1)
@@ -37,7 +37,7 @@ test_that("we call callback on pairlist", {
     expect_equal(f()(2, 2), 4)
 
     expect_false(pairlist_called)
-    cb <- callbacks() %>% with_pairlist_callback(pairlist_cb)
+    cb <- rewrite_callbacks() %>% with_pairlist_callback(pairlist_cb)
     g <- depth_first_rewrite_function(f, cb)
     expect_true(pairlist_called)
     expect_equal(g()(2, 2), 4)
@@ -52,8 +52,17 @@ test_that("we call callback on primitive", {
         primitive_called <<- TRUE
         expr
     }
-    cb <- callbacks() %>% with_primitive_callback(primitive_cb)
+    cb <- rewrite_callbacks() %>% with_primitive_callback(primitive_cb)
     depth_first_rewrite_expr(`if`, cb, environment(), list())
+    expect_true(primitive_called)
+
+    primitive_called <- FALSE
+    primitive_cb <- function(expr, ...) {
+        primitive_called <<- TRUE
+        expr
+    }
+    cb <- analysis_callbacks() %>% with_primitive_callback(primitive_cb)
+    depth_first_analyse_expr(`if`, cb, environment(), list())
     expect_true(primitive_called)
 })
 
@@ -66,7 +75,7 @@ test_that("we can call a callback for a specific function", {
         quote(2 + x)
     }
 
-    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+    cb <- rewrite_callbacks() %>% add_call_callback(fn = f, cb = f_cb)
     g_tr <- depth_first_rewrite_function(g, cb)
     expect_equal(body(g_tr), quote(y + (2 + x)))
 
@@ -91,7 +100,7 @@ test_that("we can handle call-callbacks when there are local functions", {
         stopifnot(identical(call_fn, f))
         quote(2 + x)
     }
-    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+    cb <- rewrite_callbacks() %>% add_call_callback(fn = f, cb = f_cb)
 
     g <- function(y) y + f(y)
     g_tr <- depth_first_rewrite_function(g, cb)
@@ -109,7 +118,7 @@ test_that("we warn when we see unknown functions", {
         stopifnot(identical(call_fn, f))
         quote(2 + x)
     }
-    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+    cb <- rewrite_callbacks() %>% add_call_callback(fn = f, cb = f_cb)
 
     g <- function(y) h(y) + f(y)
     g_tr <- expect_warning(
@@ -125,7 +134,7 @@ test_that("we can pass user-data along in traversals", {
     f_cb <- function(expr, env, n, ...) {
         rlang::expr(!!n + x)
     }
-    cb <- callbacks() %>% add_call_callback(fn = f, cb = f_cb)
+    cb <- rewrite_callbacks() %>% add_call_callback(fn = f, cb = f_cb)
 
     g <- function(y) y + f(y)
     g_tr <- depth_first_rewrite_function(g, cb, n = 2)
@@ -142,58 +151,57 @@ test_that("we can collect top-down information down a traversal", {
         }
         topdown
     }
-    unbound <- c() # FIXME: don't use this in a static analysis traversal.
+    collect_local_variables <- function(expr, topdown, bottomup, ...) {
+        result <- unlist(bottomup)
+        if (expr[[1]] == "<-" && rlang::is_symbol(expr[[2]])) {
+            local_var <- as.character(expr[[2]])
+            result <- c(local_var, result)
+        }
+        result
+    }
+
     collect_unbound_variables <- function(expr, topdown, ...) {
         var <- as.character(expr)
         if (!(var %in% topdown$bound_vars)) {
-            unbound <<- c(var, unbound)
+            list(unbound = list(var))
+        } else {
+            list()
         }
-        expr # FIXME: not necessary in after implementing issue #12.
     }
 
-    cb <- callbacks() %>%
+    cb <- analysis_callbacks() %>%
         with_symbol_callback(collect_unbound_variables) %>%
         with_topdown_callback(collect_bound_variables)
 
-    traverse <- function(fun)
-        depth_first_rewrite_function(
+    traverse <- function(fun) {
+        depth_first_analyse_function(
             fun, cb,
             topdown = list(bound_vars = names(formals(fun)))
         )
-
+    }
     f <- function(x, y) x + y
-    traverse(f)
-    expect_equal(unbound, c())
+    expect_equal(traverse(f), list())
 
-    unbound <- c()
     f <- function(x) x + y
-    traverse(f)
-    expect_equal(unbound, c("y"))
+    expect_equal(traverse(f), list(unbound = list("y")))
 
-    unbound <- c()
     f <- function() x + y
-    traverse(f)
-    expect_equal(unbound, c("y", "x"))
+    expect_equal(traverse(f), list(unbound = list("x", "y")))
 
-    unbound <- c()
     f <- function() function(x) x + y
-    traverse(f)
-    expect_equal(unbound, c("y"))
+    expect_equal(traverse(f), list(unbound = list("y")))
 
-    unbound <- c()
     f <- function() function(x) function(y) x + y
-    traverse(f)
-    expect_equal(unbound, c())
+    expect_equal(traverse(f), list())
 
-    unbound <- c()
     f <- function(x) {
         y <- 2 * x
         x + y
     }
-    traverse(f)
     # While y *is* bound, it is as a local variable. We cannot guarantee
-    # to catch those, so I haven't tried in this test.
-    expect_equal(unbound, c("y"))
+    # to catch those, so I haven't tried in this test. The variable
+    # appears twice because I do not remove duplicates in the test.
+    expect_equal(traverse(f), list(unbound = list("y", "y")))
 })
 
 test_that("we have an escape-hatch to skip past sub-trees", {
@@ -207,7 +215,7 @@ test_that("we have an escape-hatch to skip past sub-trees", {
         topdown
     }
 
-    cb <- callbacks() %>%
+    cb <- rewrite_callbacks() %>%
         with_symbol_callback(collect_symbols) %>%
         with_topdown_callback(skip_function_def_bodies)
     collect <- make_transform_function(cb)

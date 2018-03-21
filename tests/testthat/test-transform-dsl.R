@@ -2,7 +2,7 @@ context("API/DSL for specifying transformation functions")
 
 test_that("we can call a callback for a specific function", {
     f <- function(x) 2 + x
-    tr <- callbacks() %>%
+    tr <- rewrite_callbacks() %>%
         add_call_callback(f, function(expr, ...) {
             quote(2 + x)
         }) %>%
@@ -17,7 +17,7 @@ test_that("we can call a callback for a specific function", {
     g <- function(y) h(y + f(y))
     expect_equal(body(tr(g)), quote(h(y + (2 + x))))
 
-    tr <- callbacks() %>%
+    tr <- rewrite_callbacks() %>%
         add_call_callback(f, function(expr, ...) {
             quote(2 + x)
         }) %>%
@@ -30,7 +30,7 @@ test_that("we can call a callback for a specific function", {
 
 test_that("we can handle call-callbacks when there are local functions", {
     f <- function(x) x
-    tr <- callbacks() %>%
+    tr <- rewrite_callbacks() %>%
         add_call_callback(f, function(expr, ...) {
             quote(2 + x)
         }) %>%
