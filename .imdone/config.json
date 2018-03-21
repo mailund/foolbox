@@ -21,7 +21,12 @@
       "MARK"
     ]
   },
-  "lists": [],
+  "lists": [
+    {
+      "name": "FIXME",
+      "hidden": false
+    }
+  ],
   "marked": {
     "gfm": true,
     "tables": true,

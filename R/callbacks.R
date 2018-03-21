@@ -76,7 +76,7 @@ identity_analysis_callback <-
 #' @export
 nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 
-# FIXME: better documentation for the callbacks.
+# FIXME: better documentation for the callbacks. id:0 gh:14 ic:gh
 
 #' Default expression-transformation callbacks.
 #'
@@ -202,4 +202,4 @@ add_call_callback <- function(callbacks, fn, cb) {
     callbacks
 }
 
-# FIXME: Add an `add_topdown_callback`?
+# FIXME: Add an `add_topdown_callback`? id:1 gh:15 ic:gh
