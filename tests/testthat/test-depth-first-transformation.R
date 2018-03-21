@@ -191,7 +191,8 @@ test_that("we can collect top-down information down a traversal", {
         x + y
     }
     traverse(f)
-    # FIXME: I want this to be c() but requires sibling info
+    # While y *is* bound, it is as a local variable. We cannot guarantee
+    # to catch those, so I haven't tried in this test.
     expect_equal(unbound, c("y"))
 })
 
