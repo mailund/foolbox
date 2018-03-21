@@ -141,9 +141,6 @@ test_that("we can pass user-data along in traversals", {
     expect_equal(body(g_tr), quote(y + (2 + x)))
 })
 
-# FIXME: this should be part of an analysis traversal not a rewrite
-# traversal, but I would need to handle Issue #12 before I can implement
-# that test.
 test_that("we can collect top-down information down a traversal", {
     collect_bound_variables <- function(expr, topdown, ...) {
         if (expr[[1]] == "function") {
