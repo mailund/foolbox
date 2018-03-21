@@ -22,7 +22,7 @@ The result of the last buttom-up traversal.
 Traverses the expression \code{expr} depth-first and analyse it it using \code{callbacks}.
 }
 \seealso{
-callbacks
+analysis_callbacks
 
 identity_analysis_callback
 

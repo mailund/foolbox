@@ -11,7 +11,7 @@
 #'
 #' @return A modified expression.
 #'
-#' @seealso callbacks
+#' @seealso rewrite_callbacks
 #' @seealso identity_rewrite_callback
 #' @seealso depth_first_rewrite_function
 #' @export
@@ -80,7 +80,7 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown,
 #'     else print("Done")
 #' }
 #'
-#' cb <- callbacks() %>% with_call_callback(log_calls_transformation)
+#' cb <- rewrite_callbacks() %>% with_call_callback(log_calls_transformation)
 #' f <- depth_first_rewrite_function(f, cb)
 #'
 #' @seealso depth_first_rewrite_expr
@@ -109,7 +109,7 @@ depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
 #'
 #' @return The result of the last buttom-up traversal.
 #'
-#' @seealso callbacks
+#' @seealso analysis_callbacks
 #' @seealso identity_analysis_callback
 #' @seealso depth_first_analyse_function
 #' @export

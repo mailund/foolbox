@@ -39,7 +39,7 @@ f <- function(x) {
     else print("Done")
 }
 
-cb <- callbacks() \%>\% with_call_callback(log_calls_transformation)
+cb <- rewrite_callbacks() \%>\% with_call_callback(log_calls_transformation)
 f <- depth_first_rewrite_function(f, cb)
 
 }

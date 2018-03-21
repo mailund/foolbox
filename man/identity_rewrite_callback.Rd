@@ -13,6 +13,10 @@ identity_analysis_callback(expr, bottomup, ...)
 \item{expr}{The expression to (not) transform.}
 
 \item{...}{Additional named parameters.}
+
+\item{bottomup}{Information gathered depth-first in analysis callbacks.
+This parameter is only passed to callbacks in analysis
+traversals and not rewrite traversals.}
 }
 \value{
 \code{expr}

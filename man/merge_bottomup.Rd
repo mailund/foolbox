@@ -20,4 +20,6 @@ if you want to prevent this.
 }
 \seealso{
 depth_first_analyse_function
+
+depth_first_analyse_expr
 }

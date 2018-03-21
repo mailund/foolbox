@@ -13,8 +13,11 @@
 #' In bottom up analyses, the [merge_bottomup()] function can be used to
 #' collectd the results of several recursive calls.
 #'
-#' @param expr   The expression to (not) transform.
-#' @param ...    Additional named parameters.
+#' @param expr     The expression to (not) transform.
+#' @param bottomup Information gathered depth-first in analysis callbacks.
+#'                 This parameter is only passed to callbacks in analysis
+#'                 traversals and not rewrite traversals.
+#' @param ...      Additional named parameters.
 #' @return `expr`
 #'
 #' @seealso merge_bottomup
@@ -38,7 +41,7 @@ identity_rewrite_callback <- function(expr, ...) expr
 #' @param bottomup List of bottom up analysis results.
 #'
 #' @seealso depth_first_analyse_function
-#' @seeals depth_first_analyse_expr
+#' @seealso depth_first_analyse_expr
 #'
 #' @export
 merge_bottomup <- function(bottomup) {

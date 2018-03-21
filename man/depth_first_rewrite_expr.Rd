@@ -22,7 +22,7 @@ A modified expression.
 Traverses the expression \code{expr} depth-first and transform it using \code{callbacks}.
 }
 \seealso{
-callbacks
+rewrite_callbacks
 
 identity_rewrite_callback
 
