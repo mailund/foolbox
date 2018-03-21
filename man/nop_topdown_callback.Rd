@@ -4,12 +4,16 @@
 \alias{nop_topdown_callback}
 \title{Top-down analysis callback.}
 \usage{
-nop_topdown_callback(expr, topdown, ...)
+nop_topdown_callback(expr, topdown, skip, ...)
 }
 \arguments{
 \item{expr}{The expression before we modify it.}
 
 \item{topdown}{Information from further up the expression tree.}
+
+\item{skip}{An escape function. If called, the transformation
+or analysis traversal will skip this expression
+and continue at the sibling level.}
 
 \item{...}{Additional data that might be passed along}
 }

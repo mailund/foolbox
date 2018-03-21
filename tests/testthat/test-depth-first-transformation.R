@@ -150,8 +150,8 @@ test_that("we can collect top-down information down a traversal", {
     collect_unbound_variables <- function(expr, topdown, ...) {
         var <- as.character(expr)
         if (!(var %in% topdown$bound_vars)) {
-              unbound <<- c(var, unbound)
-          }
+            unbound <<- c(var, unbound)
+        }
         expr # FIXME: not necessary in after implementing issue #12.
     }
 
@@ -197,4 +197,34 @@ test_that("we can collect top-down information down a traversal", {
     traverse(f)
     # FIXME: I want this to be c() but requires sibling info
     expect_equal(unbound, c("y"))
+})
+
+test_that("we have an escape-hatch to skip past sub-trees", {
+    symbols_seen <- c()
+    collect_symbols <- function(expr, ...) {
+        symbols_seen <<- c(as.character(expr), symbols_seen)
+        expr
+    }
+    skip_function_def_bodies <- function(expr, topdown, skip, ...) {
+        if (expr[[1]] == "function") skip()
+        topdown
+    }
+
+    cb <- callbacks() %>%
+        with_symbol_callback(collect_symbols) %>%
+        with_topdown_callback(skip_function_def_bodies)
+    collect <- make_transform_function(cb)
+
+    f <- function(x, y) x + y + z
+    collect(f)
+    expect_equal(symbols_seen, c("z", "y", "x"))
+
+    f <- function(x, y) {
+        g <- function(w, u, v) w + u + v
+        z <- g(1, 2, 3)
+        x + y + z
+    }
+    symbols_seen <- c()
+    collect(f) # z is duplicated below because I do not fix duplications
+    expect_equal(symbols_seen, c("z", "y", "x", "z", "g"))
 })

@@ -13,7 +13,9 @@
 #' @seealso identity_callback
 #' @seealso depth_first_rewrite_function
 #' @export
-depth_first_rewrite_expr <- function(expr, callbacks, topdown, ...) {
+depth_first_rewrite_expr <- function(
+                                     expr, callbacks, topdown,
+                                     ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(expr, topdown = topdown, ...))
     }
@@ -28,21 +30,24 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown, ...) {
     }
 
     stopifnot(rlang::is_lang(expr))
-    # collect topdown info.
-    topdown <- callbacks$topdown(expr, topdown = topdown, ...)
-    # FIXME: have a way to terminate the traversal at this level.
+    # Use callCC to be able to skip an evaluation based on topdown analysis
+    callCC(function(escape) {
+        skip <- function() escape(expr) # skip means leaving the body unchanged
+        # collect topdown info.
+        topdown <- callbacks$topdown(expr, topdown = topdown, skip = skip, ...)
 
-    # handle depth first
-    call_args <- rlang::call_args(expr)
-    for (i in seq_along(call_args)) {
-        expr[[i + 1]] <- depth_first_rewrite_expr(
-            call_args[[i]], callbacks,
-            topdown = topdown, ...
-        )
-    }
+        # handle depth first
+        call_args <- rlang::call_args(expr)
+        for (i in seq_along(call_args)) {
+            expr[[i + 1]] <- depth_first_rewrite_expr(
+                call_args[[i]], callbacks,
+                topdown = topdown, ...
+            )
+        }
 
-    # then handle the actual call
-    callbacks$call(expr, topdown = topdown, ...)
+        # then handle the actual call
+        callbacks$call(expr, topdown = topdown, ...)
+    })
 }
 
 #' Transform the body of function.

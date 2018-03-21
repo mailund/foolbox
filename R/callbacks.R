@@ -19,10 +19,13 @@ identity_callback <- function(expr, ...) expr
 #'
 #' @param expr    The expression before we modify it.
 #' @param topdown Information from further up the expression tree.
-#' @param ...      Additional data that might be passed along
+#' @param skip    An escape function. If called, the transformation
+#'                or analysis traversal will skip this expression
+#'                and continue at the sibling level.
+#' @param ...     Additional data that might be passed along
 #' @return Updated `topdown` information.
 #' @export
-nop_topdown_callback <- function(expr, topdown, ...) topdown
+nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 
 # FIXME: better documentation for the callbacks.
 
