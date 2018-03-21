@@ -36,7 +36,7 @@ or \code{\link[=depth_first_analyse_function]{depth_first_analyse_function()}}.
 }
 \details{
 In bottom up analyses, the \code{\link[=merge_bottomup]{merge_bottomup()}} function can be used to
-collectd the results of several recursive calls.
+collected the results of several recursive calls.
 }
 \section{Functions}{
 \itemize{

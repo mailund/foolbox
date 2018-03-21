@@ -11,13 +11,13 @@ depth_first_analyse_function(fn, callbacks, topdown = list(), ...)
 
 \item{callbacks}{List of callbacks to apply.}
 
-\item{topdown}{A list of additional information that will be considerd
+\item{topdown}{A list of additional information that will be considered
 top-down in the traversal.}
 
 \item{...}{Additional data that will be passed along to callbacks.}
 }
 \value{
-The result of the last buttom-up call to a callback.
+The result of the last bottom-up call to a callback.
 }
 \description{
 Traverses the body of \code{fn} and analyse it based on \code{callbacks}.

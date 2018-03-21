@@ -11,7 +11,7 @@ merge_bottomup(bottomup)
 }
 \description{
 The \code{bottomup} parameter in callbacks will be calculated for all parameters
-of \code{call`` expressions. The parameter to the callbacks are thus a list of lists. This function merges these lists into one that contain a list for each named component in the}buttomup\code{parameter. If results are not named in the}bottomup` list, they are discarted.
+of \code{call`` expressions. The parameter to the callbacks are thus a list of lists. This function merges these lists into one that contain a list for each named component in the}bottomup\code{parameter. If results are not named in the}bottomup` list, they are discarded.
 }
 \details{
 The vectors from \code{bottomup} are concatenated, so one level of lists

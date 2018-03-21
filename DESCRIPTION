@@ -6,6 +6,7 @@ Description: Provides functionality for manipulating functions and translating t
     in metaprogramming.
 Depends: R (>= 3.2)
 License: GPL-3
+Language: en-GB
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

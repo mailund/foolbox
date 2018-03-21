@@ -11,7 +11,7 @@ depth_first_rewrite_function(fn, callbacks, topdown = list(), ...)
 
 \item{callbacks}{List of callbacks to apply.}
 
-\item{topdown}{A list of additional information that will be considerd
+\item{topdown}{A list of additional information that will be considered
 top-down in the traversal.}
 
 \item{...}{Additional data that will be passed along to callbacks.}

@@ -11,7 +11,7 @@
 #' or [depth_first_analyse_function()].
 #'
 #' In bottom up analyses, the [merge_bottomup()] function can be used to
-#' collectd the results of several recursive calls.
+#' collected the results of several recursive calls.
 #'
 #' @param expr     The expression to (not) transform.
 #' @param bottomup Information gathered depth-first in analysis callbacks.
@@ -31,8 +31,8 @@ identity_rewrite_callback <- function(expr, ...) expr
 #' The `bottomup` parameter in callbacks will be calculated for all parameters
 #' of `call`` expressions. The parameter to the callbacks are thus a list of
 #' lists. This function merges these lists into one that contain a list for
-#' each named component in the `buttomup` parameter. If results are not
-#' named in the `bottomup` list, they are discarted.
+#' each named component in the `bottomup` parameter. If results are not
+#' named in the `bottomup` list, they are discarded.
 #'
 #' The vectors from `bottomup` are concatenated, so one level of lists
 #' will be flattened. Use more lists, like `list(list(2), list(3))`
@@ -188,7 +188,53 @@ add_call_callback <- function(callbacks, fn, cb) {
         err_fun <- function(e) {
             warning(paste0(
                 "The function ", as.character(call_name),
-                " could not be evaluated to an actual funcion in ",
+                " could not be evaluated to an actual function in ",
+                "this scope."
+            ))
+            NULL
+        }
+        fun <- tryCatch(eval(call_name, env), error = err_fun)
+        if (!is.null(fun) && identical(fun, fn)) {
+            return(cb(call_expr, env = env, params = params, ...))
+        } else {
+            # default for closure: try the next in line
+            next_cb(call_expr, env = env, params = params, ...)
+        }
+    }
+    callbacks$call <- closure
+    callbacks
+}
+
+#' Add a function-specific callback to the top-down callbacks.
+#'
+#' This function adds to the existing topdown callback, rather than replace it,
+#' by putting a callback in front of it to be tested first. The callback will
+#' be invoked when the traversal sees a call to a specific function.
+#'
+#' @param callbacks The existing callbacks.
+#' @param fn        The function to which calls should be modified.
+#' @param cb        The callback function to invoke.
+#'
+#' @return          The updated callbacks.
+#' @export
+add_topdown_callback <- function(callbacks, fn, cb) {
+    next_cb <- callbacks$topdown
+    force(fn)
+    force(cb)
+    closure <- function(call_expr, env, params, ...) {
+        # make sure the call is not to a local variable--if it is,
+        # we can't evaluate it at transformation time. We propagate
+        # to the next callback.
+        call_name <- call_expr[[1]]
+        if (as.character(call_name) %in% names(params)) {
+            return(next_cb(call_expr, env = env, params = params, ...))
+        }
+
+        # now try to get the actual function by evaluating it
+        err_fun <- function(e) {
+            warning(paste0(
+                "The function ", as.character(call_name),
+                " could not be evaluated to an actual function in ",
                 "this scope."
             ))
             NULL
@@ -201,8 +247,6 @@ add_call_callback <- function(callbacks, fn, cb) {
             next_cb(call_expr, env, params, ...)
         }
     }
-    callbacks$call <- closure
+    callbacks$topdown <- closure
     callbacks
 }
-
-# FIXME: Add an `add_topdown_callback`? id:1 gh:15 ic:gh

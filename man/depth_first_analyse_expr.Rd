@@ -2,7 +2,7 @@
 % Please edit documentation in R/depth-first-traversals.R
 \name{depth_first_analyse_expr}
 \alias{depth_first_analyse_expr}
-\title{Ananlyse an expression.}
+\title{Analyse an expression.}
 \usage{
 depth_first_analyse_expr(expr, callbacks, topdown, ...)
 }
@@ -16,7 +16,7 @@ depth_first_analyse_expr(expr, callbacks, topdown, ...)
 \item{...}{Additional data that will be passed along to callbacks.}
 }
 \value{
-The result of the last buttom-up traversal.
+The result of the last bottom-up traversal.
 }
 \description{
 Traverses the expression \code{expr} depth-first and analyse it it using \code{callbacks}.

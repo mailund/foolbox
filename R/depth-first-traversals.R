@@ -57,7 +57,7 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown,
 #'
 #' @param fn        A (closure) function.
 #' @param callbacks List of callbacks to apply.
-#' @param topdown   A list of additional information that will be considerd
+#' @param topdown   A list of additional information that will be considered
 #'                  top-down in the traversal.
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
@@ -98,7 +98,7 @@ depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
 
 ## Analysis functions #################################################
 
-#' Ananlyse an expression.
+#' Analyse an expression.
 #'
 #' Traverses the expression `expr` depth-first and analyse it it using `callbacks`.
 #'
@@ -107,14 +107,13 @@ depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
 #' @param topdown   A list of additional information gathered in the traversal.
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
-#' @return The result of the last buttom-up traversal.
+#' @return The result of the last bottom-up traversal.
 #'
 #' @seealso analysis_callbacks
 #' @seealso identity_analysis_callback
 #' @seealso depth_first_analyse_function
 #' @export
-depth_first_analyse_expr <- function(
-                                     expr, callbacks, topdown,
+depth_first_analyse_expr <- function(expr, callbacks, topdown,
                                      ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
@@ -144,8 +143,8 @@ depth_first_analyse_expr <- function(
     stopifnot(rlang::is_lang(expr))
     # Use callCC to be able to skip an evaluation based on topdown analysis
     callCC(function(escape) {
-        skip <- function() escape(expr) # skip means leaving the body unchanged
-        # collect topdown info.
+        # skip means returning no bottomup info.
+        skip <- function() escape(list())
         topdown <- callbacks$topdown(expr, topdown = topdown, skip = skip, ...)
 
         # handle depth first
@@ -170,11 +169,11 @@ depth_first_analyse_expr <- function(
 #'
 #' @param fn        A (closure) function.
 #' @param callbacks List of callbacks to apply.
-#' @param topdown   A list of additional information that will be considerd
+#' @param topdown   A list of additional information that will be considered
 #'                  top-down in the traversal.
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
-#' @return The result of the last buttom-up call to a callback.
+#' @return The result of the last bottom-up call to a callback.
 #'
 #' @seealso depth_first_analyse_expr
 #' @seealso depth_first_rewrite_function
