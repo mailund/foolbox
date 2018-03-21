@@ -137,11 +137,7 @@ test_that("we can pass user-data along in traversals", {
 # that test.
 test_that("we can collect top-down information down a traversal", {
     collect_bound_variables <- function(expr, topdown, ...) {
-        if (expr[[1]] == "<-" && rlang::is_symbol(expr[[2]])) {
-            # FIXME: This doesn't actually work because the local variable
-            # is not set in a top-level nesting level but a sibling level...
-            topdown$bound_vars <- c(as.character(expr[[2]]), topdown$bound_vars)
-        } else if (expr[[1]] == "function") {
+        if (expr[[1]] == "function") {
             topdown$bound_vars <- c(names(expr[[2]]), topdown$bound_vars)
         }
         topdown
