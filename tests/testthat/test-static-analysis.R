@@ -199,3 +199,26 @@ test_that("we don't annotate with symbols we know are in a different scope", {
     # it doesn't matter... there should just be an x in scope.
     expect_equal(attr(nested_body, "bound"), c("x", "y", "z"))
 })
+
+
+test_that("we can handle local functions", {
+    f <- function(x) {
+        y <- 2 * x
+        g <- function(x) {
+            z <- 2 * x
+        }
+        g(y)
+    }
+    # FIXME: this warning should be disabled using a flag, see #24
+    expect_warning(f_an <- annotate_assigned_symbols_in_function(f))
+    expect_equal(attr(body(f_an), "assigned_symbols"), c("y", "g"))
+    expect_equal(attr(body(f_an), "bound"), c("x", "y", "g"))
+
+    # We shouldn't confuse a local function with
+    # one from the tranformation-scope.
+    g <- function() stop("outer")
+    cb <- rewrite_callbacks() %>%
+        add_call_callback(g, function(expr, ...) stop("don't call this"))
+    res <- depth_first_rewrite_function(f_an, cb)
+    expect_equal(body(f_an), body(res))
+})

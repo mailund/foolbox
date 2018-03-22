@@ -23,6 +23,7 @@ collection_callback <- function(expr, bottomup, ...) {
 }
 
 skip_independent_scopes_callback <- function(expr, skip, ...) {
+    cat("skipping ", as.character(expr[[1]]), "\n")
     skip()
 }
 
@@ -146,9 +147,10 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
 
     # FIXME: Document these heuristics id:11 gh:31 ic:gh
 
-    # FIXME: Make a handle so people can guide these heuristics, e.g. tell when id:13 gh:34 ic:gh
-    # arguments are evaluated in the calling scope and when they are evaluated
-    # in another and assignments won't affect this scope.
+    # FIXME: Make a handle so people can guide these id:13 gh:34 ic:gh
+    # heuristics, e.g. tell when arguments are evaluated in the calling
+    # scope and when they are evaluated in another and assignments
+    # won't affect this scope.
 
     call_name <- as.character(expr[[1]])
     if (call_name %in% c("{", "if", "for", "while", "repeat")) {
@@ -211,7 +213,7 @@ annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
 #' local variables (rather, they are considered formals and presumably handled
 #' elsewhere as such).
 #'
-#' @param fn      The function whose body we should analyse
+#' @param fn The function whose body we should analyse
 #'
 #' @return A function who's expressions are annotated with potentially
 #'    local variables.

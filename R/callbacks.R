@@ -182,33 +182,38 @@ add_call_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$call
     force(fn)
     force(cb)
-    closure <- function(call_expr, env, params, ...) {
+    closure <- function(expr, env, params, ...) {
         # make sure the call is not to a local variable--if it is,
         # we can't evaluate it at transformation time. We propagate
         # to the next callback.
-        call_name <- call_expr[[1]]
-        if (as.character(call_name) %in% names(params)) {
-            return(next_cb(call_expr, env = env, params = params, ...))
+        call_name <- as.character(expr[[1]])
+        if (call_name %in% names(params)) {
+            return(next_cb(expr, env = env, params = params, ...))
+        }
+        # The same goes for other bound variables, if we have annotated
+        # the expressions with those.
+        if (call_name %in% attr(expr, "bound")) {
+            return(next_cb(expr, env = env, params = params, ...))
         }
 
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
             warning(paste0(
-                "The function ", as.character(call_name),
+                "The function ", call_name,
                 " could not be evaluated to an actual function in ",
                 "this scope."
             ))
             NULL
         }
-        fun <- tryCatch(eval(call_name, env), error = err_fun)
+        fun <- tryCatch(eval(expr[[1]], env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr,
+            return(cb(expr,
                 env = env, params = params,
                 next_cb = next_cb, ...
             ))
         } else {
             # default for closure: try the next in line
-            next_cb(call_expr, env = env, params = params, ...)
+            next_cb(expr, env = env, params = params, ...)
         }
     }
     callbacks$call <- closure
@@ -239,30 +244,35 @@ add_topdown_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$topdown
     force(fn)
     force(cb)
-    closure <- function(call_expr, env, params, ...) {
+    closure <- function(expr, env, params, ...) {
         # make sure the call is not to a local variable--if it is,
         # we can't evaluate it at transformation time. We propagate
         # to the next callback.
-        call_name <- call_expr[[1]]
-        if (as.character(call_name) %in% names(params)) {
-            return(next_cb(call_expr, env = env, params = params, ...))
+        call_name <- as.character(expr[[1]])
+        if (call_name %in% names(params)) {
+            return(next_cb(expr, env = env, params = params, ...))
+        }
+        # The same goes for other bound variables, if we have annotated
+        # the expressions with those.
+        if (call_name %in% attr(expr, "bound")) {
+            return(next_cb(expr, env = env, params = params, ...))
         }
 
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
             warning(paste0(
-                "The function ", as.character(call_name),
+                "The function ", call_name,
                 " could not be evaluated to an actual function in ",
                 "this scope."
             ))
             NULL
         }
-        fun <- tryCatch(eval(call_name, env), error = err_fun)
+        fun <- tryCatch(eval(expr[[1]], env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr, env, params, next_cb = next_cb, ...))
+            return(cb(expr, env, params, next_cb = next_cb, ...))
         } else {
             # default for closure: try the next in line
-            next_cb(call_expr, env, params, ...)
+            next_cb(expr, env, params, ...)
         }
     }
     callbacks$topdown <- closure
