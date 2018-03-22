@@ -165,6 +165,13 @@ with_topdown_callback <- make_with_callback("topdown")
 #' by putting a callback in front of it to be tested first. The callback will
 #' be invoked when the traversal sees a call to a specific function.
 #'
+#' The callback that is installed will be called with the usual callback
+#' arguments (which depend on context and user-provided information to
+#' ..., see [rewrite_callbacks()] and [analysis_callback()]), and additionally
+#' the next callback in line, through the parameter `next_cb`. This can be
+#' used to propagate informtion through several callbacks in a pipe-like
+#' fashion.
+#'
 #' @param callbacks The existing callbacks.
 #' @param fn        The function to which calls should be modified.
 #' @param cb        The callback function to invoke.
@@ -195,7 +202,8 @@ add_call_callback <- function(callbacks, fn, cb) {
         }
         fun <- tryCatch(eval(call_name, env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr, env = env, params = params, ...))
+            return(cb(call_expr, env = env, params = params,
+                      next_cb = next_cb, ...))
         } else {
             # default for closure: try the next in line
             next_cb(call_expr, env = env, params = params, ...)
@@ -210,6 +218,14 @@ add_call_callback <- function(callbacks, fn, cb) {
 #' This function adds to the existing topdown callback, rather than replace it,
 #' by putting a callback in front of it to be tested first. The callback will
 #' be invoked when the traversal sees a call to a specific function.
+#'
+#' The callback that is installed will be called with the usual callback
+#' arguments (which depend on context and user-provided information to
+#' ..., see [rewrite_callbacks()] and [analysis_callback()]), and additionally
+#' the next callback in line, through the parameter `next_cb`. This can be
+#' used to propagate informtion through several callbacks in a pipe-like
+#' fashion.
+#'
 #'
 #' @param callbacks The existing callbacks.
 #' @param fn        The function to which calls should be modified.
@@ -241,7 +257,7 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         }
         fun <- tryCatch(eval(call_name, env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr, env, params, ...))
+            return(cb(call_expr, env, params, next_cb = next_cb, ...))
         } else {
             # default for closure: try the next in line
             next_cb(call_expr, env, params, ...)

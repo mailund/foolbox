@@ -1,5 +1,5 @@
 
-## Functions for extracting information about functions and expressions
+## Functions for extracting information about functions and expressions ####
 
 collection_callback <- function(expr, bottomup, ...) {
     bottomup <- merge_bottomup(bottomup)
@@ -88,3 +88,38 @@ collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
     )
     if (is.null(locals)) character() else locals
 }
+
+
+## Functions annotating expressions #########################################
+
+annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
+
+    #bottomup <- merge_bottomup(bottomup)
+    bottomup <- list() # FIXME: GET FROM CALL ARGS
+
+    # This function is installed to be called on assignments and
+    # on for-loops (where there is an implicit assignment to the
+    # iterator variable)
+    if (expr[[1]] == "<-") {
+        if (rlang::is_symbol(expr[[2]])) {
+            local_var <- as.character(expr[[2]])
+            locals <- c(local_var, bottomup$locals)
+        }
+    } else if (expr[[1]] == "for") {
+        local_var <- as.character(expr[[2]])
+        locals <- c(local_var, bottomup$locals)
+    } else {
+        stop("Unexpected function call!")
+    }
+
+    attr(expr, "assigned_symbols") <- locals
+    expr
+}
+
+propagate_assigned_symbols_callback <- function(expr, ...) {
+    42 # FIXME
+}
+
+annotate_assigned_symbols_callbacks <- analysis_callbacks() %>%
+    add_call_callback(`<-`, collection_callback) %>%
+    add_call_callback(`for`, collection_callback)

@@ -230,3 +230,24 @@ test_that("we have an escape-hatch to skip past sub-trees", {
     collect(f) # z is duplicated below because I do not fix duplications
     expect_equal(symbols_seen, c("z", "y", "x", "z", "g"))
 })
+
+
+test_that("we chain callbacks", {
+    g <- function(x) 2 * x
+    f <- function(x, y) g(x + y)
+
+    first <- function(expr, next_cb, ...)
+        next_cb(quote(g(y - x)), ...)
+    cb <- rewrite_callbacks() %>%
+        add_call_callback(g, first)
+    f_tr <- depth_first_rewrite_function(f, cb)
+    expect_equal(body(f_tr), quote(g(y - x)))
+
+    second <- function(expr, ...) expr[[2]]
+    cb <- rewrite_callbacks() %>%
+        add_call_callback(g, second) %>%
+        add_call_callback(g, first)
+
+    f_tr <- depth_first_rewrite_function(f, cb)
+    expect_equal(body(f_tr), quote(y - x))
+})
