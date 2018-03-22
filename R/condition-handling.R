@@ -1,5 +1,5 @@
 
-# FIXME: Document the warning flags
+# FIXME: Document the warning flags id:16 gh:40 ic:gh
 #' Collection of warning flags used when traversing expressions.
 #' @export
 warning_flags <- function() {
