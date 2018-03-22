@@ -4,7 +4,8 @@
 \alias{depth_first_rewrite_function}
 \title{Transform the body of function.}
 \usage{
-depth_first_rewrite_function(fn, callbacks, topdown = list(), ...)
+depth_first_rewrite_function(fn, callbacks, topdown = list(),
+  wflags = warning_flags(), ...)
 }
 \arguments{
 \item{fn}{A (closure) function.}
@@ -13,6 +14,8 @@ depth_first_rewrite_function(fn, callbacks, topdown = list(), ...)
 
 \item{topdown}{A list of additional information that will be considered
 top-down in the traversal.}
+
+\item{wflags}{Warning flags, see \code{\link[=warning_flags]{warning_flags()}}.}
 
 \item{...}{Additional data that will be passed along to callbacks.}
 }

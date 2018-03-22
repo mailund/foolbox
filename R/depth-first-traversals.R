@@ -7,6 +7,7 @@
 #' @param expr      An R expression
 #' @param callbacks List of callbacks to apply.
 #' @param topdown   A list of additional information gathered in the traversal.
+#' @param wflags    Warning flags, see [warning_flags()].
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
 #' @return A modified expression.
@@ -15,19 +16,27 @@
 #' @seealso identity_rewrite_callback
 #' @seealso depth_first_rewrite_function
 #' @export
-depth_first_rewrite_expr <- function(expr, callbacks, topdown,
+depth_first_rewrite_expr <- function(expr, callbacks, topdown, wflags,
                                      ...) {
     if (rlang::is_atomic(expr)) {
-        return(callbacks$atomic(expr, topdown = topdown, ...))
+        return(callbacks$atomic(
+            expr, topdown = topdown, wflags = wflags, ...
+        ))
     }
     if (rlang::is_pairlist(expr)) {
-        return(callbacks$pairlist(expr, topdown = topdown, ...))
+        return(callbacks$pairlist(
+            expr, topdown = topdown, wflags = wflags, ...
+        ))
     }
     if (rlang::is_symbol(expr)) {
-        return(callbacks$symbol(expr, topdown = topdown, ...))
+        return(callbacks$symbol(
+            expr, topdown = topdown, wflags = wflags, ...
+        ))
     }
     if (rlang::is_primitive(expr)) {
-        return(callbacks$primitive(expr, topdown = topdown, ...))
+        return(callbacks$primitive(
+            expr, topdown = topdown, wflags = wflags, ...
+        ))
     }
 
     stopifnot(rlang::is_lang(expr))
@@ -35,19 +44,24 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown,
     callCC(function(escape) {
         skip <- function() escape(expr) # skip means leaving the body unchanged
         # collect topdown info.
-        topdown <- callbacks$topdown(expr, topdown = topdown, skip = skip, ...)
+        topdown <- callbacks$topdown(
+            expr, topdown = topdown, wflags = wflags, skip = skip, ...
+        )
 
         # handle depth first
         call_args <- rlang::call_args(expr)
         for (i in seq_along(call_args)) {
             expr[[i + 1]] <- depth_first_rewrite_expr(
                 call_args[[i]], callbacks,
-                topdown = topdown, ...
+                topdown = topdown, wflags = wflags,
+                ...
             )
         }
 
         # then handle the actual call
-        callbacks$call(expr, topdown = topdown, ...)
+        callbacks$call(
+            expr, topdown = topdown, wflags = wflags, ...
+        )
     })
 }
 
@@ -59,6 +73,7 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown,
 #' @param callbacks List of callbacks to apply.
 #' @param topdown   A list of additional information that will be considered
 #'                  top-down in the traversal.
+#' @param wflags    Warning flags, see [warning_flags()].
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
 #' @return A new function similar to `fn` but with a transformed body.
@@ -86,11 +101,14 @@ depth_first_rewrite_expr <- function(expr, callbacks, topdown,
 #' @seealso depth_first_rewrite_expr
 #' @seealso rewrite_callbacks
 #' @export
-depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
+depth_first_rewrite_function <- function(fn, callbacks,
+                                         topdown = list(),
+                                         wflags = warning_flags(),
+                                         ...) {
     body(fn) <- depth_first_rewrite_expr(
         body(fn), callbacks,
         env = environment(fn), params = formals(fn),
-        topdown = topdown,
+        topdown = topdown, wflags = wflags,
         ...
     )
     fn
@@ -105,6 +123,7 @@ depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
 #' @param expr      An R expression
 #' @param callbacks List of callbacks to apply.
 #' @param topdown   A list of additional information gathered in the traversal.
+#' @param wflags    Warning flags, see [warning_flags()].
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
 #' @return The result of the last bottom-up traversal.
@@ -113,7 +132,7 @@ depth_first_rewrite_function <- function(fn, callbacks, topdown = list(), ...) {
 #' @seealso identity_analysis_callback
 #' @seealso depth_first_analyse_function
 #' @export
-depth_first_analyse_expr <- function(expr, callbacks, topdown,
+depth_first_analyse_expr <- function(expr, callbacks, topdown, wflags,
                                      ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
@@ -171,6 +190,7 @@ depth_first_analyse_expr <- function(expr, callbacks, topdown,
 #' @param callbacks List of callbacks to apply.
 #' @param topdown   A list of additional information that will be considered
 #'                  top-down in the traversal.
+#' @param wflags    Warning flags, see [warning_flags()].
 #' @param ...       Additional data that will be passed along to callbacks.
 #'
 #' @return The result of the last bottom-up call to a callback.
@@ -179,7 +199,10 @@ depth_first_analyse_expr <- function(expr, callbacks, topdown,
 #' @seealso depth_first_rewrite_function
 #' @seealso analysis_callbacks
 #' @export
-depth_first_analyse_function <- function(fn, callbacks, topdown = list(), ...) {
+depth_first_analyse_function <- function(fn, callbacks,
+                                         topdown = list(),
+                                         wflags = warning_flags(),
+                                         ...) {
     depth_first_analyse_expr(
         body(fn), callbacks,
         env = environment(fn), params = formals(fn),

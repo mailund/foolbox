@@ -4,7 +4,7 @@
 \alias{depth_first_analyse_expr}
 \title{Analyse an expression.}
 \usage{
-depth_first_analyse_expr(expr, callbacks, topdown, ...)
+depth_first_analyse_expr(expr, callbacks, topdown, wflags, ...)
 }
 \arguments{
 \item{expr}{An R expression}
@@ -12,6 +12,8 @@ depth_first_analyse_expr(expr, callbacks, topdown, ...)
 \item{callbacks}{List of callbacks to apply.}
 
 \item{topdown}{A list of additional information gathered in the traversal.}
+
+\item{wflags}{Warning flags, see \code{\link[=warning_flags]{warning_flags()}}.}
 
 \item{...}{Additional data that will be passed along to callbacks.}
 }

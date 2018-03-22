@@ -23,7 +23,6 @@ collection_callback <- function(expr, bottomup, ...) {
 }
 
 skip_independent_scopes_callback <- function(expr, skip, ...) {
-    cat("skipping ", as.character(expr[[1]]), "\n")
     skip()
 }
 
@@ -77,7 +76,8 @@ collect_assigned_symbols_in_expression <- function(expr, env,
 collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
     res <- depth_first_analyse_function(
         fun, collect_assigned_symbols_callbacks,
-        topdown = topdown
+        topdown = topdown,
+        wflags = warning_flags() %>% unset_warn_on_unknown_function()
     )
     params <- names(formals(fun))
 
@@ -221,7 +221,8 @@ annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
 #' @export
 annotate_assigned_symbols_in_function <- function(fn) {
     fn %>% depth_first_rewrite_function(
-        annotate_assigned_symbols_callbacks
+        annotate_assigned_symbols_callbacks,
+        wflags = warning_flags() %>% unset_warn_on_unknown_function()
     ) %>% depth_first_rewrite_function(
         annotate_bound_variables_callbacks,
         topdown = names(formals(fn))
