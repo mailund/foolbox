@@ -268,7 +268,7 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         # The same goes for other bound variables, if we have annotated
         # the expressions with those.
         if (call_name %in% attr(expr, "bound")) {
-            # FIXME: if the local function has the same name as the one
+            # FIXME: if the local function has the same name as the one id:17 gh:42 ic:gh
             # we are trying to analyse or transform, we want a warning here.
             return(next_cb(
                 expr, env = env, params = params,  wflags = wflags, ...
