@@ -95,7 +95,7 @@ collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
 annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
 
     #bottomup <- merge_bottomup(bottomup)
-    bottomup <- list() # FIXME: GET FROM CALL ARGS
+    bottomup <- list() # FIXME: GET FROM CALL ARGS id:8 gh:27 ic:gh
 
     # This function is installed to be called on assignments and
     # on for-loops (where there is an implicit assignment to the
@@ -117,7 +117,7 @@ annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
 }
 
 propagate_assigned_symbols_callback <- function(expr, ...) {
-    42 # FIXME
+    42 # FIXME id:9 gh:28 ic:gh
 }
 
 annotate_assigned_symbols_callbacks <- analysis_callbacks() %>%
