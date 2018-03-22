@@ -167,7 +167,7 @@ with_topdown_callback <- make_with_callback("topdown")
 #'
 #' The callback that is installed will be called with the usual callback
 #' arguments (which depend on context and user-provided information to
-#' ..., see [rewrite_callbacks()] and [analysis_callback()]), and additionally
+#' ..., see [rewrite_callbacks()] and [analysis_callbacks()]), and additionally
 #' the next callback in line, through the parameter `next_cb`. This can be
 #' used to propagate informtion through several callbacks in a pipe-like
 #' fashion.
@@ -221,7 +221,7 @@ add_call_callback <- function(callbacks, fn, cb) {
 #'
 #' The callback that is installed will be called with the usual callback
 #' arguments (which depend on context and user-provided information to
-#' ..., see [rewrite_callbacks()] and [analysis_callback()]), and additionally
+#' ..., see [rewrite_callbacks()] and [analysis_callbacks()]), and additionally
 #' the next callback in line, through the parameter `next_cb`. This can be
 #' used to propagate informtion through several callbacks in a pipe-like
 #' fashion.
