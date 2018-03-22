@@ -92,7 +92,7 @@ collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
 
 ## Functions annotating expressions #########################################
 
-# FIXME: maybe move to a misc file and export...
+# FIXME: maybe move to a misc file and export... id:10 gh:30 ic:gh
 collect_from_args <- function(expr, attribute,
                               condition = function(expr) TRUE
                               ) {
@@ -144,8 +144,8 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
     # assume that NSE *is* in play, by default, and not consider it a local
     # assignment.
 
-    # FIXME: Document these heuristics
-    # FIXME: Make a handle so people can guide these heuristics, e.g. tell
+    # FIXME: Document these heuristics id:11 gh:31 ic:gh
+    # FIXME: Make a handle so people can guide these heuristics, e.g. tell id:12 gh:32 ic:gh
     # when arguments are evaluated in the calling scope and when they are
     # evaluated in another and assignments won't affect this scope.
     call_name <- as.character(expr[[1]])
