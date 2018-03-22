@@ -209,7 +209,7 @@ test_that("we can handle local functions", {
         }
         g(y)
     }
-    # FIXME: this warning should be disabled using a flag, see #24
+    # FIXME: this warning should be disabled using a flag, see #24 id:14 gh:37 ic:gh
     expect_warning(f_an <- annotate_assigned_symbols_in_function(f))
     expect_equal(attr(body(f_an), "assigned_symbols"), c("y", "g"))
     expect_equal(attr(body(f_an), "bound"), c("x", "y", "g"))
