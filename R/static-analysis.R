@@ -146,7 +146,7 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
 
     # FIXME: Document these heuristics id:11 gh:31 ic:gh
 
-    # FIXME: Make a handle so people can guide these heuristics, e.g. tell when
+    # FIXME: Make a handle so people can guide these heuristics, e.g. tell when id:13 gh:34 ic:gh
     # arguments are evaluated in the calling scope and when they are evaluated
     # in another and assignments won't affect this scope.
 
