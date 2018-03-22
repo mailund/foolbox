@@ -101,12 +101,14 @@ test_that("we can annotate with the symbols in a simple function", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), character(0))
+    expect_equal(attr(body(res), "bound"), character(0))
 
     f <- function() {
         x <- 42
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), "x")
+    expect_equal(attr(body(res), "bound"), "x")
 
     f <- function() {
         x <- 42
@@ -115,18 +117,22 @@ test_that("we can annotate with the symbols in a simple function", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), c("x", "y"))
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
 
+    # when there is a formal parameter, that is also a bound variable
+    # although it is not an assigned symbol.
     f <- function(x = 42) {
         y <- 24
         x + y
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), "y")
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
 
     # If we analyse the full function, we might not want to consider
     # formal parameters as local variables, but inside the *body*
     # of this function, we do assign to `x`, so we include it in
-    # the annotation.
+    # the annotation. It defintely belongs in the bound variables.
     f <- function(x = 42) {
         x <- 42
         y <- 24
@@ -134,6 +140,7 @@ test_that("we can annotate with the symbols in a simple function", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), c("x", "y"))
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
 
     # we shouldn't include duplications
     f <- function(x = 42) {
@@ -144,6 +151,8 @@ test_that("we can annotate with the symbols in a simple function", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), c("y", "x"))
+    # the bound variables see the formal parameter first, so x before y
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
 })
 
 test_that("we can annotate with symbols when there are for-loops", {
@@ -152,6 +161,7 @@ test_that("we can annotate with symbols when there are for-loops", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), "i")
+    expect_equal(attr(body(res), "bound"), c("n", "i"))
 
     f <- function(n) {
         x <- 0
@@ -161,6 +171,7 @@ test_that("we can annotate with symbols when there are for-loops", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), c("x", "i"))
+    expect_equal(attr(body(res), "bound"), c("n", "x", "i"))
 })
 
 test_that("we don't annotate with symbols we know are in a different scope", {
@@ -169,6 +180,7 @@ test_that("we don't annotate with symbols we know are in a different scope", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), character())
+    expect_equal(attr(body(res), "bound"), "df")
 
     f <- function(x) {
         y <- 2 * x
@@ -178,6 +190,12 @@ test_that("we don't annotate with symbols we know are in a different scope", {
     }
     res <- annotate_assigned_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), c("y"))
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
+
     nested_body <- body(res)[[3]][[3]]
     expect_equal(attr(nested_body, "assigned_symbols"), c("z"))
+    # since the inner function is a cosure, it cna see "y". It can also
+    # see x -- we have propagated both the inner and the outper, but ok
+    # it doesn't matter... there should just be an x in scope.
+    expect_equal(attr(nested_body, "bound"), c("x", "y", "z"))
 })

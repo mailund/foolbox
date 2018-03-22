@@ -94,21 +94,21 @@ collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
 
 # FIXME: maybe move to a misc file and export... id:10 gh:30 ic:gh
 collect_from_args <- function(expr, attribute,
-                              condition = function(expr) TRUE
-                              ) {
+                              condition = function(expr) TRUE) {
     collected <- list()
     args <- rlang::call_args(expr)
     for (a in args) {
-        if (condition(a))
-            collected <- c(collected, attr(a, attribute))
+        if (condition(a)) {
+              collected <- c(collected, attr(a, attribute))
+          }
     }
     collected
 }
 
 annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
-
     locals <- collect_from_args(expr, "assigned_symbols") %>%
-        unlist %>% unique
+        unlist() %>%
+        unique()
     if (is.null(locals)) locals <- character()
 
     # This function is installed to be called on assignments and
@@ -145,9 +145,11 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
     # assignment.
 
     # FIXME: Document these heuristics id:11 gh:31 ic:gh
-    # FIXME: Make a handle so people can guide these heuristics, e.g. tell id:12 gh:32 ic:gh
-    # when arguments are evaluated in the calling scope and when they are
-    # evaluated in another and assignments won't affect this scope.
+
+    # FIXME: Make a handle so people can guide these heuristics, e.g. tell when
+    # arguments are evaluated in the calling scope and when they are evaluated
+    # in another and assignments won't affect this scope.
+
     call_name <- as.character(expr[[1]])
     if (call_name %in% c("{", "if", "for", "while", "repeat")) {
         condition <- function(expr) TRUE
@@ -159,19 +161,39 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
         }
     }
     locals <- collect_from_args(expr, "assigned_symbols", condition) %>%
-        unlist %>% unique
+        unlist() %>%
+        unique()
 
     if (is.null(locals)) locals <- character()
     attr(expr, "assigned_symbols") <- locals
     expr
 }
 
+# Called before recursions. Combines variables propagated down
+# with new formals if we see a local function definition
+collect_bound_variables_callback <- function(expr, topdown, ...) {
+    bound <- c(topdown, attr(expr, "assigned_symbols"))
+    if (expr[[1]] == "function") {
+          bound <- c(names(expr[[2]]), bound)
+      }
+    bound # passed as `topdown` to the rewrite callback
+}
+
+propagate_bound_variables_callback <- function(expr, topdown, ...) {
+    attr(expr, "bound") <- unique(topdown)
+    expr
+}
+
+#' Put attribute "assigned_symbols" on expressions bottom-up
 annotate_assigned_symbols_callbacks <- rewrite_callbacks() %>%
     with_call_callback(propagate_assigned_symbols_callback) %>%
     add_call_callback(`<-`, annotate_assigned_symbols_callback) %>%
     add_call_callback(`for`, annotate_assigned_symbols_callback)
 
-
+#' Propagate parameters and local variables top-down
+annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
+    with_topdown_callback(collect_bound_variables_callback) %>%
+    with_call_callback(propagate_bound_variables_callback)
 
 #' Extracts all the symbols that appear on the left-hand side of an
 #' assignment and annotate expressions with those potentially in scope.
@@ -196,7 +218,10 @@ annotate_assigned_symbols_callbacks <- rewrite_callbacks() %>%
 #'
 #' @export
 annotate_assigned_symbols_in_function <- function(fn) {
-    depth_first_rewrite_function(
-        fn, annotate_assigned_symbols_callbacks
+    fn %>% depth_first_rewrite_function(
+        annotate_assigned_symbols_callbacks
+    ) %>% depth_first_rewrite_function(
+        annotate_bound_variables_callbacks,
+        topdown = names(formals(fn))
     )
 }

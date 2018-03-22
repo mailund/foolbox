@@ -202,8 +202,10 @@ add_call_callback <- function(callbacks, fn, cb) {
         }
         fun <- tryCatch(eval(call_name, env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
-            return(cb(call_expr, env = env, params = params,
-                      next_cb = next_cb, ...))
+            return(cb(call_expr,
+                env = env, params = params,
+                next_cb = next_cb, ...
+            ))
         } else {
             # default for closure: try the next in line
             next_cb(call_expr, env = env, params = params, ...)
