@@ -215,7 +215,7 @@ test_that("we have an escape-hatch to skip past sub-trees", {
     cb <- rewrite_callbacks() %>%
         with_symbol_callback(collect_symbols) %>%
         with_topdown_callback(skip_function_def_bodies)
-    collect <- make_transform_function(cb)
+    collect <- . %>% rewrite() %>% rewrite_with(cb)
 
     f <- function(x, y) x + y + z
     collect(f)
