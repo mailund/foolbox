@@ -26,39 +26,6 @@
 #' @export
 identity_rewrite_callback <- function(expr, ...) expr
 
-#' Merge the results of several bottomup results.
-#'
-#' The `bottomup` parameter in callbacks will be calculated for all parameters
-#' of `call`` expressions. The parameter to the callbacks are thus a list of
-#' lists. This function merges these lists into one that contain a list for
-#' each named component in the `bottomup` parameter. If results are not
-#' named in the `bottomup` list, they are discarded.
-#'
-#' The vectors from `bottomup` are concatenated, so one level of lists
-#' will be flattened. Use more lists, like `list(list(2), list(3))`
-#' if you want to prevent this.
-#'
-#' @param bottomup List of bottom up analysis results.
-#'
-#' @seealso depth_first_analyse_function
-#' @seealso depth_first_analyse_expr
-#'
-#' @export
-merge_bottomup <- function(bottomup) {
-    components <- lapply(bottomup, names) %>% unlist() %>% unique()
-    result <- vector("list", length = length(components))
-    names(result) <- components
-
-    # processing in reverse order to keep the order of results
-    # even though we are prepending to lists.
-    for (sublist in rev(bottomup)) {
-        for (name in names(sublist)) {
-            result[[name]] <- c(sublist[[name]], result[[name]])
-        }
-    }
-
-    result
-}
 
 
 #' @describeIn identity_rewrite_callback Identity for expression rewriting

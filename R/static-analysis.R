@@ -93,19 +93,6 @@ collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
 
 ## Functions annotating expressions #########################################
 
-# FIXME: maybe move to a misc file and export... id:10 gh:30 ic:gh
-collect_from_args <- function(expr, attribute,
-                              condition = function(expr) TRUE) {
-    collected <- list()
-    args <- rlang::call_args(expr)
-    for (a in args) {
-        if (condition(a)) {
-              collected <- c(collected, attr(a, attribute))
-          }
-    }
-    collected
-}
-
 annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
     locals <- collect_from_args(expr, "assigned_symbols") %>%
         unlist() %>%
