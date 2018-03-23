@@ -33,10 +33,40 @@ with_topdown_callback(callbacks, fn)
 \item{fn}{A function to install as a callback.}
 }
 \description{
-Callbacks must be functions that take three arguments: The expression
-to rewrite, the environment of the function we are rewriting (i.e. the
+Callbacks must be functions that take three arguments: The expression to
+rewrite, the environment of the function we are rewriting (i.e. the
 environment it is defined in, not the function call frame), and a list of
 formal parameters of the function we are translating.
+}
+\details{
+The flow of a depth-first traversal is as follows:
+
+For expressions that are atomic, i.e. are either atomic values, pairlists,
+symbols, or primitives, the corresponding callback is called with the
+expression. The callbacks are called with the expression, \code{expr}, the
+environment of the function we are traversing, \code{env}, the parameters of that
+function, \code{params}, information collected top-down in \code{topdown}, warning
+flags through the \code{wflags} parameter, and any additional user-provided
+arguments through \code{...}. If the callbacks are used in a rewrite traversal,
+see \code{\link[=depth_first_rewrite_function]{depth_first_rewrite_function()}}, they must return an expression. This
+expression will be inserted as a substitute of the \code{expr} argument in the
+function being rewritten. If the callback is part of an analysis, see
+\code{\link[=depth_first_analyse_function]{depth_first_analyse_function()}}, then it can return any data; what it
+returns will be provided to the callbacks on the enclosing expression via the
+\code{bottomup} parameter.
+
+For \code{call} expressions, the \code{topdown} callback is invoked before the call is
+traversed. It is provided with the same arguments as the other callbacks and
+in addition a thunk \code{skip} that it can use to prevent the depth-first
+traversal to explore the call further. Whatever the \code{topdown} callback
+returns will be provided to the call callback via the argument \code{topdown} it
+it is called (i.e. if the \code{topdown} callback doesn't invoke \code{skip}).
+
+After the \code{topdown} callback is executed, if it doesn't call \code{skip}, the
+\code{call} callback is called on the expression. It is called with the same
+arguments as the other callbacks, and must return an expression if part of a
+rewrite traversal or any collected information if part of an analysis
+traversal.
 }
 \section{Functions}{
 \itemize{
@@ -70,4 +100,6 @@ with_primitive_callback
 with_call_callback
 
 with_topdown_callback
+
+warning_flags
 }

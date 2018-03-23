@@ -1,12 +1,17 @@
 #' A callback that does not do any transformation.
 #'
 #' Callbacks have one required argument, `expr`, but will actually be called
-#' with more. The additional named parameters are: - **env**      The function
-#' environment of the function we are transforming - **params**   The formal
-#' parameters of the function we are transforming - **topdown**  Data passed
-#' top-down in the traversal. - **bottomup** Data collected by depth-first
-#' traversals before a callback is called. plus whatever the user provide to
-#' [depth_first_rewrite_function()] or [depth_first_analyse_function()].
+#' with more. The additional named parameters are:
+#'
+#' - **env**      The function environment of the function we are transforming
+#'
+#' - **params**   The formal parameters of the function we are transforming
+#'
+#' - **topdown**  Data passed top-down in the traversal.
+#'
+#' - **bottomup** Data collected by depth-first traversals before a callback is
+#' called. plus whatever the user provide to [depth_first_rewrite_function()] or
+#' [depth_first_analyse_function()].
 #'
 #' In bottom up analyses, the [merge_bottomup()] function can be used to
 #' collected the results of several recursive calls. When annotating
@@ -21,6 +26,7 @@
 #' @return `expr`
 #'
 #' @seealso merge_bottomup
+#' @seealso collect_from_args
 #'
 #' @describeIn identity_rewrite_callback Identity for expression rewriting
 #' @export
@@ -46,14 +52,41 @@ identity_analysis_callback <-
 #' @export
 nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 
-# FIXME: better documentation for the callbacks. id:0 gh:14 ic:gh
-
 #' Default expression-transformation callbacks.
 #'
-#' Callbacks must be functions that take three arguments: The expression
-#' to rewrite, the environment of the function we are rewriting (i.e. the
+#' Callbacks must be functions that take three arguments: The expression to
+#' rewrite, the environment of the function we are rewriting (i.e. the
 #' environment it is defined in, not the function call frame), and a list of
 #' formal parameters of the function we are translating.
+#'
+#' The flow of a depth-first traversal is as follows:
+#'
+#' For expressions that are atomic, i.e. are either atomic values, pairlists,
+#' symbols, or primitives, the corresponding callback is called with the
+#' expression. The callbacks are called with the expression, `expr`, the
+#' environment of the function we are traversing, `env`, the parameters of that
+#' function, `params`, information collected top-down in `topdown`, warning
+#' flags through the `wflags` parameter, and any additional user-provided
+#' arguments through `...`. If the callbacks are used in a rewrite traversal,
+#' see [depth_first_rewrite_function()], they must return an expression. This
+#' expression will be inserted as a substitute of the `expr` argument in the
+#' function being rewritten. If the callback is part of an analysis, see
+#' [depth_first_analyse_function()], then it can return any data; what it
+#' returns will be provided to the callbacks on the enclosing expression via the
+#' `bottomup` parameter.
+#'
+#' For `call` expressions, the `topdown` callback is invoked before the call is
+#' traversed. It is provided with the same arguments as the other callbacks and
+#' in addition a thunk `skip` that it can use to prevent the depth-first
+#' traversal to explore the call further. Whatever the `topdown` callback
+#' returns will be provided to the call callback via the argument `topdown` it
+#' it is called (i.e. if the `topdown` callback doesn't invoke `skip`).
+#'
+#' After the `topdown` callback is executed, if it doesn't call `skip`, the
+#' `call` callback is called on the expression. It is called with the same
+#' arguments as the other callbacks, and must return an expression if part of a
+#' rewrite traversal or any collected information if part of an analysis
+#' traversal.
 #'
 #' @param callbacks The list of callbacks
 #' @param fn        A function to install as a callback.
@@ -64,6 +97,7 @@ nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 #' @seealso with_primitive_callback
 #' @seealso with_call_callback
 #' @seealso with_topdown_callback
+#' @seealso warning_flags
 #' @export
 
 # I'm using a function here, although it would be more natural to just use the
@@ -224,7 +258,7 @@ add_call_callback <- function(callbacks, fn, cb) {
 #' arguments (which depend on context and user-provided information to
 #' ..., see [rewrite_callbacks()] and [analysis_callbacks()]), and additionally
 #' the next callback in line, through the parameter `next_cb`. This can be
-#' used to propagate informtion through several callbacks in a pipe-like
+#' used to propagate information through several callbacks in a pipe-like
 #' fashion.
 #'
 #'

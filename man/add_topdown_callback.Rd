@@ -27,6 +27,6 @@ The callback that is installed will be called with the usual callback
 arguments (which depend on context and user-provided information to
 ..., see \code{\link[=rewrite_callbacks]{rewrite_callbacks()}} and \code{\link[=analysis_callbacks]{analysis_callbacks()}}), and additionally
 the next callback in line, through the parameter \code{next_cb}. This can be
-used to propagate informtion through several callbacks in a pipe-like
+used to propagate information through several callbacks in a pipe-like
 fashion.
 }

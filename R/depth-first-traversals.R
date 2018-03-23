@@ -143,25 +143,25 @@ depth_first_analyse_expr <- function(expr, callbacks, topdown, wflags,
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
             expr,
-            topdown = topdown, bottomup = list(), ...
+            topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_pairlist(expr)) {
         return(callbacks$pairlist(
             expr,
-            topdown = topdown, bottomup = list(), ...
+            topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(
             expr,
-            topdown = topdown, bottomup = list(), ...
+            topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_primitive(expr)) {
         return(callbacks$primitive(
             expr,
-            topdown = topdown, bottomup = list(), ...
+            topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
 
@@ -170,7 +170,10 @@ depth_first_analyse_expr <- function(expr, callbacks, topdown, wflags,
     callCC(function(escape) {
         # skip means returning no bottomup info.
         skip <- function() escape(list())
-        topdown <- callbacks$topdown(expr, topdown = topdown, skip = skip, ...)
+        topdown <- callbacks$topdown(
+            expr, wflags = wflags,
+            topdown = topdown, skip = skip, ...
+        )
 
         # handle depth first
         call_args <- rlang::call_args(expr)
@@ -178,13 +181,16 @@ depth_first_analyse_expr <- function(expr, callbacks, topdown, wflags,
         for (i in seq_along(call_args)) {
             bottomup[[i]] <- depth_first_analyse_expr(
                 call_args[[i]], callbacks,
+                wflags = wflags,
                 topdown = topdown,
                 ...
             )
         }
 
         # then handle the actual call
-        callbacks$call(expr, topdown = topdown, bottomup = bottomup, ...)
+        callbacks$call(
+            expr, topdown = topdown, bottomup = bottomup, wflags = wflags, ...
+        )
     })
 }
 
