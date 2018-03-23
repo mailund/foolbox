@@ -157,15 +157,15 @@ test_that("we can annotate with the symbols in a simple function", {
 
 test_that("we hande `=` assignments as well", {
     f <- function() {
-        x = 42
+        x <- 42
     }
     res <- annotate_bound_symbols_in_function(f)
     expect_equal(attr(body(res), "assigned_symbols"), "x")
     expect_equal(attr(body(res), "bound"), "x")
 
     f <- function() {
-        x = 42
-        y = 24
+        x <- 42
+        y <- 24
         x + y
     }
     res <- annotate_bound_symbols_in_function(f)
@@ -175,7 +175,7 @@ test_that("we hande `=` assignments as well", {
     # when there is a formal parameter, that is also a bound variable
     # although it is not an assigned symbol.
     f <- function(x = 42) {
-        y = 24
+        y <- 24
         x + y
     }
     res <- annotate_bound_symbols_in_function(f)
@@ -187,8 +187,8 @@ test_that("we hande `=` assignments as well", {
     # of this function, we do assign to `x`, so we include it in
     # the annotation. It defintely belongs in the bound variables.
     f <- function(x = 42) {
-        x = 42
-        y = 24
+        x <- 42
+        y <- 24
         x + y
     }
     res <- annotate_bound_symbols_in_function(f)
@@ -197,9 +197,9 @@ test_that("we hande `=` assignments as well", {
 
     # we shouldn't include duplications
     f <- function(x = 42) {
-        y = x
-        x = 42
-        y = x + 2
+        y <- x
+        x <- 42
+        y <- x + 2
         x + y
     }
     res <- annotate_bound_symbols_in_function(f)
@@ -335,7 +335,9 @@ test_that("we can handle local functions", {
     g <- function() stop("outer")
     cb <- rewrite_callbacks() %>%
         add_call_callback(g, function(expr, ...) stop("don't call this"))
-    expect_warning(res <- depth_first_rewrite_function(f_an, cb),
-                   "The function g is not processed .*")
+    expect_warning(
+        res <- depth_first_rewrite_function(f_an, cb),
+        "The function g is not processed .*"
+    )
     expect_equal(body(f_an), body(res))
 })

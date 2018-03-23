@@ -57,4 +57,3 @@ collect_from_args <- function(expr, attribute,
     }
     collected
 }
-

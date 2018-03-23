@@ -150,8 +150,8 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
 collect_bound_variables_callback <- function(expr, topdown, ...) {
     bound <- c(topdown, attr(expr, "assigned_symbols"))
     if (expr[[1]] == "function") {
-          bound <- c(names(expr[[2]]), bound)
-      }
+        bound <- c(names(expr[[2]]), bound)
+    }
     bound # passed as `topdown` to the rewrite callback
 }
 

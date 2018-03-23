@@ -162,7 +162,8 @@ add_call_callback <- function(callbacks, fn, cb) {
         call_name <- as.character(expr[[1]])
         if (call_name %in% names(params)) {
             return(next_cb(
-                expr, env = env, params = params, wflags = wflags, ...
+                expr,
+                env = env, params = params, wflags = wflags, ...
             ))
         }
         # The same goes for other bound variables, if we have annotated
@@ -178,18 +179,20 @@ add_call_callback <- function(callbacks, fn, cb) {
                 ))
             }
             return(next_cb(
-                expr, env = env, params = params, wflags = wflags, ...
+                expr,
+                env = env, params = params, wflags = wflags, ...
             ))
         }
 
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
-            if (wflags$warn_on_unknown_function)
-                warning(paste0(
-                    "The function ", call_name,
-                    " could not be evaluated to an actual function in ",
-                    "this scope."
-                ))
+            if (wflags$warn_on_unknown_function) {
+                  warning(paste0(
+                      "The function ", call_name,
+                      " could not be evaluated to an actual function in ",
+                      "this scope."
+                  ))
+              }
             NULL
         }
         fun <- tryCatch(eval(expr[[1]], env), error = err_fun)
@@ -202,7 +205,8 @@ add_call_callback <- function(callbacks, fn, cb) {
         } else {
             # default for closure: try the next in line
             next_cb(
-                expr, env = env, params = params, wflags = wflags, ...
+                expr,
+                env = env, params = params, wflags = wflags, ...
             )
         }
     }
@@ -245,7 +249,8 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         call_name <- as.character(expr[[1]])
         if (call_name %in% names(params)) {
             return(next_cb(
-                expr, env = env, params = params, wflags = wflags, ...
+                expr,
+                env = env, params = params, wflags = wflags, ...
             ))
         }
         # The same goes for other bound variables, if we have annotated
@@ -261,30 +266,34 @@ add_topdown_callback <- function(callbacks, fn, cb) {
                 ))
             }
             return(next_cb(
-                expr, env = env, params = params,  wflags = wflags, ...
+                expr,
+                env = env, params = params, wflags = wflags, ...
             ))
         }
 
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
-            if (wflags$warn_on_unknown_function)
-                warning(paste0(
-                    "The function ", call_name,
-                    " could not be evaluated to an actual function in ",
-                    "this scope."
-                ))
+            if (wflags$warn_on_unknown_function) {
+                  warning(paste0(
+                      "The function ", call_name,
+                      " could not be evaluated to an actual function in ",
+                      "this scope."
+                  ))
+              }
             NULL
         }
         fun <- tryCatch(eval(expr[[1]], env), error = err_fun)
         if (!is.null(fun) && identical(fun, fn)) {
             return(cb(
-                expr, env = env, params = params,
+                expr,
+                env = env, params = params,
                 next_cb = next_cb, wflags = wflags, ...
             ))
         } else {
             # default for closure: try the next in line
             next_cb(
-                expr, env = env, params = params,
+                expr,
+                env = env, params = params,
                 wflags = wflags, ...
             )
         }
