@@ -6,7 +6,9 @@
 #' pipeline of [rewrite_with()] calls for further analysis.
 #'
 #' The flow of transformations goes starts with [rewrite()] and is followed
-#' by a series of [rewrite_with()] for additional rewrite callbacks.
+#' by a series of [rewrite_with()] for additional rewrite callbacks. For
+#' analysis, it starts with [analyse()] and is followed by a pipeline of
+#' [analyse_with()].
 #'
 #' @param fn The function to rewrite
 #' @param callbacks The callbacks that should do the rewriting
@@ -34,3 +36,28 @@ rewrite_with <- function(fn, callbacks, ...)
 #' @describeIn rewrite_with Function for starting a rewrite.
 #' @export
 rewrite <- function(fn) fn %>% annotate_bound_symbols_in_function()
+
+#' @describeIn rewrite_with Function for running analysis callbacks
+#' @export
+analyse <- rewrite # it is actually the same preprocessing
+
+#' @describeIn rewrite_with Apply `callbacks` over `fn` to analyse it.
+#' @export
+analyse_with <- function(fn, callbacks, ...)
+    depth_first_analyse_function(fn, callbacks, ...)
+
+#' @describeIn rewrite_with Expression version of [rewrite()]
+#' @export
+rewrite_expr <- function(expr) expr
+
+#' @describeIn rewrite_with Expression version of [rewrite_with()]
+#' @export
+rewrite_expr_with <- function(expr, callbacks,
+                              topdown = list(),
+                              wflags = warning_flags(),
+                              ...) {
+    expr %>% depth_first_rewrite_expr(
+        callbacks, topdown, wflags,
+        ...
+    )
+}

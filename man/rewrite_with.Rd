@@ -3,11 +3,24 @@
 \name{rewrite_with}
 \alias{rewrite_with}
 \alias{rewrite}
+\alias{analyse}
+\alias{analyse_with}
+\alias{rewrite_expr}
+\alias{rewrite_expr_with}
 \title{Functions for applying a sequence of rewrites.}
 \usage{
 rewrite_with(fn, callbacks, ...)
 
 rewrite(fn)
+
+analyse(fn)
+
+analyse_with(fn, callbacks, ...)
+
+rewrite_expr(expr)
+
+rewrite_expr_with(expr, callbacks, topdown = list(),
+  wflags = warning_flags(), ...)
 }
 \arguments{
 \item{fn}{The function to rewrite}
@@ -26,13 +39,23 @@ pipeline of \code{\link[=rewrite_with]{rewrite_with()}} calls for further analys
 }
 \details{
 The flow of transformations goes starts with \code{\link[=rewrite]{rewrite()}} and is followed
-by a series of \code{\link[=rewrite_with]{rewrite_with()}} for additional rewrite callbacks.
+by a series of \code{\link[=rewrite_with]{rewrite_with()}} for additional rewrite callbacks. For
+analysis, it starts with \code{\link[=analyse]{analyse()}} and is followed by a pipeline of
+\code{\link[=analyse_with]{analyse_with()}}.
 }
 \section{Functions}{
 \itemize{
 \item \code{rewrite_with}: Apply \code{callbacks} over \code{fn} to rewrite it.
 
 \item \code{rewrite}: Function for starting a rewrite.
+
+\item \code{analyse}: Function for running analysis callbacks
+
+\item \code{analyse_with}: Apply \code{callbacks} over \code{fn} to analyse it.
+
+\item \code{rewrite_expr}: Expression version of \code{\link[=rewrite]{rewrite()}}
+
+\item \code{rewrite_expr_with}: Expression version of \code{\link[=rewrite_with]{rewrite_with()}}
 }}
 
 \examples{
