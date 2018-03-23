@@ -54,25 +54,25 @@ make_set_warning <- function(warning_name, val) {
     }
 }
 
-#' @describeIn warning_flags Enable warnings when encountring an unknown
+#' @describeIn warning_flags Enable warnings when encountering an unknown
 #'   function
 #' @export
 set_warn_on_unknown_function <-
     make_set_warning("warn_on_unknown_function", TRUE)
 
-#' @describeIn warning_flags Disable warnings when encountring an unknown
+#' @describeIn warning_flags Disable warnings when encountering an unknown
 #'   function
 #' @export
 unset_warn_on_unknown_function <-
     make_set_warning("warn_on_unknown_function", FALSE)
 
-#' @describeIn warning_flags Enable warnings when encountring a local variable
+#' @describeIn warning_flags Enable warnings when encountering a local variable
 #'   with a name that matches one installed for transformation.
 #' @export
 set_warn_on_local_function <-
     make_set_warning("warn_on_local_function", TRUE)
 
-#' @describeIn warning_flags Disable warnings when encountring a local variable
+#' @describeIn warning_flags Disable warnings when encountering a local variable
 #'   with a name that matches one installed for transformation.
 #' @export
 unset_warn_on_local_function <-

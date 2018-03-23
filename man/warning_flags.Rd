@@ -60,16 +60,16 @@ then it is the local variable that is being called.
 }
 \section{Functions}{
 \itemize{
-\item \code{set_warn_on_unknown_function}: Enable warnings when encountring an unknown
+\item \code{set_warn_on_unknown_function}: Enable warnings when encountering an unknown
 function
 
-\item \code{unset_warn_on_unknown_function}: Disable warnings when encountring an unknown
+\item \code{unset_warn_on_unknown_function}: Disable warnings when encountering an unknown
 function
 
-\item \code{set_warn_on_local_function}: Enable warnings when encountring a local variable
+\item \code{set_warn_on_local_function}: Enable warnings when encountering a local variable
 with a name that matches one installed for transformation.
 
-\item \code{unset_warn_on_local_function}: Disable warnings when encountring a local variable
+\item \code{unset_warn_on_local_function}: Disable warnings when encountering a local variable
 with a name that matches one installed for transformation.
 }}
 

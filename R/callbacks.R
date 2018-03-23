@@ -1,22 +1,22 @@
 #' A callback that does not do any transformation.
 #'
-#' Callbacks have one required argument, `expr`, but will actually
-#' be called with more. The additional named parameters are:
-#' - **env**      The function environment of the function we are transforming
-#' - **params**   The formal parameters of the function we are transforming
-#' - **topdown**  Data passed top-down in the traversal.
-#' - **bottomup** Data collected by depth-first traversals before a callback
-#'                is called.
-#' plus whatever the user provide to [depth_first_rewrite_function()]
-#' or [depth_first_analyse_function()].
+#' Callbacks have one required argument, `expr`, but will actually be called
+#' with more. The additional named parameters are: - **env**      The function
+#' environment of the function we are transforming - **params**   The formal
+#' parameters of the function we are transforming - **topdown**  Data passed
+#' top-down in the traversal. - **bottomup** Data collected by depth-first
+#' traversals before a callback is called. plus whatever the user provide to
+#' [depth_first_rewrite_function()] or [depth_first_analyse_function()].
 #'
 #' In bottom up analyses, the [merge_bottomup()] function can be used to
-#' collected the results of several recursive calls.
+#' collected the results of several recursive calls. When annotating
+#' expressions, the [collect_from_args()] can be used in `call` callbacks to
+#' extract annotation information from call arguments.
 #'
 #' @param expr     The expression to (not) transform.
-#' @param bottomup Information gathered depth-first in analysis callbacks.
-#'                 This parameter is only passed to callbacks in analysis
-#'                 traversals and not rewrite traversals.
+#' @param bottomup Information gathered depth-first in analysis callbacks. This
+#'   parameter is only passed to callbacks in analysis traversals and not
+#'   rewrite traversals.
 #' @param ...      Additional named parameters.
 #' @return `expr`
 #'
@@ -137,7 +137,7 @@ with_topdown_callback <- make_with_callback("topdown")
 #' arguments (which depend on context and user-provided information to
 #' ..., see [rewrite_callbacks()] and [analysis_callbacks()]), and additionally
 #' the next callback in line, through the parameter `next_cb`. This can be
-#' used to propagate informtion through several callbacks in a pipe-like
+#' used to propagate information through several callbacks in a pipe-like
 #' fashion.
 #'
 #' @param callbacks The existing callbacks.

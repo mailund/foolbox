@@ -188,7 +188,7 @@ annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
 #'
 #'   - **bound**: Variables that are either assigned to, thus potentially
 #'         local in the scope, or function parameters from an enclosing scope,
-#'         which will defintely be bound at this position.
+#'         which will definitely be bound at this position.
 #'
 #' Since R does not require that we declare local variables, and since the
 #' variables that are assigned to a local scope depend on the runtime execution

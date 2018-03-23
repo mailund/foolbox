@@ -11,7 +11,7 @@ collect_from_args(expr, attribute, condition = function(expr) TRUE)
 
 \item{attribute}{The attribute we want to collect from the arguments.}
 
-\item{condition}{A predicate. Only arguments where the condition evaluats to
+\item{condition}{A predicate. Only arguments where the condition evaluates to
 \code{TRUE} will be included in the result.}
 }
 \value{
@@ -19,7 +19,7 @@ A list or vector obtained by concatenating the attributes from
 the arguments.
 }
 \description{
-Givcen a call expression \code{expr}, this function scans the arguments to the
+Given a call expression \code{expr}, this function scans the arguments to the
 call and extracts the attribute \code{attribute} from each where the
 \code{condition} predicate evaluates to \code{TRUE}, and it concatenates all these.
 }

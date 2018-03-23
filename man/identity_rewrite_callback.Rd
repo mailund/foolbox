@@ -14,29 +14,27 @@ identity_analysis_callback(expr, bottomup, ...)
 
 \item{...}{Additional named parameters.}
 
-\item{bottomup}{Information gathered depth-first in analysis callbacks.
-This parameter is only passed to callbacks in analysis
-traversals and not rewrite traversals.}
+\item{bottomup}{Information gathered depth-first in analysis callbacks. This
+parameter is only passed to callbacks in analysis traversals and not
+rewrite traversals.}
 }
 \value{
 \code{expr}
 }
 \description{
-Callbacks have one required argument, \code{expr}, but will actually
-be called with more. The additional named parameters are:
-\itemize{
-\item \strong{env}      The function environment of the function we are transforming
-\item \strong{params}   The formal parameters of the function we are transforming
-\item \strong{topdown}  Data passed top-down in the traversal.
-\item \strong{bottomup} Data collected by depth-first traversals before a callback
-is called.
-plus whatever the user provide to \code{\link[=depth_first_rewrite_function]{depth_first_rewrite_function()}}
-or \code{\link[=depth_first_analyse_function]{depth_first_analyse_function()}}.
-}
+Callbacks have one required argument, \code{expr}, but will actually be called
+with more. The additional named parameters are: - \strong{env}      The function
+environment of the function we are transforming - \strong{params}   The formal
+parameters of the function we are transforming - \strong{topdown}  Data passed
+top-down in the traversal. - \strong{bottomup} Data collected by depth-first
+traversals before a callback is called. plus whatever the user provide to
+\code{\link[=depth_first_rewrite_function]{depth_first_rewrite_function()}} or \code{\link[=depth_first_analyse_function]{depth_first_analyse_function()}}.
 }
 \details{
 In bottom up analyses, the \code{\link[=merge_bottomup]{merge_bottomup()}} function can be used to
-collected the results of several recursive calls.
+collected the results of several recursive calls. When annotating
+expressions, the \code{\link[=collect_from_args]{collect_from_args()}} can be used in \code{call} callbacks to
+extract annotation information from call arguments.
 }
 \section{Functions}{
 \itemize{

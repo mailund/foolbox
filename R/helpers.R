@@ -35,13 +35,13 @@ merge_bottomup <- function(bottomup) {
 
 #' Collect attributes set in the arguments to a call expression.
 #'
-#' Givcen a call expression `expr`, this function scans the arguments to the
+#' Given a call expression `expr`, this function scans the arguments to the
 #' call and extracts the attribute `attribute` from each where the
 #' `condition` predicate evaluates to `TRUE`, and it concatenates all these.
 #'
 #' @param expr The call expression to process.
 #' @param attribute The attribute we want to collect from the arguments.
-#' @param condition A predicate. Only arguments where the condition evaluats to
+#' @param condition A predicate. Only arguments where the condition evaluates to
 #'     `TRUE` will be included in the result.
 #' @return A list or vector obtained by concatenating the attributes from
 #'     the arguments.

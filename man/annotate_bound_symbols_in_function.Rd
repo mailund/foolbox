@@ -27,7 +27,7 @@ assignment in a sub-expression of the call that is likely to
 affect the scope of the call.
 \item \strong{bound}: Variables that are either assigned to, thus potentially
 local in the scope, or function parameters from an enclosing scope,
-which will defintely be bound at this position.
+which will definitely be bound at this position.
 }
 
 Since R does not require that we declare local variables, and since the
