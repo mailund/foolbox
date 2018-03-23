@@ -54,7 +54,8 @@ formal parameters of the function we are translating.
 
 \item \code{with_call_callback}: Set the call callback function.
 
-\item \code{with_topdown_callback}: Set the topdown information passing callback function.
+\item \code{with_topdown_callback}: Set the topdown information passing callback
+function.
 }}
 
 \seealso{

@@ -1,6 +1,9 @@
 
 # FIXME: Document the warning flags id:16 gh:40 ic:gh
 #' Collection of warning flags used when traversing expressions.
+#'
+#' @param flags Used when setting or unsetting flags.
+#'
 #' @export
 warning_flags <- function() {
     list(

@@ -18,6 +18,9 @@ set_warn_on_local_function(flags)
 
 unset_warn_on_local_function(flags)
 }
+\arguments{
+\item{flags}{Used when setting or unsetting flags.}
+}
 \description{
 Collection of warning flags used when traversing expressions.
 }
