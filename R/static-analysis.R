@@ -28,6 +28,7 @@ skip_independent_scopes_callback <- function(expr, skip, ...) {
 
 collect_assigned_symbols_callbacks <- analysis_callbacks() %>%
     add_call_callback(`<-`, collection_callback) %>%
+    add_call_callback(`=`, collection_callback) %>%
     add_call_callback(`for`, collection_callback) %>%
     add_topdown_callback(`function`, skip_independent_scopes_callback) %>%
     add_topdown_callback(with, skip_independent_scopes_callback)
@@ -120,20 +121,6 @@ annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
 
 propagate_assigned_symbols_callback <- function(expr, ...) {
 
-    # The rules for when we are assigning to a local variable are a bit
-    # complicated. For control structures, we can assume that assignments will
-    # be to the local scope. People can change the implementation of these so it
-    # isn't, but then they are only hurting themselves and deserve the extra
-    # pain we can give them. For other call arguments, it gets a little more
-    # complicated. With standard-evaluation, if we have an arrow assignment in a
-    # function argument, then the assignment happens in the calling scope. So we
-    # will assume this happens unless we are handling cases we know have NSE,
-    # such as `with`. If an assignment is inside a block, however, we will
-    # assume that NSE *is* in play, by default, and not consider it a local
-    # assignment.
-
-    # FIXME: Document these heuristics id:11 gh:31 ic:gh
-
     # FIXME: Make a handle so people can guide these id:13 gh:34 ic:gh
     # heuristics, e.g. tell when arguments are evaluated in the calling
     # scope and when they are evaluated in another and assignments
@@ -177,6 +164,7 @@ propagate_bound_variables_callback <- function(expr, topdown, ...) {
 annotate_assigned_symbols_callbacks <- rewrite_callbacks() %>%
     with_call_callback(propagate_assigned_symbols_callback) %>%
     add_call_callback(`<-`, annotate_assigned_symbols_callback) %>%
+    add_call_callback(`=`, annotate_assigned_symbols_callback) %>%
     add_call_callback(`for`, annotate_assigned_symbols_callback)
 
 #' Propagate parameters and local variables top-down
@@ -184,29 +172,49 @@ annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
     with_topdown_callback(collect_bound_variables_callback) %>%
     with_call_callback(propagate_bound_variables_callback)
 
-#' Extracts all the symbols that appear on the left-hand side of an
-#' assignment and annotate expressions with those potentially in scope.
+#' Annotate sub-expressions with variables bound in their scope.
 #'
-#' Since R does not require that we declare local variables, and since
-#' the variables that are assigned to a local scope depend on the runtime
-#' execution of functions, we cannot determine with any certainty which
-#' variables will be assigned to in any given scope at any given program
-#' point. So the best we can do is figure out which variables are
-#' *potentially* assigned to. Which is what this function does.
+#' Extracts all the symbols that appear on the left-hand side of an assignment
+#' or as function parameters and annotate each sub-expression with those.
 #'
-#' The [collect_assigned_symbols_in_function()] function reformats the collected
-#' data into a character vector, removes duplications, and remove the
-#' formal parameters of the function from the list, so those are not considered
-#' local variables (rather, they are considered formals and presumably handled
-#' elsewhere as such).
+#' This function will annotate a function's body with two attributes for each
+#' sub-expression in the body. Each `call` expression in the body will be
+#' annotated with these two attributes:
+#'
+#'   -  **assigned_symbols**: Variables that appear to the left of an
+#'         assignment in a sub-expression of the call that is likely to
+#'         affect the scope of the call.
+#'
+#'   - **bound**: Variables that are either assigned to, thus potentially
+#'         local in the scope, or function parameters from an enclosing scope,
+#'         which will defintely be bound at this position.
+#'
+#' Since R does not require that we declare local variables, and since the
+#' variables that are assigned to a local scope depend on the runtime execution
+#' of functions, we cannot determine with any certainty which variables will be
+#' assigned to in any given scope at any given program point. So the best we can
+#' do is figure out which variables are *potentially* assigned to. Which is what
+#' this function does.
+#'
+#' The rules for when we are assigning to a local variable are a bit
+#' complicated. For control structures, we can assume that assignments will
+#' be to the local scope. People can change the implementation of these so it
+#' isn't, but then they are only hurting themselves and deserve the extra
+#' pain we can give them. For other call arguments, it gets a little more
+#' complicated. With standard-evaluation, if we have an arrow assignment in a
+#' function argument, then the assignment happens in the calling scope. So we
+#' will assume this happens unless we are handling cases we know have NSE,
+#' such as `with`. If an assignment is inside a block, however, we will
+#' assume that NSE *is* in play, by default, and not consider it a local
+#' assignment.
 #'
 #' @param fn The function whose body we should analyse
 #'
-#' @return A function who's expressions are annotated with potentially
-#'    local variables.
+#' @return A function who's expressions are annotated with potentially local
+#'   variables.
 #'
 #' @export
-annotate_assigned_symbols_in_function <- function(fn) {
+annotate_bound_symbols_in_function <- function(fn) {
     fn %>% depth_first_rewrite_function(
         annotate_assigned_symbols_callbacks,
         wflags = warning_flags() %>% unset_warn_on_unknown_function()
