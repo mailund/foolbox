@@ -155,6 +155,59 @@ test_that("we can annotate with the symbols in a simple function", {
     expect_equal(attr(body(res), "bound"), c("x", "y"))
 })
 
+test_that("we hande `=` assignments as well", {
+    f <- function() {
+        x = 42
+    }
+    res <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(res), "assigned_symbols"), "x")
+    expect_equal(attr(body(res), "bound"), "x")
+
+    f <- function() {
+        x = 42
+        y = 24
+        x + y
+    }
+    res <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(res), "assigned_symbols"), c("x", "y"))
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
+
+    # when there is a formal parameter, that is also a bound variable
+    # although it is not an assigned symbol.
+    f <- function(x = 42) {
+        y = 24
+        x + y
+    }
+    res <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(res), "assigned_symbols"), "y")
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
+
+    # If we analyse the full function, we might not want to consider
+    # formal parameters as local variables, but inside the *body*
+    # of this function, we do assign to `x`, so we include it in
+    # the annotation. It defintely belongs in the bound variables.
+    f <- function(x = 42) {
+        x = 42
+        y = 24
+        x + y
+    }
+    res <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(res), "assigned_symbols"), c("x", "y"))
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
+
+    # we shouldn't include duplications
+    f <- function(x = 42) {
+        y = x
+        x = 42
+        y = x + 2
+        x + y
+    }
+    res <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(res), "assigned_symbols"), c("y", "x"))
+    # the bound variables see the formal parameter first, so x before y
+    expect_equal(attr(body(res), "bound"), c("x", "y"))
+})
+
 test_that("we can annotate with symbols when there are for-loops", {
     f <- function(n) {
         for (i in 1:n) i
@@ -213,6 +266,69 @@ test_that("we can handle local functions", {
     f_an <- annotate_bound_symbols_in_function(f)
     expect_equal(attr(body(f_an), "assigned_symbols"), c("y", "g"))
     expect_equal(attr(body(f_an), "bound"), c("x", "y", "g"))
+
+    # Don't confuse named parameters with assignments
+    f <- function(x) {
+        y <- 2 * x
+        g <- function(v = x) {
+            z <- 2 * v
+        }
+        g(y)
+    }
+
+    f_an <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(f_an), "assigned_symbols"), c("y", "g"))
+    expect_equal(attr(body(f_an), "bound"), c("x", "y", "g"))
+
+    nested_fun <- body(f_an)[[3]][[3]]
+    expect_equal(attr(nested_fun, "assigned_symbols"), character(0))
+    expect_equal(attr(nested_fun, "bound"), c("v", "x", "y", "g"))
+
+    nested_body <- nested_fun[[3]]
+    expect_equal(attr(nested_body, "assigned_symbols"), "z")
+    expect_equal(attr(nested_body, "bound"), c("v", "x", "y", "g", "z"))
+
+    f <- function(x) {
+        y <- 2 * x
+        g <- function(v = x) {
+            z <- 2 * v
+        }
+        g(v = y)
+    }
+
+    f_an <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(f_an), "assigned_symbols"), c("y", "g"))
+    expect_equal(attr(body(f_an), "bound"), c("x", "y", "g"))
+
+    nested_fun <- body(f_an)[[3]][[3]]
+    expect_equal(attr(nested_fun, "assigned_symbols"), character(0))
+    expect_equal(attr(nested_fun, "bound"), c("v", "x", "y", "g"))
+
+    nested_body <- nested_fun[[3]]
+    expect_equal(attr(nested_body, "assigned_symbols"), "z")
+    expect_equal(attr(nested_body, "bound"), c("v", "x", "y", "g", "z"))
+
+    # with <- in function call, we *should* consider it an assignment
+    f <- function(x) {
+        y <- 2 * x
+        g <- function(v = x) {
+            z <- 2 * v
+        }
+        g(v <- y)
+    }
+
+    f_an <- annotate_bound_symbols_in_function(f)
+    expect_equal(attr(body(f_an), "assigned_symbols"), c("y", "g", "v"))
+    expect_equal(attr(body(f_an), "bound"), c("x", "y", "g", "v"))
+
+    nested_fun <- body(f_an)[[3]][[3]]
+    expect_equal(attr(nested_fun, "assigned_symbols"), character(0))
+    expect_equal(attr(nested_fun, "bound"), c("v", "x", "y", "g"))
+
+    nested_body <- nested_fun[[3]]
+    expect_equal(attr(nested_body, "assigned_symbols"), "z")
+    expect_equal(attr(nested_body, "bound"), c("v", "x", "y", "g", "z"))
+
 
     # We shouldn't confuse a local function with
     # one from the tranformation-scope.

@@ -7,7 +7,7 @@ collection_callback <- function(expr, bottomup, ...) {
     # This function is installed to be called on assignments and
     # on for-loops (where there is an implicit assignment to the
     # iterator variable)
-    if (expr[[1]] == "<-") {
+    if (expr[[1]] == "<-" || expr[[1]] == "=") {
         if (rlang::is_symbol(expr[[2]])) {
             local_var <- as.character(expr[[2]])
             bottomup$locals <- c(local_var, bottomup$locals)
@@ -103,7 +103,7 @@ annotate_assigned_symbols_callback <- function(expr, next_cb, ...) {
     # This function is installed to be called on assignments and
     # on for-loops (where there is an implicit assignment to the
     # iterator variable)
-    if (expr[[1]] == "<-") {
+    if (expr[[1]] == "<-" || expr[[1]] == "=") {
         if (rlang::is_symbol(expr[[2]])) {
             local_var <- as.character(expr[[2]])
             locals <- c(local_var, locals)
@@ -167,7 +167,8 @@ annotate_assigned_symbols_callbacks <- rewrite_callbacks() %>%
     add_call_callback(`=`, annotate_assigned_symbols_callback) %>%
     add_call_callback(`for`, annotate_assigned_symbols_callback)
 
-#' Propagate parameters and local variables top-down
+#' Propagate parameters and local variables top-down to assign attribute
+#' "bound" to all call expressions.
 annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
     with_topdown_callback(collect_bound_variables_callback) %>%
     with_call_callback(propagate_bound_variables_callback)

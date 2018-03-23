@@ -3,12 +3,14 @@
 \docType{data}
 \name{annotate_bound_variables_callbacks}
 \alias{annotate_bound_variables_callbacks}
-\title{Propagate parameters and local variables top-down}
+\title{Propagate parameters and local variables top-down to assign attribute
+"bound" to all call expressions.}
 \format{An object of class \code{list} of length 6.}
 \usage{
 annotate_bound_variables_callbacks
 }
 \description{
-Propagate parameters and local variables top-down
+Propagate parameters and local variables top-down to assign attribute
+"bound" to all call expressions.
 }
 \keyword{datasets}
