@@ -219,6 +219,7 @@ test_that("we can handle local functions", {
     g <- function() stop("outer")
     cb <- rewrite_callbacks() %>%
         add_call_callback(g, function(expr, ...) stop("don't call this"))
-    res <- depth_first_rewrite_function(f_an, cb)
+    expect_warning(res <- depth_first_rewrite_function(f_an, cb),
+                   "The function g is not processed .*")
     expect_equal(body(f_an), body(res))
 })

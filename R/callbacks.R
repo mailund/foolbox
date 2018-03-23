@@ -181,8 +181,13 @@ with_topdown_callback <- make_with_callback("topdown")
 #' @export
 add_call_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$call
+
+    fn_expr <- rlang::enexpr(fn)
+    fn_name <- if (rlang::is_symbol(fn_expr)) as.character(fn_expr) else ""
+
     force(fn)
     force(cb)
+
     closure <- function(expr, env, params, wflags, ...) {
         # make sure the call is not to a local variable--if it is,
         # we can't evaluate it at transformation time. We propagate
@@ -196,8 +201,15 @@ add_call_callback <- function(callbacks, fn, cb) {
         # The same goes for other bound variables, if we have annotated
         # the expressions with those.
         if (call_name %in% attr(expr, "bound")) {
-            # FIXME: if the local function has the same name as the one id:15 gh:39 ic:gh
-            # we are trying to analyse or transform, we want a warning here.
+            if (fn_name == call_name && wflags$warn_on_local_function) {
+                warning(paste0(
+                    "The function ", call_name,
+                    " is not processed by a callback because it might",
+                    " be referring to a local variable in the scope where",
+                    "it is found.\n",
+                    "Use a fully qualified name if you want it processed."
+                ))
+            }
             return(next_cb(
                 expr, env = env, params = params, wflags = wflags, ...
             ))
@@ -253,8 +265,12 @@ add_call_callback <- function(callbacks, fn, cb) {
 #' @export
 add_topdown_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$topdown
+    fn_expr <- rlang::enexpr(fn)
+    fn_name <- if (rlang::is_symbol(fn_expr)) as.character(fn_expr) else ""
+
     force(fn)
     force(cb)
+
     closure <- function(expr, env, params, wflags, ...) {
         # make sure the call is not to a local variable--if it is,
         # we can't evaluate it at transformation time. We propagate
@@ -268,8 +284,15 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         # The same goes for other bound variables, if we have annotated
         # the expressions with those.
         if (call_name %in% attr(expr, "bound")) {
-            # FIXME: if the local function has the same name as the one id:17 gh:42 ic:gh
-            # we are trying to analyse or transform, we want a warning here.
+            if (fn_name == call_name && wflags$warn_on_local_function) {
+                warning(paste0(
+                    "The function ", call_name,
+                    " is not processed by a callback because it might",
+                    " be referring to a local variable in the scope where",
+                    "it is found.\n",
+                    "Use a fully qualified name if you want it processed."
+                ))
+            }
             return(next_cb(
                 expr, env = env, params = params,  wflags = wflags, ...
             ))
