@@ -1,25 +1,40 @@
 context("API/DSL for specifying transformation functions")
 
-test_that("we can call a callback for a specific function", {
+test_that("the functions for setting up transformations work", {
     f <- function(x) 2 + x
-    cb <- rewrite_callbacks() %>%
-        add_call_callback(f, function(expr, ...) {
-            quote(2 + x)
-        })
-    tr_f <- . %>% rewrite() %>% rewrite_with(cb)
-
     g <- function(y) y + f(y)
-    expect_equal(body(tr_f(g)), quote(y + (2 + x)))
+    tr_g <- g %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>%
+            add_call_callback(f, function(expr, ...) {
+                quote(2 + x)
+            })
+    )
+    expect_equal(body(tr_g), quote(y + (2 + x)))
 
-    # Here, f is a parameter, so shouldn't be transformed
-    g <- function(f, y) y + f(y)
-    expect_equal(body(tr_f(g)), quote(y + f(y)))
+    tr_g_body <- body(g) %>% rewrite_expr() %>% rewrite_expr_with(
+        rewrite_callbacks() %>%
+            add_call_callback(f, function(expr, ...) {
+                quote(2 + x)
+            }),
+        env = environment()
+    )
+    expect_equal(tr_g_body, quote(y + (2 + x)))
+})
 
-    # Here, f is a local variable, so shouldn't be transformed
-    g <- function(f, y) {
-        f <- function(x) 2 * x
-        y + f(y)
+test_that("the functions for running analyses work", {
+    collect_symbols <- function(expr, bottomup, ...) {
+        list(syms = c(as.character(expr), merge_bottomup(bottomup)) %>% unlist %>% unique)
     }
-    expect_equal(body(tr_f(g)), quote({f <- function(x) 2 * x ; y + f(y)}))
+
+    f <- function(x, y) 2 + x - y
+    syms <- f %>% analyse() %>% analyse_with(
+        analysis_callbacks() %>% with_symbol_callback(collect_symbols)
+    )
+    expect_equal(syms$syms, c("x", "y"))
+
+    syms <- body(f) %>% analyse_expr() %>% analyse_expr_with(
+        analysis_callbacks() %>% with_symbol_callback(collect_symbols)
+    )
+    expect_equal(syms$syms, c("x", "y"))
 })
 

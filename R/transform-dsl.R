@@ -5,12 +5,14 @@
 #' function, `fn` and returns the result. This result can then be used in a
 #' pipeline of [rewrite_with()] calls for further analysis.
 #'
-#' The flow of transformations goes starts with [rewrite()] and is followed
-#' by a series of [rewrite_with()] for additional rewrite callbacks. For
-#' analysis, it starts with [analyse()] and is followed by a pipeline of
-#' [analyse_with()].
+#' The flow of transformations goes starts with [rewrite()] and is followed by a
+#' series of [rewrite_with()] for additional rewrite callbacks. For analysis, it
+#' starts with [analyse()] and is followed by a pipeline of [analyse_with()].
+#'
 #'
 #' @param fn The function to rewrite
+#' @param expr When invoked on expressions, in [rewrite_expr()], the expression
+#'   to rewrite.
 #' @param callbacks The callbacks that should do the rewriting
 #' @param ... Additional parameters passed along to the callbacks.
 #'
@@ -52,12 +54,20 @@ rewrite_expr <- function(expr) expr
 
 #' @describeIn rewrite_with Expression version of [rewrite_with()]
 #' @export
-rewrite_expr_with <- function(expr, callbacks,
-                              topdown = list(),
-                              wflags = warning_flags(),
-                              ...) {
+rewrite_expr_with <- function(expr, callbacks, ...) {
     expr %>% depth_first_rewrite_expr(
-        callbacks, topdown, wflags,
-        ...
+        callbacks, ...
+    )
+}
+
+#' @describeIn rewrite_with Expression version of [analyse()]
+#' @export
+analyse_expr <- function(expr) expr
+
+#' @describeIn rewrite_with Expression version of [analyse_with()]
+#' @export
+analyse_expr_with <- function(expr, callbacks, ...) {
+    expr %>% depth_first_analyse_expr(
+        callbacks, ...
     )
 }

@@ -4,12 +4,16 @@
 \alias{depth_first_analyse_expr}
 \title{Analyse an expression.}
 \usage{
-depth_first_analyse_expr(expr, callbacks, topdown, wflags, ...)
+depth_first_analyse_expr(expr, callbacks, params = list(), topdown = list(),
+  wflags = warning_flags(), ...)
 }
 \arguments{
 \item{expr}{An R expression}
 
 \item{callbacks}{List of callbacks to apply.}
+
+\item{params}{Parameters of the function we are analysing. If we are
+working on a raw expression, just use thes default, which is an empty list.}
 
 \item{topdown}{A list of additional information gathered in the traversal.}
 
@@ -21,7 +25,8 @@ depth_first_analyse_expr(expr, callbacks, topdown, wflags, ...)
 The result of the last bottom-up traversal.
 }
 \description{
-Traverses the expression \code{expr} depth-first and analyse it it using \code{callbacks}.
+Traverses the expression \code{expr} depth-first and analyse it it using
+\code{callbacks}.
 }
 \seealso{
 analysis_callbacks

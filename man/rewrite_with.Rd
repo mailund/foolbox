@@ -7,6 +7,8 @@
 \alias{analyse_with}
 \alias{rewrite_expr}
 \alias{rewrite_expr_with}
+\alias{analyse_expr}
+\alias{analyse_expr_with}
 \title{Functions for applying a sequence of rewrites.}
 \usage{
 rewrite_with(fn, callbacks, ...)
@@ -19,8 +21,11 @@ analyse_with(fn, callbacks, ...)
 
 rewrite_expr(expr)
 
-rewrite_expr_with(expr, callbacks, topdown = list(),
-  wflags = warning_flags(), ...)
+rewrite_expr_with(expr, callbacks, ...)
+
+analyse_expr(expr)
+
+analyse_expr_with(expr, callbacks, ...)
 }
 \arguments{
 \item{fn}{The function to rewrite}
@@ -28,6 +33,9 @@ rewrite_expr_with(expr, callbacks, topdown = list(),
 \item{callbacks}{The callbacks that should do the rewriting}
 
 \item{...}{Additional parameters passed along to the callbacks.}
+
+\item{expr}{When invoked on expressions, in \code{\link[=rewrite_expr]{rewrite_expr()}}, the expression
+to rewrite.}
 }
 \value{
 A rewritten function
@@ -38,10 +46,9 @@ function, \code{fn} and returns the result. This result can then be used in a
 pipeline of \code{\link[=rewrite_with]{rewrite_with()}} calls for further analysis.
 }
 \details{
-The flow of transformations goes starts with \code{\link[=rewrite]{rewrite()}} and is followed
-by a series of \code{\link[=rewrite_with]{rewrite_with()}} for additional rewrite callbacks. For
-analysis, it starts with \code{\link[=analyse]{analyse()}} and is followed by a pipeline of
-\code{\link[=analyse_with]{analyse_with()}}.
+The flow of transformations goes starts with \code{\link[=rewrite]{rewrite()}} and is followed by a
+series of \code{\link[=rewrite_with]{rewrite_with()}} for additional rewrite callbacks. For analysis, it
+starts with \code{\link[=analyse]{analyse()}} and is followed by a pipeline of \code{\link[=analyse_with]{analyse_with()}}.
 }
 \section{Functions}{
 \itemize{
@@ -56,6 +63,10 @@ analysis, it starts with \code{\link[=analyse]{analyse()}} and is followed by a 
 \item \code{rewrite_expr}: Expression version of \code{\link[=rewrite]{rewrite()}}
 
 \item \code{rewrite_expr_with}: Expression version of \code{\link[=rewrite_with]{rewrite_with()}}
+
+\item \code{analyse_expr}: Expression version of \code{\link[=analyse]{analyse()}}
+
+\item \code{analyse_expr_with}: Expression version of \code{\link[=analyse_with]{analyse_with()}}
 }}
 
 \examples{
