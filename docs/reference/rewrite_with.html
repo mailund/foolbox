@@ -115,8 +115,11 @@ pipeline of <code>rewrite_with()</code> calls for further analysis.</p>
 
 <span class='fu'>rewrite_expr</span>(<span class='no'>expr</span>)
 
-<span class='fu'>rewrite_expr_with</span>(<span class='no'>expr</span>, <span class='no'>callbacks</span>, <span class='kw'>topdown</span> <span class='kw'>=</span> <span class='fu'>list</span>(),
-  <span class='kw'>wflags</span> <span class='kw'>=</span> <span class='fu'><a href='warning_flags.html'>warning_flags</a></span>(), <span class='no'>...</span>)</pre>
+<span class='fu'>rewrite_expr_with</span>(<span class='no'>expr</span>, <span class='no'>callbacks</span>, <span class='no'>...</span>)
+
+<span class='fu'>analyse_expr</span>(<span class='no'>expr</span>)
+
+<span class='fu'>analyse_expr_with</span>(<span class='no'>expr</span>, <span class='no'>callbacks</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -133,6 +136,11 @@ pipeline of <code>rewrite_with()</code> calls for further analysis.</p>
       <th>...</th>
       <td><p>Additional parameters passed along to the callbacks.</p></td>
     </tr>
+    <tr>
+      <th>expr</th>
+      <td><p>When invoked on expressions, in <code>rewrite_expr()</code>, the expression
+to rewrite.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -141,10 +149,9 @@ pipeline of <code>rewrite_with()</code> calls for further analysis.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The flow of transformations goes starts with <code>rewrite()</code> and is followed
-by a series of <code>rewrite_with()</code> for additional rewrite callbacks. For
-analysis, it starts with <code>analyse()</code> and is followed by a pipeline of
-<code>analyse_with()</code>.</p>
+    <p>The flow of transformations goes starts with <code>rewrite()</code> and is followed by a
+series of <code>rewrite_with()</code> for additional rewrite callbacks. For analysis, it
+starts with <code>analyse()</code> and is followed by a pipeline of <code>analyse_with()</code>.</p>
     
     <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
@@ -155,6 +162,8 @@ analysis, it starts with <code>analyse()</code> and is followed by a pipeline of
 <li><p><code>analyse_with</code>: Apply <code>callbacks</code> over <code>fn</code> to analyse it.</p></li>
 <li><p><code>rewrite_expr</code>: Expression version of <code>rewrite()</code></p></li>
 <li><p><code>rewrite_expr_with</code>: Expression version of <code>rewrite_with()</code></p></li>
+<li><p><code>analyse_expr</code>: Expression version of <code>analyse()</code></p></li>
+<li><p><code>analyse_expr_with</code>: Expression version of <code>analyse_with()</code></p></li>
 </ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Transform an expression. — depth_first_rewrite_expr • foolbox</title>
+<title>Object for setting up a transformation pipeline when defining functions — rewrites • foolbox</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,9 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-<meta property="og:title" content="Transform an expression. — depth_first_rewrite_expr" />
+<meta property="og:title" content="Object for setting up a transformation pipeline when defining functions — rewrites" />
 
-<meta property="og:description" content="Traverses the expression expr depth-first and transform it using callbacks." />
+<meta property="og:description" content="Object for setting up a transformation pipeline when defining functions" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -93,67 +93,27 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Transform an expression.</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/depth-first-traversals.R'><code>R/depth-first-traversals.R</code></a></small>
+    <h1>Object for setting up a transformation pipeline when defining functions</h1>
+    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/transform-dsl.R'><code>R/transform-dsl.R</code></a></small>
     </div>
 
     
-    <p>Traverses the expression <code>expr</code> depth-first and transform it using <code>callbacks</code>.</p>
+    <p>Object for setting up a transformation pipeline when defining functions</p>
     
 
-    <pre class="usage"><span class='fu'>depth_first_rewrite_expr</span>(<span class='no'>expr</span>, <span class='no'>callbacks</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>topdown</span> <span class='kw'>=</span> <span class='fu'>list</span>(),
-  <span class='kw'>wflags</span> <span class='kw'>=</span> <span class='fu'><a href='warning_flags.html'>warning_flags</a></span>(), <span class='no'>...</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>expr</th>
-      <td><p>An R expression</p></td>
-    </tr>
-    <tr>
-      <th>callbacks</th>
-      <td><p>List of callbacks to apply.</p></td>
-    </tr>
-    <tr>
-      <th>params</th>
-      <td><p>Parameters of the function we are rewriting. If we are
-working on a raw expression, just use the default, which is an empty list.</p></td>
-    </tr>
-    <tr>
-      <th>topdown</th>
-      <td><p>A list of additional information gathered in the traversal.</p></td>
-    </tr>
-    <tr>
-      <th>wflags</th>
-      <td><p>Warning flags, see <code><a href='warning_flags.html'>warning_flags()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Additional data that will be passed along to callbacks.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <pre class="usage"><span class='no'>rewrites</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A modified expression.</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <p>rewrite_callbacks</p>
-<p>identity_rewrite_callback</p>
-<p>depth_first_rewrite_function</p>
+    <p>An object of class <code>foolbox_rewrite_spec</code> of length 1.</p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#format">Format</a></li>
           </ul>
 
   </div>

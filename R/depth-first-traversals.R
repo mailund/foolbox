@@ -25,25 +25,29 @@ depth_first_rewrite_expr <- function(expr, callbacks,
                                      ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, ...
         ))
     }
     if (rlang::is_pairlist(expr)) {
         return(callbacks$pairlist(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, ...
         ))
     }
     if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, ...
         ))
     }
     if (rlang::is_primitive(expr)) {
         return(callbacks$primitive(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, ...
         ))
     }
@@ -54,7 +58,8 @@ depth_first_rewrite_expr <- function(expr, callbacks,
         skip <- function() escape(expr) # skip means leaving the body unchanged
         # collect topdown info.
         topdown <- callbacks$topdown(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, skip = skip, ...
         )
 
@@ -62,7 +67,8 @@ depth_first_rewrite_expr <- function(expr, callbacks,
         call_args <- rlang::call_args(expr)
         for (i in seq_along(call_args)) {
             expr[[i + 1]] <- depth_first_rewrite_expr(
-                call_args[[i]], callbacks, params = params,
+                call_args[[i]], callbacks,
+                params = params,
                 topdown = topdown, wflags = wflags,
                 ...
             )
@@ -70,7 +76,8 @@ depth_first_rewrite_expr <- function(expr, callbacks,
 
         # then handle the actual call
         callbacks$call(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, ...
         )
     })
@@ -153,25 +160,29 @@ depth_first_analyse_expr <- function(expr, callbacks,
                                      ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_pairlist(expr)) {
         return(callbacks$pairlist(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_primitive(expr)) {
         return(callbacks$primitive(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
@@ -182,7 +193,8 @@ depth_first_analyse_expr <- function(expr, callbacks,
         # skip means returning no bottomup info.
         skip <- function() escape(list())
         topdown <- callbacks$topdown(
-            expr, params = params, wflags = wflags,
+            expr,
+            params = params, wflags = wflags,
             topdown = topdown, skip = skip, ...
         )
 
@@ -201,7 +213,8 @@ depth_first_analyse_expr <- function(expr, callbacks,
 
         # then handle the actual call
         callbacks$call(
-            expr, params = params,
+            expr,
+            params = params,
             topdown = topdown, bottomup = bottomup,
             wflags = wflags, ...
         )

@@ -71,3 +71,35 @@ analyse_expr_with <- function(expr, callbacks, ...) {
         callbacks, ...
     )
 }
+
+#' Object for setting up a transformation pipeline when defining functions
+#'
+#' @export
+rewrites <- structure(NA, class = "foolbox_rewrite_spec")
+
+#' Provide list of rewrite transformations.
+#'
+#' This subscript operator is used together with \code{\link{rewrites}} to specify
+#' a sequence of transformations to apply to a new function we define.
+#'
+#' @param dummy The dummy-table \code{\link{rewrites}}. It is only here because it
+#'     allows us to use subscripts as part of the domain-specific language.
+#' @param ... A list of rewrite functions.
+#'
+#' @export
+`[.foolbox_rewrite_spec` <- function(dummy, ...) {
+    structure(list(...), class = "foolbox_pipe")
+}
+#' This operator is used together with \code{\link{rewrites}} to transform a function
+#' after it is defined and before it is assigned to a name.
+#' @param pipe A specificiation of a a pipeline of transformations provided
+#'     using the subscript operator to `rewrites`.
+#' @param fn The function we wish to transform.
+#'
+#' @export
+`<.foolbox_pipe` <- function(pipe, fn) {
+    for (trans in pipe) {
+        fn <- trans(fn)
+    }
+    fn
+}

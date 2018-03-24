@@ -221,12 +221,12 @@ add_call_callback <- function(callbacks, fn, cb) {
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
             if (wflags$warn_on_unknown_function) {
-                  warning(paste0(
-                      "The function ", call_name,
-                      " could not be evaluated to an actual function in ",
-                      "this scope."
-                  ))
-              }
+                warning(paste0(
+                    "The function ", call_name,
+                    " could not be evaluated to an actual function in ",
+                    "this scope."
+                ))
+            }
             NULL
         }
         fun <- tryCatch(eval(expr[[1]], env), error = err_fun)
@@ -308,12 +308,12 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
             if (wflags$warn_on_unknown_function) {
-                  warning(paste0(
-                      "The function ", call_name,
-                      " could not be evaluated to an actual function in ",
-                      "this scope."
-                  ))
-              }
+                warning(paste0(
+                    "The function ", call_name,
+                    " could not be evaluated to an actual function in ",
+                    "this scope."
+                ))
+            }
             NULL
         }
         fun <- tryCatch(eval(expr[[1]], env), error = err_fun)

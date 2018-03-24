@@ -99,6 +99,36 @@ g %>% rewrite() %>% rewrite_with(
 At least, that is what I find myself doing as I am experimenting with
 `foolbox`.
 
+If you have transformations you apply on more than one function, you can
+of course save them
+
+``` r
+subst_f <- . %>% rewrite() %>% rewrite_with(
+    rewrite_callbacks() %>% add_call_callback(f, function(expr, ...) quote(2 * x))
+)
+```
+
+and apply them later
+
+``` r
+g %>% subst_f
+#> function (y) 
+#> 2 * x
+```
+
+If you have such saved transformations you can also use them as part of
+function definition
+
+``` r
+h <- rewrites[subst_f] < function(x) f(x) + 2 * f(x)
+h
+#> function (x) 
+#> 2 * x + 2 * (2 * x)
+```
+
+You can also put the full definition of a transformation in this syntax,
+but it is less readable.
+
 The documentation is currently a bit sparse. All functions are
 documented, but I haven’t written documentation for the overall design.
 That is on its way. For now, check the examples below.
@@ -458,6 +488,23 @@ To see it in action, we can inline the calls to `f` in the function `g`:
 f <- function(x, y = x) 2 * x + y
 g <- function(z) f(z - 3) + f(y = z + 3, x = 4)
 g %>% inline_function(f)
+#> function (z) 
+#> 2 * (z - 3) + (z - 3) + (2 * 4 + (z + 3))
+```
+
+If we want to perform the inline-transformation while we define a new
+function we can use the `rewrites` syntax, but here we need to change
+the inline transformation function a bit. The transformations given to
+`rewrites` must take the function to be transformed as its first
+argument, so we need to “curry” the inline function, changing it from
+`function(f, fn) ...` to `function(f) function(fn) ...` so we can
+provide the function to inline in `rewrites` and get the function to
+transform when the `rewrites` rules are run.
+
+``` r
+inline <- function(f) function(fn) inline_function(fn, f)
+g <- rewrites[inline(f)] < function(z) f(z - 3) + f(y = z + 3, x = 4)
+g
 #> function (z) 
 #> 2 * (z - 3) + (z - 3) + (2 * 4 + (z + 3))
 ```

@@ -27,7 +27,8 @@
 <script src="../pkgdown.js"></script>
 <meta property="og:title" content="Analyse an expression. — depth_first_analyse_expr" />
 
-<meta property="og:description" content="Traverses the expression expr depth-first and analyse it it using callbacks." />
+<meta property="og:description" content="Traverses the expression expr depth-first and analyse it it using
+callbacks." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -98,10 +99,12 @@
     </div>
 
     
-    <p>Traverses the expression <code>expr</code> depth-first and analyse it it using <code>callbacks</code>.</p>
+    <p>Traverses the expression <code>expr</code> depth-first and analyse it it using
+<code>callbacks</code>.</p>
     
 
-    <pre class="usage"><span class='fu'>depth_first_analyse_expr</span>(<span class='no'>expr</span>, <span class='no'>callbacks</span>, <span class='no'>topdown</span>, <span class='no'>wflags</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>depth_first_analyse_expr</span>(<span class='no'>expr</span>, <span class='no'>callbacks</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>topdown</span> <span class='kw'>=</span> <span class='fu'>list</span>(),
+  <span class='kw'>wflags</span> <span class='kw'>=</span> <span class='fu'><a href='warning_flags.html'>warning_flags</a></span>(), <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -113,6 +116,11 @@
     <tr>
       <th>callbacks</th>
       <td><p>List of callbacks to apply.</p></td>
+    </tr>
+    <tr>
+      <th>params</th>
+      <td><p>Parameters of the function we are analysing. If we are
+working on a raw expression, just use thes default, which is an empty list.</p></td>
     </tr>
     <tr>
       <th>topdown</th>
