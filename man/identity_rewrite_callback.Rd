@@ -33,6 +33,9 @@ with more. The additional named parameters are:
 \item \strong{bottomup} Data collected by depth-first traversals before a callback is
 called. plus whatever the user provide to \code{\link[=depth_first_rewrite_function]{depth_first_rewrite_function()}} or
 \code{\link[=depth_first_analyse_function]{depth_first_analyse_function()}}.
+\item \strong{next_cb} A handle to call the next callback if more are installed. This
+variable will be the callback that was in the callbacks list before this one
+replaced it.
 }
 
 In bottom up analyses, the \code{\link[=merge_bottomup]{merge_bottomup()}} function can be used to

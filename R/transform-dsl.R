@@ -88,8 +88,12 @@ rewrites <- structure(NA, class = "foolbox_rewrite_spec")
 #'
 #' @export
 `[.foolbox_rewrite_spec` <- function(dummy, ...) {
-    structure(list(...), class = "foolbox_pipe")
+    transformation_exprs <- rlang::enexprs(...)
+    transformations <- Map(function(trex) eval(rlang::expr(. %>% !!trex)),
+                           transformation_exprs)
+    structure(transformations, class = "foolbox_pipe")
 }
+
 #' This operator is used together with \code{\link{rewrites}} to transform a function
 #' after it is defined and before it is assigned to a name.
 #' @param pipe A specificiation of a a pipeline of transformations provided

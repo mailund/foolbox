@@ -289,7 +289,7 @@ After that, I define a function that maps a symbol to a value, if the symbol is 
 I then define a callback to inline function calls. This will be called on `call` objects for the given function. I extract the arguments provided in the call and put them in a table. Then I substitute the values in the table into the variables in the default parameters and rewrite the expressions there, substituting the variables I now have there with the values they get in the function call. Finally, I take the function body, rewrite it using the symbol map, and return that. This will then be inserted as a replacement for the function call in the depth-first traversal we set up as the final expression in the function.
 
 ```{r}
-inline_function <- function(fn, f) {
+inline <- function(fn, f) {
     
     # only inline if `f` has no assignments... otherwise, too much
     # analysis is needed for this simple example.
@@ -347,13 +347,14 @@ To see it in action, we can inline the calls to `f` in the function `g`:
 ```{r}
 f <- function(x, y = x) 2 * x + y
 g <- function(z) f(z - 3) + f(y = z + 3, x = 4)
-g %>% inline_function(f)
+g %>% inline(f)
 ```
 
 If we want to perform the inline-transformation while we define a new function we can use the `rewrites` syntax, but here we need to change the inline transformation function a bit. The transformations given to `rewrites` must take the function to be transformed as its first argument, so we need to "curry" the inline function, changing it from `function(f, fn) ...` to `function(f) function(fn) ...` so we can provide the function to inline in `rewrites` and get the function to transform when the `rewrites` rules are run.
 
 ```{r}
-inline <- function(f) function(fn) inline_function(fn, f)
 g <- rewrites[inline(f)] < function(z) f(z - 3) + f(y = z + 3, x = 4)
 g
 ```
+
+We can write `inline(f)` here, although the `inline` function takes two arguments, the first of which being the function we transform, because the `rewrites[...]` syntax transform the functions in the same was as the `%>%` operator. The input to the `rewrites[...]` is automatically added as the first argument to the first transformation in `rewrites`, the output of the first transformation will be inserted as the first argument to the next transformation, etc.

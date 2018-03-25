@@ -7,7 +7,7 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--24-green.svg)](/commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--25-green.svg)](/commits/master)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.0.0.9000-green.svg?style=flat-square)](commits/master)
 [![Travis build
 status](https://travis-ci.org/mailund/foolbox.svg?branch=master)](https://travis-ci.org/mailund/foolbox)
@@ -340,6 +340,11 @@ f <- function(x, y) {
 }
 
 f %>% set_invariant(a, a > 0)
+#> Warning in value[[3L]](cond): The function could not be evaluated to an
+#> actual function in this scope.
+
+#> Warning in value[[3L]](cond): The function could not be evaluated to an
+#> actual function in this scope.
 #> function (x, y) 
 #> {
 #>     {
@@ -429,7 +434,7 @@ will then be inserted as a replacement for the function call in the
 depth-first traversal we set up as the final expression in the function.
 
 ``` r
-inline_function <- function(fn, f) {
+inline <- function(fn, f) {
     
     # only inline if `f` has no assignments... otherwise, too much
     # analysis is needed for this simple example.
@@ -487,7 +492,7 @@ To see it in action, we can inline the calls to `f` in the function `g`:
 ``` r
 f <- function(x, y = x) 2 * x + y
 g <- function(z) f(z - 3) + f(y = z + 3, x = 4)
-g %>% inline_function(f)
+g %>% inline(f)
 #> function (z) 
 #> 2 * (z - 3) + (z - 3) + (2 * 4 + (z + 3))
 ```
@@ -502,9 +507,16 @@ provide the function to inline in `rewrites` and get the function to
 transform when the `rewrites` rules are run.
 
 ``` r
-inline <- function(f) function(fn) inline_function(fn, f)
 g <- rewrites[inline(f)] < function(z) f(z - 3) + f(y = z + 3, x = 4)
 g
 #> function (z) 
 #> 2 * (z - 3) + (z - 3) + (2 * 4 + (z + 3))
 ```
+
+We can write `inline(f)` here, although the `inline` function takes two
+arguments, the first of which being the function we transform, because
+the `rewrites[...]` syntax transform the functions in the same was as
+the `%>%` operator. The input to the `rewrites[...]` is automatically
+added as the first argument to the first transformation in `rewrites`,
+the output of the first transformation will be inserted as the first
+argument to the next transformation, etc.

@@ -151,6 +151,9 @@ rewrite traversals.</p></td>
 <li><p><strong>bottomup</strong> Data collected by depth-first traversals before a callback is
 called. plus whatever the user provide to <code><a href='depth_first_rewrite_function.html'>depth_first_rewrite_function()</a></code> or
 <code><a href='depth_first_analyse_function.html'>depth_first_analyse_function()</a></code>.</p></li>
+<li><p><strong>next_cb</strong> A handle to call the next callback if more are installed. This
+variable will be the callback that was in the callbacks list before this one
+replaced it.</p></li>
 </ul>
     <p>In bottom up analyses, the <code><a href='merge_bottomup.html'>merge_bottomup()</a></code> function can be used to
 collected the results of several recursive calls. When annotating
