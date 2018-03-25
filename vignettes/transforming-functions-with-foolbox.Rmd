@@ -177,6 +177,18 @@ Top-down callbacks get one additional argument:
 
 ### Setting up callbacks
 
+When configuring callbacks for a traversal, you should start with the default set of functions for the traversal you have in mind. You get the default callbacks for an analysis traversal using the function `analysis_callbacks()` and the default callbacks for a rewrite traversal using the function `rewrite_callbacks()`. You can then replace a callback, of each of the six kinds, using the `with_`*type*`_callback()` functions, as part of a pipeline. For example, the pipeline
+
+```r
+rewrite_callbacks() %>% 
+    with_call_callback(my_call_callback) %>%
+    with_symbol_callback(my_symbol_callback)
+```
+
+will create callbacks that are defaults for rewriting for atomics, primates, pair-lists and top-down and have replaced the call and symbol callbacks with `my_call_callback` and `my_symbol_callback`, respectively.
+
+
+
 ## Traversals
 
 ### Setting up a traversal
