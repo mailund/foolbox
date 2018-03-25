@@ -16,6 +16,9 @@ Imports:
     rlang (>= 0.2.0)
 Suggests: 
     covr,
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
 URL: https://github.com/mailund/foolbox
 BugReports: https://github.com/mailund/foolbox/issues
+VignetteBuilder: knitr

@@ -1,0 +1,195 @@
+---
+title: "Transforming functions with foolbox"
+author: "Thomas Mailund"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(foolbox)
+```
+
+## Introduction
+
+R is a functional language that allows us to treat functions as data, but more than that, it is a language with powerful support for reflection, allowing us to examine the inner workings of objects and functions--and meta-programming--manipulating these objects and functions. We can take existing functions and build other functions from them but calling them as part of a computation or by composing functions in point-free programming, but we can *also* take existing functions, access their implementation, and *rewrite* that representation, creating a derived implementation, that can be the body of a new function.
+
+The `foolbox` package aims at making the second type of function manipulation—meta-programming on functions—easier by providing a framework for rewriting functions. The framework is based on depth-first traversals of the expression-structure a function implementation consists of that invokes user-provided callback handles that can be used to modify parts of the structure.
+
+This document describes how you can define your own callbacks and how you can apply them to analysing or rewriting functions.
+
+## Introductory examples
+
+To get a feeling for how the framework is used, we consider two simple examples: collecting the symbols (variables) used in a function and substituting variables for values.
+
+### Example: collecting symbols
+
+To get a feeling for how the framework is used, we start with a simple example: collecting the symbols (variables) used in a function. Say we have the function `f` defined as below:
+
+```{r}
+f <- function(x, y) {
+    a <- x + y
+    b <- x - y
+    2 * a - b^2
+}
+```
+
+This is a dummy-function so we don't care what it does, but for some reason we are interested in collecting all the symbols inside it. That is, we want to collect the variables used in the implementation of the function, which are `x`, `y`, `a`, and `b`.
+
+We can get the symbols in an expression structure by traversing it and picking all the elements where `is.symbol(expr)` or `clang::is_symbol(expr)` are `TRUE`. We can do this in a recursive function we write for this purpose, or we can use `foolbox` with a callback for symbols. To do this, we first define a callback. This is a function that must take at least one argument, `expr`, and allow additional arguments, `...`. We will use it in a traversal where it will only be called on symbols, so we can translate `expr` into a string whenever it is called, and we want to collect all such strings.
+
+We build the callbacks for the traversal from the default callbacks used in an analysis, we get it using the function `analysis_callbacks()`, and we update the symbols callback with new function using `with_symbols_callback`. We can then run an analysis by setting it up—using the `analyse()` function and then run the callbacks using `analyse_with(callbacks)`.
+
+```{r}
+collect_symbols <- function(expr, ...) {
+    list(symbols = as.character(expr))
+}
+callbacks <- analysis_callbacks() %>% with_symbol_callback(collect_symbols)
+f %>% analyse() %>% analyse_with(callbacks)
+```
+
+The symbols are collected in the order we see them in the function and since we do not remove duplications, we see each symbol as many times as it appears. We can simplify this a bit by post-processing the traversal results.
+
+```{r}
+f %>% analyse() %>% analyse_with(callbacks) %>% 
+    unlist(use.names = FALSE) %>% unique()
+```
+
+Normally, I will not bother with naming callbacks and constructing an analysis pipeline in steps, but simply construct it using a `%>%` pipeline like this:
+
+```{r}
+f %>% analyse() %>% analyse_with(
+    analysis_callbacks() %>% with_symbol_callback(
+        function(expr, ...) list(symbols = as.character(expr))
+    )
+) %>% unlist(use.names = FALSE) %>% unique()
+```
+
+It is a matter of taste what you prefer.
+
+I will often name a given pipeline, though, so I can reuse it later. This is something we can do by specifying the pipeline but with dot, `.`, as the initial input:
+
+```{r}
+collect_symbols <- . %>% analyse() %>% analyse_with(
+    analysis_callbacks() %>% with_symbol_callback(
+        function(expr, ...) list(symbols = as.character(expr))
+    )
+) %>% unlist(use.names = FALSE) %>% unique()
+```
+
+Then, when we have a function we want to analyse, we can pipe it into the analysis:
+
+```{r}
+f %>% collect_symbols()
+```
+
+The example uses an `analyse()` traversal. Such a traversal traverses the expression structure depth-first and invoke the callbacks on each sub-expression. What these compute are passed, bottom-up, to callbacks in the parameter `bottomup`. For symbols, we are at a leaf in the expression tree, so we do not get any `bottomup` information from the recursion, but the list we created is propagated up in the recursion. We just didn't see it in the example because the default callbacks propagate the results up and we could use those. Using callbacks for `call` expressions lets us manipulate this information to construct more complicated analyses.
+
+### Example: substitution
+
+As another example, we can consider modifying a function by replacing a given variable with a value. Here, we will use a `rewrite()` traversal instead of the `analyse()` traversal we used in the previous example. With a `rewrite()` traversal we have the same callbacks as in an analysis, and they are called with the same arguments (except for `bottomup` which is only used in `analysis()`), but they have to return an expression. The expression they return will be substituted into the result at the position where their `expr` argument sits in the input function.
+
+We want to replace symbols with values, so we will use the symbols callback again. This time around, we write a function for the transformation because we want to specify the variable we want substituted and the value we want it substituted with. We will simply collect these as expressions and then run the function through a `rewrite()` pipeline. Like this:
+
+```{r}
+subst_symbol <- function(fn, var, val) {
+    var <- rlang::enexpr(var)
+    val <- rlang::enexpr(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>% with_symbol_callback(
+            function(expr, ...) if (expr == var) val else expr
+        )
+    )
+}
+```
+
+Then, with a function like this:
+
+```{r}
+f <- function(x, y) 2 * x + y ** 2
+```
+
+we can replace `x` with `3`:
+
+```{r}
+f %>% subst_symbol(x, 3)
+```
+
+We have replaced `x` with `3` inside `f`'s body, but not removed the formal parameter. If you want to do this, you can do it in the `subst_symbol` function:
+
+```{r}
+subst_symbol <- function(fn, var, val) {
+    var <- rlang::enexpr(var)
+    val <- rlang::enexpr(val)
+    new_fn <- fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>% with_symbol_callback(
+            function(expr, ...) if (expr == var) val else expr
+        )
+    )
+    params <- formals(fn)
+    formals(new_fn) <- params[names(params) != as.character(var)]
+    new_fn
+}
+f %>% subst_symbol(x, 3)
+```
+
+In `foolbox` there is no special functionality for manipulating the *function* we rewrite. That can easily be done using base R functions. We focus on rewriting expressions.
+
+
+## Callbacks: when they are called and with which parameters
+
+There are five different expression types, and `foolbox` have a callback for each:
+
+* **atomic**: Literals, such as `12`, `"foo"`, or `TRUE`.
+* **symbol**: Variables, such as `f` or `x`.
+* **primitive**: Built in functions defined in C, such as `if` or `for` — the actual functions, not calls to them. Control structures are calls and not primitives, but the first component of a control structure call is (usually) a primitive.
+* **pairlist**: Parameter lists in `function()` definitions. This is a type that is only used when defining functions. The names of a pair-list is then the formal arguments of the function and the values the default parameters.
+* **call**: Function calls. Since control-structures, operators, indices, etc. are all considered functions in R, this captures all such expressions.
+
+The first three of these are base cases in expressions; they are expressions in themselves and not defined in terms of other expressions. The last two are recursive; they are expressions constructed from other expressions—the default arguments for pair-lists and the function plus its arguments for calls.
+
+When traversing a tree, we call these callbacks depth-first in traversals. In addition, there is a sixth callback, which doesn't correspond to an expression type, but which is called top-down, i.e. it is called *before* we recurse on a composite expression (pair-lists or calls).
+
+You set a callback of type *type* using the function `with_`*type*`_callback`, i.e. to set a symbol callback, as we have seen in the examples, you use `with_symbol_callback`.
+
+We explore traversals in greater detail in the next section, but to understand callbacks we need to know that there are two types of traversals in `toolbox`: analyses and rewrites. The difference between the two is in what callbacks should return and how information flows bottom-up in a traversal. With analysis traversals, the callbacks should return lists. For the expression-callbacks, i.e. those that are not **topdown**, the lists are combined bottom-up in the traversals and provided to the callbacks higher up in the traversal. For rewrite callbacks, the expression-callbacks must return expressions. These expressions are combined bottom-up when constructing the result of a traversal.
+
+All callbacks must be defined to take a variable number of named arguments through the triple-dot notation, `...`. This allows the user to provide extra information to some callbacks, but only as long as that information is passed along down the recursion, so all callbacks must allow for it. Some arguments are provided by the traversal code, and you can choose to ignore it or exploit it in your callbacks. Those arguments are:
+
+* **expr**: An R expression. This is the expression we should analyse or rewrite.
+* **params**: Parameters of the function we are analysing or rewriting.
+* **env**: The environment of the function we are analysing or rewriting.
+* **topdown**: A list of additional information gathered in the traversal.
+* **bottomup**: A list of the values computed in the traversal of composite expressions' components. Only used in analysis traversals.
+* **wflags**: Warning flags. We return to those in the [Miscellaneous] section.
+
+Top-down callbacks get one additional argument:
+
+* **skip**: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a "thunk", i.e. a function that doesn't take any arguments. If this function is called, the traversal does not process the expression but use the existing expression in the rewrite. For analysis traversals, **skip** takes one argument that will be considered the result of that (unexplored) expression.
+
+### Setting up callbacks
+
+## Traversals
+
+### Setting up a traversal
+
+> the initial annotation before a run…
+
+### Information-flow in traversals
+
+> How is data propagated top-down and bottom-up?
+
+## Transformations as annotations
+
+## Miscellaneous 
+
+> controlling warnings
+

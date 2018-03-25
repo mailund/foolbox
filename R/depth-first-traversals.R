@@ -30,8 +30,8 @@ depth_first_rewrite_expr <- function(expr, callbacks,
             topdown = topdown, wflags = wflags, ...
         ))
     }
-    if (rlang::is_pairlist(expr)) {
-        return(callbacks$pairlist(
+    if (rlang::is_primitive(expr)) {
+        return(callbacks$primitive(
             expr,
             params = params,
             topdown = topdown, wflags = wflags, ...
@@ -44,15 +44,8 @@ depth_first_rewrite_expr <- function(expr, callbacks,
             topdown = topdown, wflags = wflags, ...
         ))
     }
-    if (rlang::is_primitive(expr)) {
-        return(callbacks$primitive(
-            expr,
-            params = params,
-            topdown = topdown, wflags = wflags, ...
-        ))
-    }
 
-    stopifnot(rlang::is_lang(expr))
+    stopifnot(rlang::is_lang(expr) || rlang::is_pairlist(expr))
     # Use callCC to be able to skip an evaluation based on topdown analysis
     callCC(function(escape) {
         skip <- function() escape(expr) # skip means leaving the body unchanged
@@ -74,12 +67,23 @@ depth_first_rewrite_expr <- function(expr, callbacks,
             )
         }
 
-        # then handle the actual call
-        callbacks$call(
-            expr,
-            params = params,
-            topdown = topdown, wflags = wflags, ...
-        )
+        # then handle the actual pairlist/call
+        if (rlang::is_pairlist(expr)) {
+            callbacks$pairlist(
+                expr,
+                params = params,
+                topdown = topdown,
+                wflags = wflags, ...
+            )
+        } else {
+            callbacks$call(
+                expr,
+                params = params,
+                topdown = topdown,
+                wflags = wflags, ...
+            )
+        }
+
     })
 }
 
@@ -142,7 +146,7 @@ depth_first_rewrite_function <- function(fn, callbacks,
 #' @param expr      An R expression
 #' @param callbacks List of callbacks to apply.
 #' @param params    Parameters of the function we are analysing. If we are
-#'   working on a raw expression, just use thes default, which is an empty list.
+#'   working on a raw expression, just use the default, which is an empty list.
 #' @param topdown   A list of additional information gathered in the traversal.
 #' @param wflags    Warning flags, see [warning_flags()].
 #' @param ...       Additional data that will be passed along to callbacks.
@@ -165,13 +169,6 @@ depth_first_analyse_expr <- function(expr, callbacks,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
-    if (rlang::is_pairlist(expr)) {
-        return(callbacks$pairlist(
-            expr,
-            params = params,
-            topdown = topdown, wflags = wflags, bottomup = list(), ...
-        ))
-    }
     if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(
             expr,
@@ -187,11 +184,13 @@ depth_first_analyse_expr <- function(expr, callbacks,
         ))
     }
 
-    stopifnot(rlang::is_lang(expr))
+
+    stopifnot(rlang::is_lang(expr) || rlang::is_pairlist(expr))
+
     # Use callCC to be able to skip an evaluation based on topdown analysis
     callCC(function(escape) {
         # skip means returning no bottomup info.
-        skip <- function() escape(list())
+        skip <- function(result) escape(result)
         topdown <- callbacks$topdown(
             expr,
             params = params, wflags = wflags,
@@ -211,13 +210,24 @@ depth_first_analyse_expr <- function(expr, callbacks,
             )
         }
 
-        # then handle the actual call
-        callbacks$call(
-            expr,
-            params = params,
-            topdown = topdown, bottomup = bottomup,
-            wflags = wflags, ...
-        )
+        if (rlang::is_pairlist(expr)) {
+            callbacks$pairlist(
+                expr,
+                params = params,
+                topdown = topdown,
+                bottomup = bottomup,
+                wflags = wflags,
+                ...
+            )
+        } else {
+            callbacks$call(
+                expr,
+                params = params,
+                topdown = topdown,
+                bottomup = bottomup,
+                wflags = wflags, ...
+            )
+        }
     })
 }
 

@@ -13,7 +13,7 @@ depth_first_analyse_expr(expr, callbacks, params = list(), topdown = list(),
 \item{callbacks}{List of callbacks to apply.}
 
 \item{params}{Parameters of the function we are analysing. If we are
-working on a raw expression, just use thes default, which is an empty list.}
+working on a raw expression, just use the default, which is an empty list.}
 
 \item{topdown}{A list of additional information gathered in the traversal.}
 

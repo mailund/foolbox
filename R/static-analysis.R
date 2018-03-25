@@ -23,7 +23,7 @@ collection_callback <- function(expr, bottomup, ...) {
 }
 
 skip_independent_scopes_callback <- function(expr, skip, ...) {
-    skip()
+    skip(list())
 }
 
 collect_assigned_symbols_callbacks <- analysis_callbacks() %>%
