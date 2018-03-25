@@ -169,6 +169,7 @@ All callbacks must be defined to take a variable number of named arguments throu
 * **env**: The environment of the function we are analysing or rewriting.
 * **topdown**: A list of additional information gathered in the traversal.
 * **bottomup**: A list of the values computed in the traversal of composite expressions' components. Only used in analysis traversals.
+* **next_cb**: A handle to call the next callback in a chain (see below).
 * **wflags**: Warning flags. We return to those in the [Miscellaneous] section.
 
 Top-down callbacks get one additional argument:
@@ -187,7 +188,7 @@ rewrite_callbacks() %>%
 
 will create callbacks that are defaults for rewriting for atomics, primates, pair-lists and top-down and have replaced the call and symbol callbacks with `my_call_callback` and `my_symbol_callback`, respectively.
 
-
+When you use the `with_`*type*`_callback` functions you replace the previous callback of the same type with the new function. The existing one is not lost, however. It will be provided to the function you install via the `next_cb` parameter, and you can call it if you want to chain together several callbacks of the same type.
 
 ## Traversals
 

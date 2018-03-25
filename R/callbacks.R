@@ -13,6 +13,10 @@
 #' called. plus whatever the user provide to [depth_first_rewrite_function()] or
 #' [depth_first_analyse_function()].
 #'
+#' - **next_cb** A handle to call the next callback if more are installed. This
+#' variable will be the callback that was in the callbacks list before this one
+#' replaced it.
+#'
 #' In bottom up analyses, the [merge_bottomup()] function can be used to
 #' collected the results of several recursive calls. When annotating
 #' expressions, the [collect_from_args()] can be used in `call` callbacks to
@@ -135,7 +139,10 @@ analysis_callbacks <- function() list(
 make_with_callback <- function(cb_name) {
     force(cb_name)
     function(callbacks, fn) {
-        callbacks[[cb_name]] <- fn
+        next_cb <- callbacks[[cb_name]]
+        callbacks[[cb_name]] <- function(expr, ...) {
+            fn(expr, next_cb = next_cb, ...)
+        }
         callbacks
     }
 }
