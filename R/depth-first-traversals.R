@@ -99,26 +99,6 @@ depth_first_rewrite_expr <- function(expr, callbacks,
 #'
 #' @return A new function similar to `fn` but with a transformed body.
 #'
-#' @examples
-#' log_calls_transformation <- function(call_expr, env, param, ...) {
-#'     call_fn <- eval(call_expr[[1]], envir = env)
-#'     if (rlang::is_primitive(call_fn)) return(call_expr)
-#'     if (!rlang::is_symbol(call_expr[[1]])) return(call_expr)
-#'
-#'     rlang::expr({
-#'         cat("Calling", rlang::UQ(as.character(call_expr[[1]])), "\n")
-#'         rlang::UQ(call_expr)
-#'     })
-#' }
-#'
-#' f <- function(x) {
-#'     if (x > 0) f(x - 1)
-#'     else print("Done")
-#' }
-#'
-#' cb <- rewrite_callbacks() %>% with_call_callback(log_calls_transformation)
-#' f <- depth_first_rewrite_function(f, cb)
-#'
 #' @seealso depth_first_rewrite_expr
 #' @seealso rewrite_callbacks
 depth_first_rewrite_function <- function(fn, callbacks,
