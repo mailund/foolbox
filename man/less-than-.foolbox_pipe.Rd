@@ -9,7 +9,7 @@ after it is defined and before it is assigned to a name.}
 }
 \arguments{
 \item{pipe}{A specificiation of a a pipeline of transformations provided
-using the subscript operator to \code{rewrites}.}
+using the subscript operator to \code{\link[=rewrites]{rewrites()}}.}
 
 \item{fn}{The function we wish to transform.}
 }

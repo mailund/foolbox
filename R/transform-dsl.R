@@ -99,7 +99,7 @@ rewrites <- structure(NA, class = "foolbox_rewrite_spec")
 #' This operator is used together with \code{\link{rewrites}} to transform a function
 #' after it is defined and before it is assigned to a name.
 #' @param pipe A specificiation of a a pipeline of transformations provided
-#'     using the subscript operator to `rewrites`.
+#'     using the subscript operator to [rewrites()].
 #' @param fn The function we wish to transform.
 #'
 #' @export
