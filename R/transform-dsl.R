@@ -88,10 +88,12 @@ rewrites <- structure(NA, class = "foolbox_rewrite_spec")
 #'
 #' @export
 `[.foolbox_rewrite_spec` <- function(dummy, ...) {
-    transformation_exprs <- rlang::enexprs(...)
-    transformations <- Map(function(trex) eval(rlang::expr(. %>% !!trex)),
-                           transformation_exprs)
-    structure(transformations, class = "foolbox_pipe")
+    transf_exprs <- rlang::enexprs(...)
+    transf_env <- rlang::caller_env()
+    transf <- Map(function(trex)
+                    eval(rlang::expr(function(fn) fn %>% !!trex), transf_env),
+                  transf_exprs)
+    structure(transf, class = "foolbox_pipe")
 }
 
 #' This operator is used together with \code{\link{rewrites}} to transform a function
