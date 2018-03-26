@@ -1,0 +1,49 @@
+reference:
+  - title: Traversals
+    desc: >
+      Traversing functions or expressions for analysing or
+      rewriting them.
+    contents:
+      - rewrite
+      - rewrite_with
+      - rewrite_expr
+      - rewrite_expr_with
+
+      - analyse
+      - analyse_with
+      - analyse_expr
+      - analyse_expr_with
+
+  - title: Callbacks
+    desc: >
+      Modifying the list of callbacks used in a traversal.
+    contents:
+      - rewrite_callbacks
+      - analysis_callbacks
+      - starts_with("with_")
+      - starts_with("add_")
+      - identity_rewrite_callback
+      - nop_topdown_callback
+
+  - title: Function annotation transformations
+    desc: >
+      Notation for rewriting as part of a function definition.
+    contents:
+      - rewrites
+      - "`[.foolbox_rewrite_spec`"
+      - "`<.foolbox_pipe`"
+
+  - title: Information processing
+    desc: >
+      Propagating information between callbacks.
+    contents:
+      - merge_bottomup
+      - collect_from_args
+
+  - title: Warnings
+    desc: >
+      Controling which warnings are raised when traversing a function.
+    contents:
+      - warning_flags
+      - starts_with("set_")
+      - starts_with("unset_")

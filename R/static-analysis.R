@@ -59,7 +59,6 @@ collect_assigned_symbols_callbacks <- analysis_callbacks() %>%
 #' @return A list containing the symbols that were assigned to.
 #'
 #' @describeIn collect_asigned_symbols_in_expression Analyse an expression.
-#' @export
 collect_assigned_symbols_in_expression <- function(expr, env,
                                                    params = list(),
                                                    topdown = list()) {
@@ -73,7 +72,6 @@ collect_assigned_symbols_in_expression <- function(expr, env,
 
 #' @describeIn collect_asigned_symbols_in_expression
 #'             Analyse the body of a function.
-#' @export
 collect_assigned_symbols_in_function <- function(fun, topdown = list()) {
     res <- depth_first_analyse_function(
         fun, collect_assigned_symbols_callbacks,
@@ -213,8 +211,6 @@ annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
 #'
 #' @return A function who's expressions are annotated with potentially local
 #'   variables.
-#'
-#' @export
 annotate_bound_symbols_in_function <- function(fn) {
     fn %>% depth_first_rewrite_function(
         annotate_assigned_symbols_callbacks,

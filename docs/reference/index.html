@@ -116,11 +116,31 @@
       <tbody>
         <tr>
           <th colspan="2">
-            <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-            <p class="section-desc"></p>
+            <h2 id="section-traversals" class="hasAnchor"><a href="#section-traversals" class="anchor"></a>Traversals</h2>
+            <p class="section-desc"><p>Traversing functions or expressions for analysing or rewriting them.</p></p>
           </th>
         </tr>
         <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="rewrite_with.html">rewrite_with()</a></code> <code><a href="rewrite_with.html">rewrite()</a></code> <code><a href="rewrite_with.html">analyse()</a></code> <code><a href="rewrite_with.html">analyse_with()</a></code> <code><a href="rewrite_with.html">rewrite_expr()</a></code> <code><a href="rewrite_with.html">rewrite_expr_with()</a></code> <code><a href="rewrite_with.html">analyse_expr()</a></code> <code><a href="rewrite_with.html">analyse_expr_with()</a></code> </p>
+          </td>
+          <td><p>Functions for applying a sequence of rewrites.</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-callbacks" class="hasAnchor"><a href="#section-callbacks" class="anchor"></a>Callbacks</h2>
+            <p class="section-desc"><p>Modifying the list of callbacks used in a traversal.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="rewrite_callbacks.html">rewrite_callbacks()</a></code> <code><a href="rewrite_callbacks.html">analysis_callbacks()</a></code> <code><a href="rewrite_callbacks.html">with_atomic_callback()</a></code> <code><a href="rewrite_callbacks.html">with_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_symbol_callback()</a></code> <code><a href="rewrite_callbacks.html">with_primitive_callback()</a></code> <code><a href="rewrite_callbacks.html">with_call_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_callback()</a></code> </p>
+          </td>
+          <td><p>Default expression-transformation callbacks.</p></td>
+        </tr><tr>
           <!--  -->
           <td>
             <p><code><a href="add_call_callback.html">add_call_callback()</a></code> </p>
@@ -135,103 +155,24 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="annotate_assigned_symbols_callbacks.html">annotate_assigned_symbols_callbacks</a></code> </p>
-          </td>
-          <td><p>Put attribute "assigned_symbols" on expressions bottom-up</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="annotate_bound_symbols_in_function.html">annotate_bound_symbols_in_function()</a></code> </p>
-          </td>
-          <td><p>Annotate sub-expressions with variables bound in their scope.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="annotate_bound_variables_callbacks.html">annotate_bound_variables_callbacks</a></code> </p>
-          </td>
-          <td><p>Propagate parameters and local variables top-down to assign attribute
-"bound" to all call expressions.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="collect_asigned_symbols_in_expression.html">collect_assigned_symbols_in_expression()</a></code> <code><a href="collect_asigned_symbols_in_expression.html">collect_assigned_symbols_in_function()</a></code> </p>
-          </td>
-          <td><p>Extracts all the symbols that appear on the left-hand side of an
-assignment.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="collect_from_args.html">collect_from_args()</a></code> </p>
-          </td>
-          <td><p>Collect attributes set in the arguments to a call expression.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="depth_first_analyse_expr.html">depth_first_analyse_expr()</a></code> </p>
-          </td>
-          <td><p>Analyse an expression.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="depth_first_analyse_function.html">depth_first_analyse_function()</a></code> </p>
-          </td>
-          <td><p>Analyse the body of function.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="depth_first_rewrite_expr.html">depth_first_rewrite_expr()</a></code> </p>
-          </td>
-          <td><p>Transform an expression.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="depth_first_rewrite_function.html">depth_first_rewrite_function()</a></code> </p>
-          </td>
-          <td><p>Transform the body of function.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="identity_rewrite_callback.html">identity_rewrite_callback()</a></code> <code><a href="identity_rewrite_callback.html">identity_analysis_callback()</a></code> </p>
           </td>
           <td><p>A callback that does not do any transformation.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="less-than-.foolbox_pipe.html">`<`(<i>&lt;foolbox_pipe&gt;</i>)</a></code> </p>
-          </td>
-          <td><p>This operator is used together with <code>rewrites</code> to transform a function
-after it is defined and before it is assigned to a name.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="make_with_callback.html">make_with_callback()</a></code> </p>
-          </td>
-          <td><p>Create a function for setting callbacks.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="merge_bottomup.html">merge_bottomup()</a></code> </p>
-          </td>
-          <td><p>Merge the results of several bottomup results.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
             <p><code><a href="nop_topdown_callback.html">nop_topdown_callback()</a></code> </p>
           </td>
           <td><p>Top-down analysis callback.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="rewrite_callbacks.html">rewrite_callbacks()</a></code> <code><a href="rewrite_callbacks.html">analysis_callbacks()</a></code> <code><a href="rewrite_callbacks.html">with_atomic_callback()</a></code> <code><a href="rewrite_callbacks.html">with_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_symbol_callback()</a></code> <code><a href="rewrite_callbacks.html">with_primitive_callback()</a></code> <code><a href="rewrite_callbacks.html">with_call_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_callback()</a></code> </p>
-          </td>
-          <td><p>Default expression-transformation callbacks.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="rewrite_with.html">rewrite_with()</a></code> <code><a href="rewrite_with.html">rewrite()</a></code> <code><a href="rewrite_with.html">analyse()</a></code> <code><a href="rewrite_with.html">analyse_with()</a></code> <code><a href="rewrite_with.html">rewrite_expr()</a></code> <code><a href="rewrite_with.html">rewrite_expr_with()</a></code> <code><a href="rewrite_with.html">analyse_expr()</a></code> <code><a href="rewrite_with.html">analyse_expr_with()</a></code> </p>
-          </td>
-          <td><p>Functions for applying a sequence of rewrites.</p></td>
-        </tr><tr>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-function-annotation-transformations" class="hasAnchor"><a href="#section-function-annotation-transformations" class="anchor"></a>Function annotation transformations</h2>
+            <p class="section-desc"><p>Notation for rewriting as part of a function definition.</p></p>
+          </th>
+        </tr>
+        <tr>
           <!--  -->
           <td>
             <p><code><a href="rewrites.html">rewrites</a></code> </p>
@@ -246,6 +187,41 @@ after it is defined and before it is assigned to a name.</p></td>
         </tr><tr>
           <!--  -->
           <td>
+            <p><code><a href="less-than-.foolbox_pipe.html">`<`(<i>&lt;foolbox_pipe&gt;</i>)</a></code> </p>
+          </td>
+          <td><p>This operator is used together with <code>rewrites</code> to transform a function
+after it is defined and before it is assigned to a name.</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-information-processing" class="hasAnchor"><a href="#section-information-processing" class="anchor"></a>Information processing</h2>
+            <p class="section-desc"><p>Propagating information between callbacks.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="merge_bottomup.html">merge_bottomup()</a></code> </p>
+          </td>
+          <td><p>Merge the results of several bottomup results.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="collect_from_args.html">collect_from_args()</a></code> </p>
+          </td>
+          <td><p>Collect attributes set in the arguments to a call expression.</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-warnings" class="hasAnchor"><a href="#section-warnings" class="anchor"></a>Warnings</h2>
+            <p class="section-desc"><p>Controling which warnings are raised when traversing a function.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
             <p><code><a href="warning_flags.html">warning_flags()</a></code> <code><a href="warning_flags.html">set_warn_on_unknown_function()</a></code> <code><a href="warning_flags.html">unset_warn_on_unknown_function()</a></code> <code><a href="warning_flags.html">set_warn_on_local_function()</a></code> <code><a href="warning_flags.html">unset_warn_on_local_function()</a></code> </p>
           </td>
           <td><p>Collection of warning flags used when traversing expressions.</p></td>
@@ -258,7 +234,11 @@ after it is defined and before it is assigned to a name.</p></td>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-traversals">Traversals</a></li>
+      <li><a href="#section-callbacks">Callbacks</a></li>
+      <li><a href="#section-function-annotation-transformations">Function annotation transformations</a></li>
+      <li><a href="#section-information-processing">Information processing</a></li>
+      <li><a href="#section-warnings">Warnings</a></li>
     </ul>
   </div>
 </div>

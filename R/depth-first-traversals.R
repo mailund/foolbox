@@ -17,7 +17,6 @@
 #' @seealso rewrite_callbacks
 #' @seealso identity_rewrite_callback
 #' @seealso depth_first_rewrite_function
-#' @export
 depth_first_rewrite_expr <- function(expr, callbacks,
                                      params = list(),
                                      topdown = list(),
@@ -122,7 +121,6 @@ depth_first_rewrite_expr <- function(expr, callbacks,
 #'
 #' @seealso depth_first_rewrite_expr
 #' @seealso rewrite_callbacks
-#' @export
 depth_first_rewrite_function <- function(fn, callbacks,
                                          topdown = list(),
                                          wflags = warning_flags(),
@@ -156,7 +154,6 @@ depth_first_rewrite_function <- function(fn, callbacks,
 #' @seealso analysis_callbacks
 #' @seealso identity_analysis_callback
 #' @seealso depth_first_analyse_function
-#' @export
 depth_first_analyse_expr <- function(expr, callbacks,
                                      params = list(),
                                      topdown = list(),
@@ -247,7 +244,6 @@ depth_first_analyse_expr <- function(expr, callbacks,
 #' @seealso depth_first_analyse_expr
 #' @seealso depth_first_rewrite_function
 #' @seealso analysis_callbacks
-#' @export
 depth_first_analyse_function <- function(fn, callbacks,
                                          topdown = list(),
                                          wflags = warning_flags(),
