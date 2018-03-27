@@ -92,15 +92,21 @@ nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 #' rewrite traversal or any collected information if part of an analysis
 #' traversal.
 #'
-#' @param callbacks The list of callbacks
-#' @param fn        A function to install as a callback.
+#' @param callbacks       The list of callbacks
+#' @param fn              A function to install as a callback.
+#' @param include_missing For symbols, it is possible that the expression is
+#'   missing. This can happen in pair-lists if a function parameter does not
+#'   have a default argument. By default, the callback is not invoked on missing
+#'   expressions--there is very little you can do with them -- but you can
+#'   include them by setting this parameter to `TRUE`.
 #'
 #' @seealso with_atomic_callback
-#' @seealso with_pairlist_callback
 #' @seealso with_symbol_callback
 #' @seealso with_primitive_callback
+#' @seealso with_pairlist_callback
 #' @seealso with_call_callback
-#' @seealso with_topdown_callback
+#' @seealso with_topdown_pairlist_callback
+#' @seealso with_topdown_call_callback
 #' @seealso warning_flags
 #' @export
 
@@ -110,22 +116,24 @@ nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 #' @describeIn rewrite_callbacks Default callbacks for rewriting expressions
 rewrite_callbacks <- function() list(
         atomic = identity_rewrite_callback,
-        pairlist = identity_rewrite_callback,
         symbol = identity_rewrite_callback,
         primitive = identity_rewrite_callback,
+        pairlist = identity_rewrite_callback,
         call = identity_rewrite_callback,
-        topdown = nop_topdown_callback
+        topdown_pairlist = nop_topdown_callback,
+        topdown_call = nop_topdown_callback
     )
 
 #' @describeIn rewrite_callbacks Default callbacks for analysing expressions
 #' @export
 analysis_callbacks <- function() list(
         atomic = identity_analysis_callback,
-        pairlist = identity_analysis_callback,
         symbol = identity_analysis_callback,
         primitive = identity_analysis_callback,
+        pairlist = identity_analysis_callback,
         call = identity_analysis_callback,
-        topdown = nop_topdown_callback
+        topdown_pairlist = nop_topdown_callback,
+        topdown_call = nop_topdown_callback
     )
 
 #' Create a function for setting callbacks.
@@ -140,6 +148,8 @@ make_with_callback <- function(cb_name) {
     force(cb_name)
     function(callbacks, fn) {
         next_cb <- callbacks[[cb_name]]
+        # should only happen if we mis-spell a callback name
+        stopifnot(!is.null(next_cb))
         callbacks[[cb_name]] <- function(expr, ...) {
             fn(expr, next_cb = next_cb, ...)
         }
@@ -156,17 +166,38 @@ with_atomic_callback <- make_with_callback("atomic")
 with_pairlist_callback <- make_with_callback("pairlist")
 #' @describeIn rewrite_callbacks Set the symbol callback function.
 #' @export
-with_symbol_callback <- make_with_callback("symbol")
+with_symbol_callback <- function(callbacks, fn, include_missing = FALSE) {
+    next_cb <- callbacks$symbol
+    if (include_missing)
+        callbacks$symbol <- function(expr, ...) {
+            fn(expr, next_cb = next_cb, ...)
+        }
+    else
+        callbacks$symbol <- function(expr, ...) {
+            if (as.character(expr) == "") {
+                next_cb(expr, ...)
+            } else {
+                fn(expr, next_cb = next_cb, ...)
+            }
+        }
+    callbacks
+}
+
+
 #' @describeIn rewrite_callbacks Set the primitive callback function.
 #' @export
 with_primitive_callback <- make_with_callback("primitive")
 #' @describeIn rewrite_callbacks Set the call callback function.
 #' @export
 with_call_callback <- make_with_callback("call")
-#' @describeIn rewrite_callbacks Set the topdown information passing callback
-#'   function.
+#' @describeIn rewrite_callbacks Set the topdown information-passing callback
+#'   function for pair-lists
 #' @export
-with_topdown_callback <- make_with_callback("topdown")
+with_topdown_pairlist_callback <- make_with_callback("topdown_pairlist")
+#' @describeIn rewrite_callbacks Set the topdown information-passing callback
+#'   function for calls.
+#' @export
+with_topdown_call_callback <- make_with_callback("topdown_call")
 
 #' Add a function-specific callback to the call callbacks.
 #'
@@ -231,7 +262,7 @@ add_call_callback <- function(callbacks, fn, cb) {
                 warning(paste0(
                     "The function ", call_name,
                     " could not be evaluated to an actual function in ",
-                    "this scope."
+                    "this scope.\n"
                 ))
             }
             NULL
@@ -276,7 +307,7 @@ add_call_callback <- function(callbacks, fn, cb) {
 #' @return          The updated callbacks.
 #' @export
 add_topdown_callback <- function(callbacks, fn, cb) {
-    next_cb <- callbacks$topdown
+    next_cb <- callbacks$topdown_call
     fn_expr <- rlang::enexpr(fn)
     fn_name <- if (rlang::is_symbol(fn_expr)) as.character(fn_expr) else ""
 
@@ -315,10 +346,12 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
             if (wflags$warn_on_unknown_function) {
+                cat("call name:", paste0('"',call_name,'"'), "\n")
+                cat("expr: ", deparse(expr), "\n")
                 warning(paste0(
                     "The function ", call_name,
                     " could not be evaluated to an actual function in ",
-                    "this scope."
+                    "this scope.\n"
                 ))
             }
             NULL
@@ -339,6 +372,6 @@ add_topdown_callback <- function(callbacks, fn, cb) {
             )
         }
     }
-    callbacks$topdown <- closure
+    callbacks$topdown_call <- closure
     callbacks
 }

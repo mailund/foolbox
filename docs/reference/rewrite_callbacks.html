@@ -81,6 +81,9 @@ formal parameters of the function we are translating." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/partial-evaluation.html">Partial evaluation with foolbox</a>
+    </li>
+    <li>
       <a href="../articles/transforming-functions-with-foolbox.html">Transforming functions with foolbox</a>
     </li>
   </ul>
@@ -127,13 +130,15 @@ formal parameters of the function we are translating.</p>
 
 <span class='fu'>with_pairlist_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)
 
-<span class='fu'>with_symbol_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)
+<span class='fu'>with_symbol_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>, <span class='kw'>include_missing</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='fu'>with_primitive_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)
 
 <span class='fu'>with_call_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)
 
-<span class='fu'>with_topdown_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)</pre>
+<span class='fu'>with_topdown_pairlist_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)
+
+<span class='fu'>with_topdown_call_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,6 +150,14 @@ formal parameters of the function we are translating.</p>
     <tr>
       <th>fn</th>
       <td><p>A function to install as a callback.</p></td>
+    </tr>
+    <tr>
+      <th>include_missing</th>
+      <td><p>For symbols, it is possible that the expression is
+missing. This can happen in pair-lists if a function parameter does not
+have a default argument. By default, the callback is not invoked on missing
+expressions--there is very little you can do with them -- but you can
+include them by setting this parameter to <code>TRUE</code>.</p></td>
     </tr>
     </table>
     
@@ -186,18 +199,21 @@ traversal.</p>
 <li><p><code>with_symbol_callback</code>: Set the symbol callback function.</p></li>
 <li><p><code>with_primitive_callback</code>: Set the primitive callback function.</p></li>
 <li><p><code>with_call_callback</code>: Set the call callback function.</p></li>
-<li><p><code>with_topdown_callback</code>: Set the topdown information passing callback
-function.</p></li>
+<li><p><code>with_topdown_pairlist_callback</code>: Set the topdown information-passing callback
+function for pair-lists</p></li>
+<li><p><code>with_topdown_call_callback</code>: Set the topdown information-passing callback
+function for calls.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <p>with_atomic_callback</p>
-<p>with_pairlist_callback</p>
 <p>with_symbol_callback</p>
 <p>with_primitive_callback</p>
+<p>with_pairlist_callback</p>
 <p>with_call_callback</p>
-<p>with_topdown_callback</p>
+<p>with_topdown_pairlist_callback</p>
+<p>with_topdown_call_callback</p>
 <p>warning_flags</p>
     
 

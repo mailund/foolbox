@@ -144,11 +144,16 @@ test_that("we can pass user-data along in traversals", {
 test_that("we can collect top-down information down a traversal", {
     collect_bound_variables <- function(expr, topdown, ...) {
         if (expr[[1]] == "function") {
-            topdown$bound_vars <- c(names(expr[[2]]), topdown$bound_vars)
+            if (length(expr[[2]]) > 0)
+                topdown$bound_vars <- c(names(expr[[2]]), topdown$bound_vars)
         }
         topdown
     }
-    collect_local_variables <- function(expr, topdown, bottomup, ...) {
+    handle_pairlist <- function(expr, ...) {
+        n <- names(expr)
+        n[n != n]
+    }
+    collect_local_variables <- function(expr, bottomup, ...) {
         result <- unlist(bottomup)
         if (expr[[1]] == "<-" && rlang::is_symbol(expr[[2]])) {
             local_var <- as.character(expr[[2]])
@@ -168,7 +173,8 @@ test_that("we can collect top-down information down a traversal", {
 
     cb <- analysis_callbacks() %>%
         with_symbol_callback(collect_unbound_variables) %>%
-        with_topdown_callback(collect_bound_variables)
+        with_pairlist_callback(handle_pairlist) %>%
+        with_topdown_call_callback(collect_bound_variables)
 
     traverse <- function(fun) {
         depth_first_analyse_function(
@@ -177,19 +183,19 @@ test_that("we can collect top-down information down a traversal", {
         )
     }
     f <- function(x, y) x + y
-    expect_equal(traverse(f), list())
+    expect_equal(traverse(f), list(unbound = list("+")))
 
     f <- function(x) x + y
-    expect_equal(traverse(f), list(unbound = list("y")))
+    expect_equal(traverse(f), list(unbound = list("+", "y")))
 
     f <- function() x + y
-    expect_equal(traverse(f), list(unbound = list("x", "y")))
+    expect_equal(traverse(f), list(unbound = list("+", "x", "y")))
 
     f <- function() function(x) x + y
-    expect_equal(traverse(f), list(unbound = list("y")))
+    expect_equal(traverse(f), list(unbound = list("function", "+", "y")))
 
     f <- function() function(x) function(y) x + y
-    expect_equal(traverse(f), list())
+    expect_equal(traverse(f), list(unbound = list("function", "function", "+")))
 
     f <- function(x) {
         y <- 2 * x
@@ -198,7 +204,9 @@ test_that("we can collect top-down information down a traversal", {
     # While y *is* bound, it is as a local variable. We cannot guarantee
     # to catch those, so I haven't tried in this test. The variable
     # appears twice because I do not remove duplicates in the test.
-    expect_equal(traverse(f), list(unbound = list("y", "y")))
+    expect_equal(traverse(f), list(unbound = list(
+        "{", "<-", "y", "*", "+", "y"
+    )))
 })
 
 test_that("we have an escape-hatch to skip past sub-trees", {
@@ -208,18 +216,18 @@ test_that("we have an escape-hatch to skip past sub-trees", {
         expr
     }
     skip_function_def_bodies <- function(expr, topdown, skip, ...) {
-        if (expr[[1]] == "function") skip()
+        if (expr[[1]] == "function") skip(expr)
         topdown
     }
 
     cb <- rewrite_callbacks() %>%
         with_symbol_callback(collect_symbols) %>%
-        with_topdown_callback(skip_function_def_bodies)
+        with_topdown_call_callback(skip_function_def_bodies)
     collect <- . %>% rewrite() %>% rewrite_with(cb)
 
     f <- function(x, y) x + y + z
     collect(f)
-    expect_equal(symbols_seen, c("z", "y", "x"))
+    expect_equal(symbols_seen, c("z", "y", "x", "+", "+"))
 
     f <- function(x, y) {
         g <- function(w, u, v) w + u + v
@@ -227,8 +235,10 @@ test_that("we have an escape-hatch to skip past sub-trees", {
         x + y + z
     }
     symbols_seen <- c()
-    collect(f) # z is duplicated below because I do not fix duplications
-    expect_equal(symbols_seen, c("z", "y", "x", "z", "g"))
+    collect(f)
+    expect_equal(symbols_seen, c(
+        "z", "y", "x", "+", "+", "g", "z", "<-", "g", "<-", "{"
+    ))
 })
 
 

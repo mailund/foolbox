@@ -6,13 +6,13 @@ test_that("Default callbacks look like they should", {
         callbacks$atomic, foolbox::identity_rewrite_callback
     ))
     expect_true(identical(
-        callbacks$pairlist, foolbox::identity_rewrite_callback
-    ))
-    expect_true(identical(
         callbacks$symbol, foolbox::identity_rewrite_callback
     ))
     expect_true(identical(
         callbacks$primitive, foolbox::identity_rewrite_callback
+    ))
+    expect_true(identical(
+        callbacks$pairlist, foolbox::identity_rewrite_callback
     ))
     expect_true(identical(
         callbacks$call, foolbox::identity_rewrite_callback

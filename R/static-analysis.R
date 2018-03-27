@@ -168,7 +168,7 @@ annotate_assigned_symbols_callbacks <- rewrite_callbacks() %>%
 #' Propagate parameters and local variables top-down to assign attribute
 #' "bound" to all call expressions.
 annotate_bound_variables_callbacks <- rewrite_callbacks() %>%
-    with_topdown_callback(collect_bound_variables_callback) %>%
+    with_topdown_call_callback(collect_bound_variables_callback) %>%
     with_call_callback(propagate_bound_variables_callback)
 
 #' Annotate sub-expressions with variables bound in their scope.

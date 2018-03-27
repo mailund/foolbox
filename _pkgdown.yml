@@ -40,6 +40,13 @@ reference:
       - merge_bottomup
       - collect_from_args
 
+  - title: Formals
+    desc: >
+      Manipulations of the formal parameters of a function.
+    contents:
+      - remove_formal_
+      - remove_formal
+
   - title: Warnings
     desc: >
       Controling which warnings are raised when traversing a function.

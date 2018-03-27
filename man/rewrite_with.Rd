@@ -49,6 +49,37 @@ pipeline of \code{\link[=rewrite_with]{rewrite_with()}} calls for further analys
 The flow of transformations goes starts with \code{\link[=rewrite]{rewrite()}} and is followed by a
 series of \code{\link[=rewrite_with]{rewrite_with()}} for additional rewrite callbacks. For analysis, it
 starts with \code{\link[=analyse]{analyse()}} and is followed by a pipeline of \code{\link[=analyse_with]{analyse_with()}}.
+
+This functions will annotate a function's body with two attributes for each
+sub-expression in the body. Each \code{call} expression in the body will be
+annotated with these two attributes:
+\itemize{
+\item \strong{assigned_symbols}: Variables that appear to the left of an
+assignment in a sub-expression of the call that is likely to
+affect the scope of the call.
+\item \strong{bound}: Variables that are either assigned to, thus potentially
+local in the scope, or function parameters from an enclosing scope,
+which will definitely be bound at this position.
+}
+
+Since R does not require that we declare local variables, and since the
+variables that are assigned to a local scope depend on the runtime execution
+of functions, we cannot determine with any certainty which variables will be
+assigned to in any given scope at any given program point. So the best we can
+do is figure out which variables are \emph{potentially} assigned to. Which is what
+this function does.
+
+The rules for when we are assigning to a local variable are a bit
+complicated. For control structures, we can assume that assignments will
+be to the local scope. People can change the implementation of these so it
+isn't, but then they are only hurting themselves and deserve the extra
+pain we can give them. For other call arguments, it gets a little more
+complicated. With standard-evaluation, if we have an arrow assignment in a
+function argument, then the assignment happens in the calling scope. So we
+will assume this happens unless we are handling cases we know have NSE,
+such as \code{with}. If an assignment is inside a block, however, we will
+assume that NSE \emph{is} in play, by default, and not consider it a local
+assignment.
 }
 \section{Functions}{
 \itemize{
