@@ -227,3 +227,30 @@ rescale_nested %>% pe(x, test_x)
 
 We don't want to substitute variables that are local to *another* local function.
 
+```{r}
+skip_overscoped_functions <- function(var_symbol) {
+    var <- as.character(var_symbol)
+    function(expr, skip, ...) {
+        # in `function` expressions, the pair-list is element 2
+        if (var %in% names(expr[[2]])) {
+            attr(expr, "evaluated") <- TRUE # it's evaluated, just not substituted
+            skip(expr)
+        }
+    }
+}
+pe <- function(fn, var, val) {
+    var <- rlang::enexpr(var) ; stopifnot(rlang::is_symbol(var))
+    force(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>%
+            with_atomic_callback(atomic_callback) %>%
+            with_primitive_callback(primitive_callback) %>%
+            with_symbol_callback(subst_var_callback(var,val)) %>%
+            with_pairlist_callback(pairlist_callback) %>%
+            with_call_callback(call_callback) %>%
+            add_topdown_callback(`function`, skip_overscoped_functions(var))
+    ) %>% remove_formal_(var)
+}
+
+rescale_nested %>% pe(x, test_x)
+```

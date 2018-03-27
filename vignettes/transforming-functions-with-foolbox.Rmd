@@ -171,7 +171,7 @@ All callbacks must be defined to take a variable number of named arguments throu
 
 Top-down callbacks get one additional argument:
 
-* **skip**: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a "thunk", i.e. a function that doesn't take any arguments. If this function is called, the traversal does not process the expression but use the existing expression in the rewrite. For analysis traversals, **skip** takes one argument that will be considered the result of that (unexplored) expression.
+* **skip**: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a "thunk", i.e. a function that doesn't take any arguments. If this function is called, the traversal does not process the expression. Instead, **skip** takes one argument, and that will be considered the result of the unexplored expression.
 
 ### Setting up callbacks
 

@@ -46,8 +46,7 @@ depth_first_rewrite_expr <- function(expr, callbacks,
 
     stopifnot(rlang::is_lang(expr) || rlang::is_pairlist(expr))
     # Use callCC to be able to skip an evaluation based on topdown analysis
-    callCC(function(escape) {
-        skip <- function() escape(expr) # skip means leaving the body unchanged
+    callCC(function(skip) {
 
         if (rlang::is_pairlist(expr)) {
             # collect topdown info.
@@ -189,9 +188,7 @@ depth_first_analyse_expr <- function(expr, callbacks,
     stopifnot(rlang::is_lang(expr) || rlang::is_pairlist(expr))
 
     # Use callCC to be able to skip an evaluation based on topdown analysis
-    callCC(function(escape) {
-        # skip means returning no bottomup info.
-        skip <- function(result) escape(result)
+    callCC(function(skip) {
         if (rlang::is_pairlist(expr)) {
             topdown <- callbacks$topdown_pairlist(
                 expr = expr,

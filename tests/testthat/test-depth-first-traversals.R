@@ -216,7 +216,7 @@ test_that("we have an escape-hatch to skip past sub-trees", {
         expr
     }
     skip_function_def_bodies <- function(expr, topdown, skip, ...) {
-        if (expr[[1]] == "function") skip()
+        if (expr[[1]] == "function") skip(expr)
         topdown
     }
 
