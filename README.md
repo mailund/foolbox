@@ -7,7 +7,7 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--25-green.svg)](/commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--27-green.svg)](/commits/master)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.0.0.9000-green.svg?style=flat-square)](commits/master)
 [![Travis build
 status](https://travis-ci.org/mailund/foolbox.svg?branch=master)](https://travis-ci.org/mailund/foolbox)
@@ -340,11 +340,6 @@ f <- function(x, y) {
 }
 
 f %>% set_invariant(a, a > 0)
-#> Warning in value[[3L]](cond): The function could not be evaluated to an
-#> actual function in this scope.
-
-#> Warning in value[[3L]](cond): The function could not be evaluated to an
-#> actual function in this scope.
 #> function (x, y) 
 #> {
 #>     {

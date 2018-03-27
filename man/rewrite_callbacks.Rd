@@ -8,7 +8,8 @@
 \alias{with_symbol_callback}
 \alias{with_primitive_callback}
 \alias{with_call_callback}
-\alias{with_topdown_callback}
+\alias{with_topdown_pairlist_callback}
+\alias{with_topdown_call_callback}
 \title{Default expression-transformation callbacks.}
 \usage{
 rewrite_callbacks()
@@ -19,18 +20,26 @@ with_atomic_callback(callbacks, fn)
 
 with_pairlist_callback(callbacks, fn)
 
-with_symbol_callback(callbacks, fn)
+with_symbol_callback(callbacks, fn, include_missing = FALSE)
 
 with_primitive_callback(callbacks, fn)
 
 with_call_callback(callbacks, fn)
 
-with_topdown_callback(callbacks, fn)
+with_topdown_pairlist_callback(callbacks, fn)
+
+with_topdown_call_callback(callbacks, fn)
 }
 \arguments{
 \item{callbacks}{The list of callbacks}
 
 \item{fn}{A function to install as a callback.}
+
+\item{include_missing}{For symbols, it is possible that the expression is
+missing. This can happen in pair-lists if a function parameter does not
+have a default argument. By default, the callback is not invoked on missing
+expressions--there is very little you can do with them -- but you can
+include them by setting this parameter to \code{TRUE}.}
 }
 \description{
 Callbacks must be functions that take three arguments: The expression to
@@ -84,22 +93,27 @@ traversal.
 
 \item \code{with_call_callback}: Set the call callback function.
 
-\item \code{with_topdown_callback}: Set the topdown information passing callback
-function.
+\item \code{with_topdown_pairlist_callback}: Set the topdown information-passing callback
+function for pair-lists
+
+\item \code{with_topdown_call_callback}: Set the topdown information-passing callback
+function for calls.
 }}
 
 \seealso{
 with_atomic_callback
 
-with_pairlist_callback
-
 with_symbol_callback
 
 with_primitive_callback
 
+with_pairlist_callback
+
 with_call_callback
 
-with_topdown_callback
+with_topdown_pairlist_callback
+
+with_topdown_call_callback
 
 warning_flags
 }

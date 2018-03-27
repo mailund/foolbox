@@ -39,17 +39,24 @@ merge_bottomup <- function(bottomup) {
 #' call and extracts the attribute `attribute` from each where the
 #' `condition` predicate evaluates to `TRUE`, and it concatenates all these.
 #'
-#' @param expr The call expression to process.
+#' @param expr The expression to process.
 #' @param attribute The attribute we want to collect from the arguments.
 #' @param condition A predicate. Only arguments where the condition evaluates to
 #'     `TRUE` will be included in the result.
+#' @param include_fun Include the first element in a call, i.e. the function
+#'     that will be called.
+#'
 #' @return A list or vector obtained by concatenating the attributes from
 #'     the arguments.
 #' @export
 collect_from_args <- function(expr, attribute,
-                              condition = function(expr) TRUE) {
+                              condition = function(expr) TRUE,
+                              include_fun = FALSE) {
     collected <- list()
-    args <- rlang::call_args(expr)
+    if (include_fun)
+        args <- as.list(expr)
+    else
+        args <- rlang::call_args(expr)
     for (a in args) {
         if (condition(a)) {
             collected <- c(collected, attr(a, attribute))

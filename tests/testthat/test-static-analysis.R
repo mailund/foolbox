@@ -3,11 +3,11 @@ context("Static analysis")
 ## Collection ###########################################################
 test_that("we can collect the symbols in a simple expression", {
     expr <- quote(42)
-    res <- collect_assigned_symbols_in_expression(expr, env = environment())
+    res <- foolbox:::collect_assigned_symbols_in_expression(expr, env = environment())
     expect_equal(res, list())
 
     expr <- quote(x <- 42)
-    res <- collect_assigned_symbols_in_expression(expr, env = environment())
+    res <- foolbox:::collect_assigned_symbols_in_expression(expr, env = environment())
     expect_equal(res, list(locals = "x"))
 })
 

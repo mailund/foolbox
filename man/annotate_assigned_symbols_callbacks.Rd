@@ -4,7 +4,7 @@
 \name{annotate_assigned_symbols_callbacks}
 \alias{annotate_assigned_symbols_callbacks}
 \title{Put attribute "assigned_symbols" on expressions bottom-up}
-\format{An object of class \code{list} of length 6.}
+\format{An object of class \code{list} of length 7.}
 \usage{
 annotate_assigned_symbols_callbacks
 }

@@ -4,15 +4,19 @@
 \alias{collect_from_args}
 \title{Collect attributes set in the arguments to a call expression.}
 \usage{
-collect_from_args(expr, attribute, condition = function(expr) TRUE)
+collect_from_args(expr, attribute, condition = function(expr) TRUE,
+  include_fun = FALSE)
 }
 \arguments{
-\item{expr}{The call expression to process.}
+\item{expr}{The expression to process.}
 
 \item{attribute}{The attribute we want to collect from the arguments.}
 
 \item{condition}{A predicate. Only arguments where the condition evaluates to
 \code{TRUE} will be included in the result.}
+
+\item{include_fun}{Include the first element in a call, i.e. the function
+that will be called.}
 }
 \value{
 A list or vector obtained by concatenating the attributes from

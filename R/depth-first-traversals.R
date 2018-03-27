@@ -24,21 +24,21 @@ depth_first_rewrite_expr <- function(expr, callbacks,
                                      ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
-            expr,
+            expr = expr,
             params = params,
             topdown = topdown, wflags = wflags, ...
         ))
     }
     if (rlang::is_primitive(expr)) {
         return(callbacks$primitive(
-            expr,
+            expr = expr,
             params = params,
             topdown = topdown, wflags = wflags, ...
         ))
     }
     if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(
-            expr,
+            expr = expr,
             params = params,
             topdown = topdown, wflags = wflags, ...
         ))
@@ -48,26 +48,26 @@ depth_first_rewrite_expr <- function(expr, callbacks,
     # Use callCC to be able to skip an evaluation based on topdown analysis
     callCC(function(escape) {
         skip <- function() escape(expr) # skip means leaving the body unchanged
-        # collect topdown info.
-        topdown <- callbacks$topdown(
-            expr,
-            params = params,
-            topdown = topdown, wflags = wflags, skip = skip, ...
-        )
 
-        # handle depth first
-        call_args <- rlang::call_args(expr)
-        for (i in seq_along(call_args)) {
-            expr[[i + 1]] <- depth_first_rewrite_expr(
-                call_args[[i]], callbacks,
+        if (rlang::is_pairlist(expr)) {
+            # collect topdown info.
+            topdown <- callbacks$topdown_pairlist(
+                expr,
                 params = params,
                 topdown = topdown, wflags = wflags,
-                ...
+                skip = skip, ...
             )
-        }
 
-        # then handle the actual pairlist/call
-        if (rlang::is_pairlist(expr)) {
+            # handle depth first
+            for (i in seq_along(expr)) {
+                expr[[i]] <- depth_first_rewrite_expr(
+                    expr = expr[[i]],
+                    callbacks = callbacks,
+                    params = params,
+                    topdown = topdown, wflags = wflags,
+                    ...
+                )
+            }
             callbacks$pairlist(
                 expr,
                 params = params,
@@ -75,6 +75,30 @@ depth_first_rewrite_expr <- function(expr, callbacks,
                 wflags = wflags, ...
             )
         } else {
+            # collect topdown info.
+            topdown <- callbacks$topdown_call(
+                expr,
+                params = params,
+                topdown = topdown, wflags = wflags, skip = skip, ...
+            )
+
+            # handle depth first
+            expr[[1]] <- depth_first_rewrite_expr(
+                expr[[1]], callbacks,
+                params = params,
+                topdown = topdown, wflags = wflags,
+                ...
+            )
+            call_args <- rlang::call_args(expr)
+            for (i in seq_along(call_args)) {
+                expr[[i + 1]] <- depth_first_rewrite_expr(
+                    call_args[[i]], callbacks,
+                    params = params,
+                    topdown = topdown, wflags = wflags,
+                    ...
+                )
+            }
+
             callbacks$call(
                 expr,
                 params = params,
@@ -141,21 +165,21 @@ depth_first_analyse_expr <- function(expr, callbacks,
                                      ...) {
     if (rlang::is_atomic(expr)) {
         return(callbacks$atomic(
-            expr,
+            expr = expr,
             params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_symbol(expr)) {
         return(callbacks$symbol(
-            expr,
+            expr = expr,
             params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
     }
     if (rlang::is_primitive(expr)) {
         return(callbacks$primitive(
-            expr,
+            expr = expr,
             params = params,
             topdown = topdown, wflags = wflags, bottomup = list(), ...
         ))
@@ -168,26 +192,24 @@ depth_first_analyse_expr <- function(expr, callbacks,
     callCC(function(escape) {
         # skip means returning no bottomup info.
         skip <- function(result) escape(result)
-        topdown <- callbacks$topdown(
-            expr,
-            params = params, wflags = wflags,
-            topdown = topdown, skip = skip, ...
-        )
-
-        # handle depth first
-        call_args <- rlang::call_args(expr)
-        bottomup <- vector("list", length = length(call_args))
-        for (i in seq_along(call_args)) {
-            bottomup[[i]] <- depth_first_analyse_expr(
-                call_args[[i]], callbacks,
-                params = params,
-                wflags = wflags,
-                topdown = topdown,
-                ...
-            )
-        }
-
         if (rlang::is_pairlist(expr)) {
+            topdown <- callbacks$topdown_pairlist(
+                expr = expr,
+                params = params, wflags = wflags,
+                topdown = topdown, skip = skip, ...
+            )
+
+            # handle depth first
+            bottomup <- vector("list", length = length(expr))
+            for (i in seq_along(expr)) {
+                bottomup[[i]] <- depth_first_analyse_expr(
+                    expr[[i]], callbacks,
+                    params = params,
+                    wflags = wflags,
+                    topdown = topdown,
+                    ...
+                )
+            }
             callbacks$pairlist(
                 expr,
                 params = params,
@@ -197,6 +219,25 @@ depth_first_analyse_expr <- function(expr, callbacks,
                 ...
             )
         } else {
+
+            topdown <- callbacks$topdown_call(
+                expr,
+                params = params, wflags = wflags,
+                topdown = topdown, skip = skip, ...
+            )
+
+            # handle depth first
+            bottomup <- vector("list", length = length(expr))
+            for (i in seq_along(expr)) {
+                bottomup[[i]] <- depth_first_analyse_expr(
+                    expr[[i]], callbacks,
+                    params = params,
+                    wflags = wflags,
+                    topdown = topdown,
+                    ...
+                )
+            }
+
             callbacks$call(
                 expr,
                 params = params,

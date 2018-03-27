@@ -31,12 +31,12 @@ test_that("the functions for running analyses work", {
     syms <- f %>% analyse() %>% analyse_with(
         analysis_callbacks() %>% with_symbol_callback(collect_symbols)
     )
-    expect_equal(syms$syms, c("x", "y"))
+    expect_equal(syms$syms, c("-", "+", "x", "y"))
 
     syms <- body(f) %>% analyse_expr() %>% analyse_expr_with(
         analysis_callbacks() %>% with_symbol_callback(collect_symbols)
     )
-    expect_equal(syms$syms, c("x", "y"))
+    expect_equal(syms$syms, c("-", "+", "x", "y"))
 })
 
 test_that("we can transform as part of a function definition", {

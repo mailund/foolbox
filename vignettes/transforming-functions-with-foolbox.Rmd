@@ -129,14 +129,11 @@ We have replaced `x` with `3` inside `f`'s body, but not removed the formal para
 subst_symbol <- function(fn, var, val) {
     var <- rlang::enexpr(var)
     val <- rlang::enexpr(val)
-    new_fn <- fn %>% rewrite() %>% rewrite_with(
+    fn %>% rewrite() %>% rewrite_with(
         rewrite_callbacks() %>% with_symbol_callback(
             function(expr, ...) if (expr == var) val else expr
         )
-    )
-    params <- formals(fn)
-    formals(new_fn) <- params[names(params) != as.character(var)]
-    new_fn
+    ) %>% remove_formal_(var)
 }
 f %>% subst_symbol(x, 3)
 ```
@@ -289,7 +286,7 @@ g_body <- body(annotated_f)[[3]][[3]][[3]]
 g_body
 ```
 
-It is impossible to know before runtime whether any variable that is part of an assignment call in the body of a function will actually be assigned to. So this annotation is conservative and assumes that if it is *possible* that a variable is assigned to, then it will also be bound. Even so, R is such a dynamic language that it is possible, in many different ways, to modify the environment of a function from outside the static expressions in its body, that the best we can do is heuristics. The heuristics used are described in the documentation for the `annotate_bound_symbols_in_function()` function that implements them:
+It is impossible to know before runtime whether any variable that is part of an assignment call in the body of a function will actually be assigned to. So this annotation is conservative and assumes that if it is *possible* that a variable is assigned to, then it will also be bound. Even so, R is such a dynamic language that it is possible, in many different ways, to modify the environment of a function from outside the static expressions in its body, that the best we can do is heuristics. The heuristics used are described in the documentation for the `rewrite()` function that implements them:
 
 > Since R does not require that we declare local variables, and since the variables that are assigned to a local scope depend on the runtime execution of functions, we cannot determine with any certainty which variables will be assigned to in any given scope at any given program point. So the best we can do is figure out which variables are *potentially* assigned to. Which is what this function does.
 >

@@ -1,0 +1,229 @@
+---
+title: "Partial evaluation with foolbox"
+author: "Thomas Mailund"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+set.seed(1234)
+```
+
+An approach to runtime optimisation is [partial evaluation](https://en.wikipedia.org/wiki/Partial_evaluation). It isn't that complicated an idea; if you are computing the same thing again and again, you would be better off computing it once and remember the result. This idea is used many places, both implementations and in the design of algorithms, where we call the idea things like *dynamic programming* or *memorisation*. When it comes to functions, though, it involves evaluating the parts of a function we are able to with the parameters we can fix, and keeping the rest of the function as code that must be evaluated at a later time.
+
+## Example
+
+```{r}
+rescale <- function(x, y) {
+    (y - mean(x)) / sd(x)
+}
+```
+
+```{r}
+rescale_curry <- function(x) function(y) {
+    (y - mean(x)) / sd(x)
+}
+```
+
+```{r}
+rescale_curry_pe <- function(x) {
+    mean_x <- mean(x)
+    sd_x <- sd(x)
+    function(y) (y - mean_x) / sd_x
+}
+```
+
+```{r}
+x <- rnorm(1000,  0,   1)
+y <- rnorm(1000, 10, 100)
+rescale_curried <- rescale_curry(x)
+rescale_pe <- rescale_curry_pe(x)
+microbenchmark::microbenchmark(rescale(x,y), rescale_curried(y), rescale_pe(y))
+```
+
+```{r}
+library(foolbox)
+
+pe <- function(fn, var, val) {
+    var <- rlang::enexpr(var) ; stopifnot(rlang::is_symbol(var))
+    force(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>%
+            with_symbol_callback(function(expr, ...) {
+                if (expr == var) rlang::expr(!!val)
+                else expr
+            }
+    )) %>% remove_formal_(var)
+}
+```
+
+```{r}
+test_x <- rnorm(3, 0, 1) %>% round(digits = 2)
+rescale_pe <- rescale %>% pe(x, test_x)
+rescale_pe
+
+test_y <- rnorm(5, 10, 100)
+rescale(test_x, test_y)
+rescale_pe(test_y)
+```
+
+```{r}
+rescale_pe <- rescale %>% pe(x, x)
+microbenchmark::microbenchmark(rescale(x, y), rescale_pe(y))
+```
+
+```{r}
+atomic_callback <- function(expr, ...) {
+    attr(expr, "evaluated") <- TRUE
+    expr
+}
+primitive_callback <- function(expr, ...) {
+    attr(expr, "evaluated") <- TRUE
+    expr
+}
+subst_var_callback <- function(var, val) {
+    function(expr, ...) {
+        if (expr == var) {
+            expr <- rlang::expr(!!val)
+            attr(expr, "evaluated") <- TRUE
+        } else {
+            attr(expr, "evaluated") <- FALSE
+        }
+        expr
+    }
+}
+pairlist_callback <- function(expr, ...) {
+    attr(expr, "evaluated") <- FALSE
+    expr
+}
+call_callback <- function(expr, env, ...) {
+    evaluated <- collect_from_args(expr, "evaluated") %>% unlist
+    
+    if (is.null(evaluated)) return(expr)
+    if (length(evaluated) != length(expr) - 1) return(expr)
+    if (any(!evaluated)) return(expr)
+    
+    expr <- tryCatch({
+        val <- eval(expr, env)
+        expr <- rlang::expr(!!val)
+        attr(expr, "evaluated") <- TRUE
+        expr
+    },
+    error = function(e) {
+        attr(expr, "evaluated") <- FALSE
+        expr
+    }
+    )
+    expr 
+}
+
+pe <- function(fn, var, val) {
+    var <- rlang::enexpr(var) ; stopifnot(rlang::is_symbol(var))
+    force(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>%
+            with_atomic_callback(atomic_callback) %>%
+            with_primitive_callback(primitive_callback) %>%
+            with_symbol_callback(subst_var_callback(var,val)) %>%
+            with_pairlist_callback(pairlist_callback) %>%
+            with_call_callback(call_callback)
+    ) %>% remove_formal_(var)
+}
+
+rescale %>% pe(x, test_x)
+```
+
+```{r}
+rescale_pe <- rescale %>% pe(x, x)
+microbenchmark::microbenchmark(rescale(x, y), rescale_pe(y))
+```
+
+Since we use `env` in the evaluation we also capture local variables where the function is defined:
+
+```{r}
+make_rescale <- function(m) {
+    function(x, y) (y - m(x))/sd(x)
+}
+closure_rescale <- make_rescale(mean)
+closure_rescale %>% pe(x, test_x)
+```
+
+
+What about other local functions?
+
+```{r}
+rescale_ms <- function(x, y, mean, sd)
+    (y - mean(x))/sd(x)
+
+rescale_ms %>% pe(x, test_x)
+```
+
+We evaluate `mean(x)` and `sd(x)` in the environment of `rescale_ms` but *not* its execution environment. We should not evaluate functions that are local variables.
+
+```{r}
+call_callback <- function(expr, env, ...) {
+        evaluated <- collect_from_args(expr, "evaluated") %>% unlist
+    
+    if (is.null(evaluated)) return(expr)
+    if (length(evaluated) != length(expr) - 1) return(expr)
+    if (any(!evaluated)) return(expr)
+
+    # don't evaluate bound variables.
+    if (rlang::is_symbol(expr[[1]]) &&
+        (as.character(expr[[1]]) %in% attr(expr, "bound"))) {
+            attr(expr, "evaluated") <- FALSE
+            return(expr)
+    }
+
+    expr <- tryCatch({
+        val <- eval(expr, env)
+        expr <- rlang::expr(!!val)
+        attr(expr, "evaluated") <- TRUE
+        expr
+    },
+    error = function(e) {
+        attr(expr, "evaluated") <- FALSE
+        expr
+    }
+    )
+    expr  
+}
+
+pe <- function(fn, var, val) {
+    var <- rlang::enexpr(var) ; stopifnot(rlang::is_symbol(var))
+    force(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>%
+            with_atomic_callback(atomic_callback) %>%
+            with_primitive_callback(primitive_callback) %>%
+            with_symbol_callback(subst_var_callback(var,val)) %>%
+            with_pairlist_callback(pairlist_callback) %>%
+            with_call_callback(call_callback)
+    ) %>% remove_formal_(var)
+}
+
+rescale %>% pe(x, test_x)
+rescale_ms %>% pe(x, test_x)
+rescale_ms %>% pe(x, test_x) %>% pe(mean, mean)
+rescale_ms %>% pe(x, test_x) %>% pe(mean, mean) %>% pe(sd, sd)
+```
+
+
+```{r}
+rescale_nested <- function(x, y) {
+    move <- function(x, y) y - mean(x)
+    move(x, y) / sd
+}
+rescale_nested %>% pe(x, test_x)
+```
+
+We don't want to substitute variables that are local to *another* local function.
+

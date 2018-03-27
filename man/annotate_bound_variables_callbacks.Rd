@@ -5,7 +5,7 @@
 \alias{annotate_bound_variables_callbacks}
 \title{Propagate parameters and local variables top-down to assign attribute
 "bound" to all call expressions.}
-\format{An object of class \code{list} of length 6.}
+\format{An object of class \code{list} of length 7.}
 \usage{
 annotate_bound_variables_callbacks
 }
