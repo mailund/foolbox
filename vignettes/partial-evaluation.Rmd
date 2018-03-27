@@ -81,44 +81,26 @@ microbenchmark::microbenchmark(rescale(x, y), rescale_pe(y))
 ```
 
 ```{r}
-atomic_callback <- function(expr, ...) {
-    attr(expr, "evaluated") <- TRUE
-    expr
-}
-primitive_callback <- function(expr, ...) {
-    attr(expr, "evaluated") <- TRUE
-    expr
-}
 subst_var_callback <- function(var, val) {
     function(expr, ...) {
         if (expr == var) {
             expr <- rlang::expr(!!val)
-            attr(expr, "evaluated") <- TRUE
-        } else {
-            attr(expr, "evaluated") <- FALSE
         }
         expr
     }
 }
-pairlist_callback <- function(expr, ...) {
-    attr(expr, "evaluated") <- FALSE
-    expr
-}
 call_callback <- function(expr, env, ...) {
-    evaluated <- collect_from_args(expr, "evaluated") %>% unlist
+    call_args_atomic <- rlang::call_args(expr) %>% 
+        Map(rlang::is_atomic, .) %>% unlist
     
-    if (is.null(evaluated)) return(expr)
-    if (length(evaluated) != length(expr) - 1) return(expr)
-    if (any(!evaluated)) return(expr)
+    stopifnot(length(call_args_atomic) == length(expr) - 1)
+    if (any(!call_args_atomic)) return(expr)
     
     expr <- tryCatch({
         val <- eval(expr, env)
-        expr <- rlang::expr(!!val)
-        attr(expr, "evaluated") <- TRUE
-        expr
+        rlang::expr(!!val)
     },
     error = function(e) {
-        attr(expr, "evaluated") <- FALSE
         expr
     }
     )
@@ -130,10 +112,7 @@ pe <- function(fn, var, val) {
     force(val)
     fn %>% rewrite() %>% rewrite_with(
         rewrite_callbacks() %>%
-            with_atomic_callback(atomic_callback) %>%
-            with_primitive_callback(primitive_callback) %>%
             with_symbol_callback(subst_var_callback(var,val)) %>%
-            with_pairlist_callback(pairlist_callback) %>%
             with_call_callback(call_callback)
     ) %>% remove_formal_(var)
 }
@@ -170,27 +149,23 @@ We evaluate `mean(x)` and `sd(x)` in the environment of `rescale_ms` but *not* i
 
 ```{r}
 call_callback <- function(expr, env, ...) {
-        evaluated <- collect_from_args(expr, "evaluated") %>% unlist
+    call_args_atomic <- rlang::call_args(expr) %>% 
+        Map(rlang::is_atomic, .) %>% unlist
     
-    if (is.null(evaluated)) return(expr)
-    if (length(evaluated) != length(expr) - 1) return(expr)
-    if (any(!evaluated)) return(expr)
-
+    stopifnot(length(call_args_atomic) == length(expr) - 1)
+    if (any(!call_args_atomic)) return(expr)
+    
     # don't evaluate bound variables.
     if (rlang::is_symbol(expr[[1]]) &&
         (as.character(expr[[1]]) %in% attr(expr, "bound"))) {
-            attr(expr, "evaluated") <- FALSE
             return(expr)
     }
 
     expr <- tryCatch({
         val <- eval(expr, env)
-        expr <- rlang::expr(!!val)
-        attr(expr, "evaluated") <- TRUE
-        expr
+        rlang::expr(!!val)
     },
     error = function(e) {
-        attr(expr, "evaluated") <- FALSE
         expr
     }
     )
@@ -202,10 +177,7 @@ pe <- function(fn, var, val) {
     force(val)
     fn %>% rewrite() %>% rewrite_with(
         rewrite_callbacks() %>%
-            with_atomic_callback(atomic_callback) %>%
-            with_primitive_callback(primitive_callback) %>%
             with_symbol_callback(subst_var_callback(var,val)) %>%
-            with_pairlist_callback(pairlist_callback) %>%
             with_call_callback(call_callback)
     ) %>% remove_formal_(var)
 }
@@ -233,7 +205,6 @@ skip_overscoped_functions <- function(var_symbol) {
     function(expr, skip, ...) {
         # in `function` expressions, the pair-list is element 2
         if (var %in% names(expr[[2]])) {
-            attr(expr, "evaluated") <- TRUE # it's evaluated, just not substituted
             skip(expr)
         }
     }
@@ -243,10 +214,7 @@ pe <- function(fn, var, val) {
     force(val)
     fn %>% rewrite() %>% rewrite_with(
         rewrite_callbacks() %>%
-            with_atomic_callback(atomic_callback) %>%
-            with_primitive_callback(primitive_callback) %>%
             with_symbol_callback(subst_var_callback(var,val)) %>%
-            with_pairlist_callback(pairlist_callback) %>%
             with_call_callback(call_callback) %>%
             add_topdown_callback(`function`, skip_overscoped_functions(var))
     ) %>% remove_formal_(var)
