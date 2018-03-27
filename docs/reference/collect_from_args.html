@@ -80,6 +80,9 @@ condition predicate evaluates to TRUE, and it concatenates all these." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/partial-evaluation.html">Partial evaluation with foolbox</a>
+    </li>
+    <li>
       <a href="../articles/transforming-functions-with-foolbox.html">Transforming functions with foolbox</a>
     </li>
   </ul>
@@ -117,14 +120,15 @@ call and extracts the attribute <code>attribute</code> from each where the
 <code>condition</code> predicate evaluates to <code>TRUE</code>, and it concatenates all these.</p>
     
 
-    <pre class="usage"><span class='fu'>collect_from_args</span>(<span class='no'>expr</span>, <span class='no'>attribute</span>, <span class='kw'>condition</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>expr</span>) <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>collect_from_args</span>(<span class='no'>expr</span>, <span class='no'>attribute</span>, <span class='kw'>condition</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>expr</span>) <span class='fl'>TRUE</span>,
+  <span class='kw'>include_fun</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>expr</th>
-      <td><p>The call expression to process.</p></td>
+      <td><p>The expression to process.</p></td>
     </tr>
     <tr>
       <th>attribute</th>
@@ -134,6 +138,11 @@ call and extracts the attribute <code>attribute</code> from each where the
       <th>condition</th>
       <td><p>A predicate. Only arguments where the condition evaluates to
 <code>TRUE</code> will be included in the result.</p></td>
+    </tr>
+    <tr>
+      <th>include_fun</th>
+      <td><p>Include the first element in a call, i.e. the function
+that will be called.</p></td>
     </tr>
     </table>
     

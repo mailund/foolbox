@@ -78,6 +78,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/partial-evaluation.html">Partial evaluation with foolbox</a>
+    </li>
+    <li>
       <a href="../articles/transforming-functions-with-foolbox.html">Transforming functions with foolbox</a>
     </li>
   </ul>
@@ -152,25 +155,6 @@ top-down in the traversal.</p></td>
 <p>rewrite_callbacks</p>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>log_calls_transformation</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>call_expr</span>, <span class='no'>env</span>, <span class='no'>param</span>, <span class='no'>...</span>) {
-    <span class='no'>call_fn</span> <span class='kw'>&lt;-</span> <span class='fu'>eval</span>(<span class='no'>call_expr</span><span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>envir</span> <span class='kw'>=</span> <span class='no'>env</span>)
-    <span class='kw'>if</span> (<span class='kw pkg'>rlang</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rlang/topics/is_function'>is_primitive</a></span>(<span class='no'>call_fn</span>)) <span class='fu'>return</span>(<span class='no'>call_expr</span>)
-    <span class='kw'>if</span> (!<span class='kw pkg'>rlang</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rlang/topics/is_symbol'>is_symbol</a></span>(<span class='no'>call_expr</span><span class='kw'>[[</span><span class='fl'>1</span>]])) <span class='fu'>return</span>(<span class='no'>call_expr</span>)
-
-    <span class='kw pkg'>rlang</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>expr</a></span>({
-        <span class='fu'>cat</span>(<span class='st'>"Calling"</span>, <span class='kw pkg'>rlang</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rlang/topics/quasiquotation'>UQ</a></span>(<span class='fu'>as.character</span>(<span class='no'>call_expr</span><span class='kw'>[[</span><span class='fl'>1</span>]])), <span class='st'>"\n"</span>)
-        <span class='kw pkg'>rlang</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rlang/topics/quasiquotation'>UQ</a></span>(<span class='no'>call_expr</span>)
-    })
-}
-
-<span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) {
-    <span class='kw'>if</span> (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='fu'>f</span>(<span class='no'>x</span> - <span class='fl'>1</span>)
-    <span class='kw'>else</span> <span class='fu'>print</span>(<span class='st'>"Done"</span>)
-}
-
-<span class='no'>cb</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rewrite_callbacks.html'>rewrite_callbacks</a></span>() <span class='kw'>%&gt;%</span> <span class='fu'><a href='rewrite_callbacks.html'>with_call_callback</a></span>(<span class='no'>log_calls_transformation</span>)
-<span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='fu'>depth_first_rewrite_function</span>(<span class='no'>f</span>, <span class='no'>cb</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -180,9 +164,7 @@ top-down in the traversal.</p></td>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+          </ul>
 
   </div>
 </div>

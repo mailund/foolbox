@@ -52,6 +52,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/partial-evaluation.html">Partial evaluation with foolbox</a>
+    </li>
+    <li>
       <a href="../articles/transforming-functions-with-foolbox.html">Transforming functions with foolbox</a>
     </li>
   </ul>
@@ -82,7 +85,7 @@
       <h1>Transforming functions with foolbox</h1>
                         <h4 class="author">Thomas Mailund</h4>
             
-            <h4 class="date">2018-03-26</h4>
+            <h4 class="date">2018-03-27</h4>
       
       <small>Source: <a href="https://github.com/mailund/foolbox/blob/master/vignettes/transforming-functions-with-foolbox.Rmd"><code>vignettes/transforming-functions-with-foolbox.Rmd</code></a></small>
 
@@ -120,18 +123,19 @@
 <a class="sourceLine" id="cb2-4" data-line-number="4">callbacks &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rewrite_callbacks.html">analysis_callbacks</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_callbacks.html">with_symbol_callback</a></span>(collect_symbols)</a>
 <a class="sourceLine" id="cb2-5" data-line-number="5">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse_with</a></span>(callbacks)</a>
 <a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; $symbols</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; [1] "a" "x" "y" "b" "x" "y" "a" "b"</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt;  [1] "{"  "&lt;-" "a"  "+"  "x"  "y"  "&lt;-" "b"  "-"  "x"  "y"  "-"  "*"  "a" </span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; [15] "^"  "b"</span></a></code></pre></div>
 <p>The symbols are collected in the order we see them in the function and since we do not remove duplications, we see each symbol as many times as it appears. We can simplify this a bit by post-processing the traversal results.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse_with</a></span>(callbacks) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">    </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; [1] "a" "x" "y" "b"</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;  [1] "{"  "&lt;-" "a"  "+"  "x"  "y"  "b"  "-"  "*"  "^"</span></a></code></pre></div>
 <p>Normally, I will not bother with naming callbacks and constructing an analysis pipeline in steps, but simply construct it using a <code>%&gt;%</code> pipeline like this:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse_with</a></span>(</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">    <span class="kw"><a href="../reference/rewrite_callbacks.html">analysis_callbacks</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_callbacks.html">with_symbol_callback</a></span>(</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3">        <span class="cf">function</span>(expr, ...) <span class="kw">list</span>(<span class="dt">symbols =</span> <span class="kw">as.character</span>(expr))</a>
 <a class="sourceLine" id="cb4-4" data-line-number="4">    )</a>
 <a class="sourceLine" id="cb4-5" data-line-number="5">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] "a" "x" "y" "b"</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  [1] "{"  "&lt;-" "a"  "+"  "x"  "y"  "b"  "-"  "*"  "^"</span></a></code></pre></div>
 <p>It is a matter of taste what you prefer.</p>
 <p>I will often name a given pipeline, though, so I can reuse it later. This is something we can do by specifying the pipeline but with dot, <code>.</code>, as the initial input:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">collect_symbols &lt;-<span class="st"> </span>. <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">analyse_with</a></span>(</a>
@@ -141,7 +145,7 @@
 <a class="sourceLine" id="cb5-5" data-line-number="5">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a></code></pre></div>
 <p>Then, when we have a function we want to analyse, we can pipe it into the analysis:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect_symbols</span>()</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; [1] "a" "x" "y" "b"</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt;  [1] "{"  "&lt;-" "a"  "+"  "x"  "y"  "b"  "-"  "*"  "^"</span></a></code></pre></div>
 <p>The example uses an <code><a href="../reference/rewrite_with.html">analyse()</a></code> traversal. Such a traversal traverses the expression structure depth-first and invoke the callbacks on each sub-expression. What these compute are passed, bottom-up, to callbacks in the parameter <code>bottomup</code>. For symbols, we are at a leaf in the expression tree, so we do not get any <code>bottomup</code> information from the recursion, but the list we created is propagated up in the recursion. We just didn’t see it in the example because the default callbacks propagate the results up and we could use those. Using callbacks for <code>call</code> expressions lets us manipulate this information to construct more complicated analyses.</p>
 </div>
 <div id="example-substitution" class="section level3">
@@ -168,18 +172,15 @@
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">subst_symbol &lt;-<span class="st"> </span><span class="cf">function</span>(fn, var, val) {</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2">    var &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/rlang/topics/quotation">enexpr</a></span>(var)</a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">    val &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/rlang/topics/quotation">enexpr</a></span>(val)</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">    new_fn &lt;-<span class="st"> </span>fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">rewrite</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">rewrite_with</a></span>(</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">    fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">rewrite</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_with.html">rewrite_with</a></span>(</a>
 <a class="sourceLine" id="cb10-5" data-line-number="5">        <span class="kw"><a href="../reference/rewrite_callbacks.html">rewrite_callbacks</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/rewrite_callbacks.html">with_symbol_callback</a></span>(</a>
 <a class="sourceLine" id="cb10-6" data-line-number="6">            <span class="cf">function</span>(expr, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span>var) val <span class="cf">else</span> expr</a>
 <a class="sourceLine" id="cb10-7" data-line-number="7">        )</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">    )</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">    params &lt;-<span class="st"> </span><span class="kw">formals</span>(fn)</a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">    <span class="kw">formals</span>(new_fn) &lt;-<span class="st"> </span>params[<span class="kw">names</span>(params) <span class="op">!=</span><span class="st"> </span><span class="kw">as.character</span>(var)]</a>
-<a class="sourceLine" id="cb10-11" data-line-number="11">    new_fn</a>
-<a class="sourceLine" id="cb10-12" data-line-number="12">}</a>
-<a class="sourceLine" id="cb10-13" data-line-number="13">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">subst_symbol</span>(x, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt; function (y) </span></a>
-<a class="sourceLine" id="cb10-15" data-line-number="15"><span class="co">#&gt; 2 * 3 + y^2</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-8" data-line-number="8">    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/remove_formal_.html">remove_formal_</a></span>(var)</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">subst_symbol</span>(x, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; function (y) </span></a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; 2 * 3 + y^2</span></a></code></pre></div>
 <p>In <code>foolbox</code> there is no special functionality for manipulating the <em>function</em> we rewrite. That can easily be done using base R functions. We focus on rewriting expressions.</p>
 </div>
 </div>
@@ -223,7 +224,7 @@
 <p>Top-down callbacks get one additional argument:</p>
 <ul>
 <li>
-<strong>skip</strong>: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a “thunk”, i.e. a function that doesn’t take any arguments. If this function is called, the traversal does not process the expression but use the existing expression in the rewrite. For analysis traversals, <strong>skip</strong> takes one argument that will be considered the result of that (unexplored) expression.</li>
+<strong>skip</strong>: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a “thunk”, i.e. a function that doesn’t take any arguments. If this function is called, the traversal does not process the expression. Instead, <strong>skip</strong> takes one argument, and that will be considered the result of the unexplored expression.</li>
 </ul>
 <div id="setting-up-callbacks" class="section level3">
 <h3 class="hasAnchor">
@@ -313,7 +314,7 @@
 <a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; character(0)</span></a>
 <a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; attr(,"bound")</span></a>
 <a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt; [1] "z" "x" "y" "a" "g"</span></a></code></pre></div>
-<p>It is impossible to know before runtime whether any variable that is part of an assignment call in the body of a function will actually be assigned to. So this annotation is conservative and assumes that if it is <em>possible</em> that a variable is assigned to, then it will also be bound. Even so, R is such a dynamic language that it is possible, in many different ways, to modify the environment of a function from outside the static expressions in its body, that the best we can do is heuristics. The heuristics used are described in the documentation for the <code><a href="../reference/annotate_bound_symbols_in_function.html">annotate_bound_symbols_in_function()</a></code> function that implements them:</p>
+<p>It is impossible to know before runtime whether any variable that is part of an assignment call in the body of a function will actually be assigned to. So this annotation is conservative and assumes that if it is <em>possible</em> that a variable is assigned to, then it will also be bound. Even so, R is such a dynamic language that it is possible, in many different ways, to modify the environment of a function from outside the static expressions in its body, that the best we can do is heuristics. The heuristics used are described in the documentation for the <code><a href="../reference/rewrite_with.html">rewrite()</a></code> function that implements them:</p>
 <blockquote>
 <p>Since R does not require that we declare local variables, and since the variables that are assigned to a local scope depend on the runtime execution of functions, we cannot determine with any certainty which variables will be assigned to in any given scope at any given program point. So the best we can do is figure out which variables are <em>potentially</em> assigned to. Which is what this function does.</p>
 <p>The rules for when we are assigning to a local variable are a bit complicated. For control structures, we can assume that assignments will be to the local scope. People can change the implementation of these so it isn’t, but then they are only hurting themselves and deserve the extra pain we can give them. For other call arguments, it gets a little more complicated. With standard-evaluation, if we have an arrow assignment in a function argument, then the assignment happens in the calling scope. So we will assume this happens unless we are handling cases we know have NSE, such as <code>with</code>. If an assignment is inside a block, however, we will assume that NSE <em>is</em> in play, by default, and not consider it a local assignment.</p>

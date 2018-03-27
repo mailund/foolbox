@@ -7,3 +7,4 @@
 ^docs$
 ^.imdone$
 ^cleanup.R$
+^vignettes/partial-evaluation_cache/*$

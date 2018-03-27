@@ -75,6 +75,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/partial-evaluation.html">Partial evaluation with foolbox</a>
+    </li>
+    <li>
       <a href="../articles/transforming-functions-with-foolbox.html">Transforming functions with foolbox</a>
     </li>
   </ul>
@@ -137,7 +140,7 @@
         <tr>
           <!--  -->
           <td>
-            <p><code><a href="rewrite_callbacks.html">rewrite_callbacks()</a></code> <code><a href="rewrite_callbacks.html">analysis_callbacks()</a></code> <code><a href="rewrite_callbacks.html">with_atomic_callback()</a></code> <code><a href="rewrite_callbacks.html">with_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_symbol_callback()</a></code> <code><a href="rewrite_callbacks.html">with_primitive_callback()</a></code> <code><a href="rewrite_callbacks.html">with_call_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_callback()</a></code> </p>
+            <p><code><a href="rewrite_callbacks.html">rewrite_callbacks()</a></code> <code><a href="rewrite_callbacks.html">analysis_callbacks()</a></code> <code><a href="rewrite_callbacks.html">with_atomic_callback()</a></code> <code><a href="rewrite_callbacks.html">with_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_symbol_callback()</a></code> <code><a href="rewrite_callbacks.html">with_primitive_callback()</a></code> <code><a href="rewrite_callbacks.html">with_call_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_call_callback()</a></code> </p>
           </td>
           <td><p>Default expression-transformation callbacks.</p></td>
         </tr><tr>
@@ -215,6 +218,26 @@ after it is defined and before it is assigned to a name.</p></td>
       </tbody><tbody>
         <tr>
           <th colspan="2">
+            <h2 id="section-formals" class="hasAnchor"><a href="#section-formals" class="anchor"></a>Formals</h2>
+            <p class="section-desc"><p>Manipulations of the formal parameters of a function.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="remove_formal_.html">remove_formal_()</a></code> </p>
+          </td>
+          <td><p>Remove a parameter from the formal parameters of a function.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="remove_formal.html">remove_formal()</a></code> </p>
+          </td>
+          <td><p>Remove a parameter from the formal parameters of a function.</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
             <h2 id="section-warnings" class="hasAnchor"><a href="#section-warnings" class="anchor"></a>Warnings</h2>
             <p class="section-desc"><p>Controling which warnings are raised when traversing a function.</p></p>
           </th>
@@ -238,6 +261,7 @@ after it is defined and before it is assigned to a name.</p></td>
       <li><a href="#section-callbacks">Callbacks</a></li>
       <li><a href="#section-function-annotation-transformations">Function annotation transformations</a></li>
       <li><a href="#section-information-processing">Information processing</a></li>
+      <li><a href="#section-formals">Formals</a></li>
       <li><a href="#section-warnings">Warnings</a></li>
     </ul>
   </div>

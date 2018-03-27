@@ -43,9 +43,9 @@ reference:
   - title: Formals
     desc: >
       Manipulations of the formal parameters of a function.
-    content:
-        - remove_formal_
-        - remove_formal
+    contents:
+      - remove_formal_
+      - remove_formal
 
   - title: Warnings
     desc: >
