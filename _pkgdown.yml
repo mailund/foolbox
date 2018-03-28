@@ -1,3 +1,24 @@
+template:
+    params:
+        bootswatch: cosmo
+
+development:
+  mode: auto
+
+navbar:
+  title: "foolbox"
+  left:
+    - text: "Manuals"
+      href: articles/index.html
+    - text: "Functions"
+      href: reference/index.html
+    - text: "News"
+      href: news/index.html
+  right:
+   - icon: fa-twitter
+     href: https://twitter.com/ThomasMailund
+   - icon: fa-github
+     href: https://github.com/mailund/dynprog
 reference:
   - title: Traversals
     desc: >
