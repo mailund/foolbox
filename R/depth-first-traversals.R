@@ -128,6 +128,10 @@ depth_first_rewrite_function <- function(fn, callbacks,
                                          topdown = list(),
                                          wflags = warning_flags(),
                                          ...) {
+    if (!rlang::is_closure(fn)) {
+        err <- simpleError("Function must be a closure.")
+        stop(err)
+    }
     body(fn) <- depth_first_rewrite_expr(
         body(fn), callbacks,
         env = environment(fn), params = formals(fn),
@@ -266,6 +270,11 @@ depth_first_analyse_function <- function(fn, callbacks,
                                          topdown = list(),
                                          wflags = warning_flags(),
                                          ...) {
+    if (!rlang::is_closure(fn)) {
+        err <- simpleError("Function must be a closure.")
+        stop(err)
+    }
+
     depth_first_analyse_expr(
         body(fn), callbacks,
         env = environment(fn), params = formals(fn),

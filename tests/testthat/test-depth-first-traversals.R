@@ -103,11 +103,11 @@ test_that("we can handle call-callbacks when there are local functions", {
     cb <- rewrite_callbacks() %>% add_call_callback(fn = f, cb = f_cb)
 
     g <- function(y) y + f(y)
-    g_tr <- depth_first_rewrite_function(g, cb)
+    g_tr <- foolbox:::depth_first_rewrite_function(g, cb)
     expect_equal(body(g_tr), quote(y + (2 + x)))
 
     h <- function(f, y) y + f(y)
-    h_tr <- depth_first_rewrite_function(h, cb)
+    h_tr <- foolbox:::depth_first_rewrite_function(h, cb)
     expect_equal(body(h_tr), quote(y + f(y)))
 })
 

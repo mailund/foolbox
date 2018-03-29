@@ -115,26 +115,26 @@ nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 
 #' @describeIn rewrite_callbacks Default callbacks for rewriting expressions
 rewrite_callbacks <- function() list(
-        atomic = identity_rewrite_callback,
-        symbol = identity_rewrite_callback,
-        primitive = identity_rewrite_callback,
-        pairlist = identity_rewrite_callback,
-        call = identity_rewrite_callback,
-        topdown_pairlist = nop_topdown_callback,
-        topdown_call = nop_topdown_callback
-    )
+    atomic = identity_rewrite_callback,
+    symbol = identity_rewrite_callback,
+    primitive = identity_rewrite_callback,
+    pairlist = identity_rewrite_callback,
+    call = identity_rewrite_callback,
+    topdown_pairlist = nop_topdown_callback,
+    topdown_call = nop_topdown_callback
+)
 
 #' @describeIn rewrite_callbacks Default callbacks for analysing expressions
 #' @export
 analysis_callbacks <- function() list(
-        atomic = identity_analysis_callback,
-        symbol = identity_analysis_callback,
-        primitive = identity_analysis_callback,
-        pairlist = identity_analysis_callback,
-        call = identity_analysis_callback,
-        topdown_pairlist = nop_topdown_callback,
-        topdown_call = nop_topdown_callback
-    )
+    atomic = identity_analysis_callback,
+    symbol = identity_analysis_callback,
+    primitive = identity_analysis_callback,
+    pairlist = identity_analysis_callback,
+    call = identity_analysis_callback,
+    topdown_pairlist = nop_topdown_callback,
+    topdown_call = nop_topdown_callback
+)
 
 #' Create a function for setting callbacks.
 #'
@@ -232,28 +232,35 @@ add_call_callback <- function(callbacks, fn, cb) {
         # we can't evaluate it at transformation time. We propagate
         # to the next callback.
         call_name <- as.character(expr[[1]])
-        if (call_name %in% names(params)) {
-            return(next_cb(
-                expr,
-                env = env, params = params, wflags = wflags, ...
-            ))
-        }
-        # The same goes for other bound variables, if we have annotated
-        # the expressions with those.
-        if (call_name %in% attr(expr, "bound")) {
-            if (fn_name == call_name && wflags$warn_on_local_function) {
-                warning(paste0(
-                    "The function ", call_name,
-                    " is not processed by a callback because it might",
-                    " be referring to a local variable in the scope where",
-                    "it is found.\n",
-                    "Use a fully qualified name if you want it processed."
+
+        # as.character will return a vector for qualified names. Those,
+        # we simply do not consider local. So we only check for those
+        # with length 1.
+        if (length(call_name) == 1) {
+
+            if (call_name %in% names(params)) {
+                return(next_cb(
+                    expr,
+                    env = env, params = params, wflags = wflags, ...
                 ))
             }
-            return(next_cb(
-                expr,
-                env = env, params = params, wflags = wflags, ...
-            ))
+            # The same goes for other bound variables, if we have annotated
+            # the expressions with those.
+            if (call_name %in% attr(expr, "bound")) {
+                if (fn_name == call_name && wflags$warn_on_local_function) {
+                    warning(paste0(
+                        "The function ", call_name,
+                        " is not processed by a callback because it might",
+                        " be referring to a local variable in the scope where",
+                        "it is found.\n",
+                        "Use a fully qualified name if you want it processed."
+                    ))
+                }
+                return(next_cb(
+                    expr,
+                    env = env, params = params, wflags = wflags, ...
+                ))
+            }
         }
 
         # now try to get the actual function by evaluating it
@@ -319,35 +326,40 @@ add_topdown_callback <- function(callbacks, fn, cb) {
         # we can't evaluate it at transformation time. We propagate
         # to the next callback.
         call_name <- as.character(expr[[1]])
-        if (call_name %in% names(params)) {
-            return(next_cb(
-                expr,
-                env = env, params = params, wflags = wflags, ...
-            ))
-        }
-        # The same goes for other bound variables, if we have annotated
-        # the expressions with those.
-        if (call_name %in% attr(expr, "bound")) {
-            if (fn_name == call_name && wflags$warn_on_local_function) {
-                warning(paste0(
-                    "The function ", call_name,
-                    " is not processed by a callback because it might",
-                    " be referring to a local variable in the scope where",
-                    "it is found.\n",
-                    "Use a fully qualified name if you want it processed."
+
+        # as.character will return a vector for qualified names. Those,
+        # we simply do not consider local. So we only check for those
+        # with length 1.
+        if (length(call_name) == 1) {
+
+            if (call_name %in% names(params)) {
+                return(next_cb(
+                    expr,
+                    env = env, params = params, wflags = wflags, ...
                 ))
             }
-            return(next_cb(
-                expr,
-                env = env, params = params, wflags = wflags, ...
-            ))
+            # The same goes for other bound variables, if we have annotated
+            # the expressions with those.
+            if (call_name %in% attr(expr, "bound")) {
+                if (fn_name == call_name && wflags$warn_on_local_function) {
+                    warning(paste0(
+                        "The function ", call_name,
+                        " is not processed by a callback because it might",
+                        " be referring to a local variable in the scope where",
+                        "it is found.\n",
+                        "Use a fully qualified name if you want it processed."
+                    ))
+                }
+                return(next_cb(
+                    expr,
+                    env = env, params = params, wflags = wflags, ...
+                ))
+            }
         }
 
         # now try to get the actual function by evaluating it
         err_fun <- function(e) {
             if (wflags$warn_on_unknown_function) {
-                cat("call name:", paste0('"',call_name,'"'), "\n")
-                cat("expr: ", deparse(expr), "\n")
                 warning(paste0(
                     "The function ", call_name,
                     " could not be evaluated to an actual function in ",
