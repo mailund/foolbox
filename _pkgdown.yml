@@ -2,14 +2,17 @@ template:
     params:
         bootswatch: cosmo
 
-development:
-  mode: auto
-
 navbar:
   title: "foolbox"
   left:
-    - text: "Manuals"
-      href: articles/index.html
+    - icon: fa-home
+      href: index.html
+    - text: "Tutorials"
+      menu:
+        - text: "Transforming Functions with `foolbox`"
+          href: articles/transforming-functions-with-foolbox.html
+        - text: "Partial Evaluation with `foolbox`"
+          href: articles/partial-evaluation.html
     - text: "Functions"
       href: reference/index.html
     - text: "News"
@@ -19,6 +22,7 @@ navbar:
      href: https://twitter.com/ThomasMailund
    - icon: fa-github
      href: https://github.com/mailund/dynprog
+
 reference:
   - title: Traversals
     desc: >
