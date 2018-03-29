@@ -267,7 +267,7 @@ add_call_callback <- function(callbacks, fn, cb) {
         err_fun <- function(e) {
             if (wflags$warn_on_unknown_function) {
                 warning(paste0(
-                    "The function ", call_name,
+                    "The function ", toString(expr[[1]]),
                     " could not be evaluated to an actual function in ",
                     "this scope.\n"
                 ))
@@ -343,7 +343,7 @@ add_topdown_callback <- function(callbacks, fn, cb) {
             if (call_name %in% attr(expr, "bound")) {
                 if (fn_name == call_name && wflags$warn_on_local_function) {
                     warning(paste0(
-                        "The function ", call_name,
+                        "The function ", toString(expr[[1]]),
                         " is not processed by a callback because it might",
                         " be referring to a local variable in the scope where",
                         "it is found.\n",

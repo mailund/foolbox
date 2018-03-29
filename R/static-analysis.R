@@ -124,7 +124,7 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
     # scope and when they are evaluated in another and assignments
     # won't affect this scope.
 
-    call_name <- as.character(expr[[1]])
+    call_name <- rlang::call_name(expr)
     if (call_name %in% c("{", "if", "for", "while", "repeat")) {
         condition <- function(expr) TRUE
     } else if (call_name == "with") {
