@@ -4,11 +4,11 @@
 # Function manipulation toolbox
 
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2018--03--27-green.svg)](/commits/master)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.0.9000-green.svg?style=flat-square)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2018--04--26-green.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.1.0-green.svg?style=flat-square)](commits/master)
 [![Travis build
 status](https://travis-ci.org/mailund/foolbox.svg?branch=master)](https://travis-ci.org/mailund/foolbox)
 [![AppVeyor build
@@ -17,6 +17,12 @@ status](https://ci.appveyor.com/api/projects/status/github/mailund/foolbox?branc
 Status](http://img.shields.io/codecov/c/github/mailund/foolbox/master.svg)](https://codecov.io/github/mailund/foobox?branch=master)
 [![Coverage
 Status](http://coveralls.io/repos/github/mailund/foolbox/badge.svg?branch=master)](https://coveralls.io/github/mailund/foolbox?branch=master)
+[![CRAN
+status](http://www.r-pkg.org/badges/version/foolbox)](https://cran.r-project.org/package=foolbox)
+[![CRAN
+downloads](http://cranlogs.r-pkg.org/badges/grand-total/foolbox)](https://cran.r-project.org/package=foolbox)
+[![minimal R
+version](https://img.shields.io/badge/R-%E2%89%A53.2-blue.svg)](https://cran.r-project.org/)
 
 The `foolbox` package implements functionality for static analysis of R
 functions and for manipulating functions by rewriting the components
