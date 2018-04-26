@@ -58,7 +58,14 @@
 #'    })
 #' tr_f <- . %>% rewrite() %>% rewrite_with(cb)
 #'
-#' g <- function(y) y + f(y) # body(g) is now quote(y + (2 + x))
+#' g <- function(y) y + f(y)
+#' tr_f(g)
+#'
+#' collect_symbols <- function(expr, ...) {
+#'    list(symbols = as.character(expr))
+#' }
+#' callbacks <- analysis_callbacks() %>% with_symbol_callback(collect_symbols)
+#' f %>% analyse() %>% analyse_with(callbacks)
 #'
 #' @describeIn rewrite_with Apply `callbacks` over `fn` to rewrite it.
 #' @export
@@ -104,6 +111,24 @@ analyse_expr_with <- function(expr, callbacks, ...) {
 
 #' Object for setting up a transformation pipeline when defining functions
 #'
+#' @examples
+#' # This is a very simple inline function that require we
+#' # provide the function body as it should be inserted.
+#' # For a more detailed version, see the Tutorial vignette.
+#' # For a version that permits partial evaluation, see that vignette.
+#' inline <- function(f, fn, body) {
+#'    body <- substitute(body)
+#'    rewrite(f) %>%
+#'      rewrite_with(
+#'          rewrite_callbacks() %>%
+#'            add_call_callback(fn, function(expr, ...) body)
+#'      )
+#' }
+#'
+#' g <- function(x) x**2
+#' h <- rewrites[inline(g,y**2)] < function(y) y + g(y)
+#' h
+#'
 #' @export
 rewrites <- structure(NA, class = "foolbox_rewrite_spec")
 
@@ -115,6 +140,26 @@ rewrites <- structure(NA, class = "foolbox_rewrite_spec")
 #' @param dummy The dummy-table \code{\link{rewrites}}. It is only here because it
 #'     allows us to use subscripts as part of the domain-specific language.
 #' @param ... A list of rewrite functions.
+#'
+#' @seealso `<.foolbox_pipe`
+#' @seealso rewrites
+#'
+#' @examples
+#' # This is a very simple inline function that require we
+#' # provide the function body as it should be inserted.
+#' # For a more detailed version, see the Tutorial vignette.
+#' inline <- function(f, fn, body) {
+#'    body <- substitute(body)
+#'    rewrite(f) %>%
+#'      rewrite_with(
+#'          rewrite_callbacks() %>%
+#'            add_call_callback(fn, function(expr, ...) body)
+#'      )
+#' }
+#'
+#' g <- function(x) x**2
+#' h <- rewrites[inline(g,y**2)] < function(y) y + g(y)
+#' h
 #'
 #' @export
 `[.foolbox_rewrite_spec` <- function(dummy, ...) {
@@ -132,6 +177,25 @@ rewrites <- structure(NA, class = "foolbox_rewrite_spec")
 #'     using the subscript operator to [rewrites()].
 #' @param fn The function we wish to transform.
 #'
+#' @examples
+#' # This is a very simple inline function that require we
+#' # provide the function body as it should be inserted.
+#' # For a more detailed version, see the Tutorial vignette.
+#' inline <- function(f, fn, body) {
+#'    body <- substitute(body)
+#'    rewrite(f) %>%
+#'      rewrite_with(
+#'          rewrite_callbacks() %>%
+#'            add_call_callback(fn, function(expr, ...) body)
+#'      )
+#' }
+#'
+#' g <- function(x) x**2
+#' h <- rewrites[inline(g,y**2)] < function(y) y + g(y)
+#' h
+#'
+#' @seealso `[.foolbox_rewrite_spec`
+#' @seealso rewrites
 #' @export
 `<.foolbox_pipe` <- function(pipe, fn) {
     for (trans in pipe) {

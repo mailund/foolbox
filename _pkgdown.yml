@@ -7,6 +7,8 @@ navbar:
   left:
     - icon: fa-home
       href: index.html
+    - text: "Getting Started"
+      href: articles/tutorial.html
     - text: "Tutorials"
       menu:
         - text: "Transforming Functions with `foolbox`"
@@ -21,7 +23,7 @@ navbar:
    - icon: fa-twitter
      href: https://twitter.com/ThomasMailund
    - icon: fa-github
-     href: https://github.com/mailund/dynprog
+     href: https://github.com/mailund/foolbox
 
 reference:
   - title: Traversals

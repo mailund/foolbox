@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Merge the results of several bottomup results. — merge_bottomup" />
 
 <meta property="og:description" content="The bottomup parameter in callbacks will be calculated for all parameters
@@ -56,7 +59,7 @@ of call`` expressions. The parameter to the callbacks are thus a list of lists. 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -67,6 +70,9 @@ of call`` expressions. The parameter to the callbacks are thus a list of lists. 
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -99,12 +105,13 @@ of call`` expressions. The parameter to the callbacks are thus a list of lists. 
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -112,17 +119,20 @@ of call`` expressions. The parameter to the callbacks are thus a list of lists. 
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Merge the results of several bottomup results.</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/helpers.R'><code>R/helpers.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mailund/foolbox/blob/master/R/helpers.R'><code>R/helpers.R</code></a></small>
+    <div class="hidden name"><code>merge_bottomup.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>The <code>bottomup</code> parameter in callbacks will be calculated for all parameters
 of <code>call`` expressions. The parameter to the callbacks are thus a list of lists. This function merges these lists into one that contain a list for each named component in the</code>bottomup<code>parameter. If results are not named in the</code>bottomup` list, they are discarded.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>merge_bottomup</span>(<span class='no'>bottomup</span>)</pre>
     
@@ -143,8 +153,8 @@ if you want to prevent this.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>depth_first_analyse_function</p>
-<p>depth_first_analyse_expr</p>
+    <div class='dont-index'><p>depth_first_analyse_function</p>
+<p>depth_first_analyse_expr</p></div>
     
 
   </div>
@@ -172,6 +182,8 @@ if you want to prevent this.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

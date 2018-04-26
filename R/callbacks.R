@@ -100,6 +100,23 @@ nop_topdown_callback <- function(expr, topdown, skip, ...) topdown
 #'   expressions--there is very little you can do with them -- but you can
 #'   include them by setting this parameter to `TRUE`.
 #'
+#' @examples
+#' f <- function(x) 2 + x
+#' cb <- rewrite_callbacks() %>%
+#'    add_call_callback(f, function(expr, ...) {
+#'        quote(2 + x)
+#'    })
+#' tr_f <- . %>% rewrite() %>% rewrite_with(cb)
+#'
+#' g <- function(y) y + f(y)
+#' tr_f(g)
+#'
+#' collect_symbols <- function(expr, ...) {
+#'    list(symbols = as.character(expr))
+#' }
+#' callbacks <- analysis_callbacks() %>% with_symbol_callback(collect_symbols)
+#' f %>% analyse() %>% analyse_with(callbacks)
+#'
 #' @seealso with_atomic_callback
 #' @seealso with_symbol_callback
 #' @seealso with_primitive_callback
@@ -217,6 +234,18 @@ with_topdown_call_callback <- make_with_callback("topdown_call")
 #' @param cb        The callback function to invoke.
 #'
 #' @return          The updated callbacks.
+#'
+#' @examples
+#' f <- function(x) 2 + x
+#' cb <- rewrite_callbacks() %>%
+#'    add_call_callback(f, function(expr, ...) {
+#'        quote(2 + x)
+#'    })
+#' tr_f <- . %>% rewrite() %>% rewrite_with(cb)
+#'
+#' g <- function(y) y + f(y)
+#' tr_f(g)
+#'
 #' @export
 add_call_callback <- function(callbacks, fn, cb) {
     next_cb <- callbacks$call

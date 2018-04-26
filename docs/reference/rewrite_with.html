@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Functions for applying a sequence of rewrites. — rewrite_with" />
 
 <meta property="og:description" content="The rewrite() function applies a series of transformations to an input
@@ -57,7 +60,7 @@ pipeline of rewrite_with() calls for further analysis." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -68,6 +71,9 @@ pipeline of rewrite_with() calls for further analysis." />
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -100,12 +106,13 @@ pipeline of rewrite_with() calls for further analysis." />
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,18 +120,21 @@ pipeline of rewrite_with() calls for further analysis." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Functions for applying a sequence of rewrites.</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/transform-dsl.R'><code>R/transform-dsl.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mailund/foolbox/blob/master/R/transform-dsl.R'><code>R/transform-dsl.R</code></a></small>
+    <div class="hidden name"><code>rewrite_with.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>The <code>rewrite()</code> function applies a series of transformations to an input
 function, <code>fn</code> and returns the result. This result can then be used in a
 pipeline of <code>rewrite_with()</code> calls for further analysis.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>rewrite_with</span>(<span class='no'>fn</span>, <span class='no'>callbacks</span>, <span class='no'>...</span>)
 
@@ -216,7 +226,7 @@ assignment.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>rewrite_callbacks</p>
+    <div class='dont-index'><p>rewrite_callbacks</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -227,7 +237,18 @@ assignment.</p>
    })
 <span class='no'>tr_f</span> <span class='kw'>&lt;-</span> <span class='no'>.</span> <span class='kw'>%&gt;%</span> <span class='fu'>rewrite</span>() <span class='kw'>%&gt;%</span> <span class='fu'>rewrite_with</span>(<span class='no'>cb</span>)
 
-<span class='no'>g</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>y</span>) <span class='no'>y</span> + <span class='fu'>f</span>(<span class='no'>y</span>) <span class='co'># body(g) is now quote(y + (2 + x))</span></div></pre>
+<span class='no'>g</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>y</span>) <span class='no'>y</span> + <span class='fu'>f</span>(<span class='no'>y</span>)
+<span class='fu'>tr_f</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; function (y) 
+#&gt; y + (2 + x)
+#&gt; &lt;environment: 0x107e42d50&gt;</div><div class='input'>
+<span class='no'>collect_symbols</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>expr</span>, <span class='no'>...</span>) {
+   <span class='fu'>list</span>(<span class='kw'>symbols</span> <span class='kw'>=</span> <span class='fu'>as.character</span>(<span class='no'>expr</span>))
+}
+<span class='no'>callbacks</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='rewrite_callbacks.html'>analysis_callbacks</a></span>() <span class='kw'>%&gt;%</span> <span class='fu'><a href='rewrite_callbacks.html'>with_symbol_callback</a></span>(<span class='no'>collect_symbols</span>)
+<span class='no'>f</span> <span class='kw'>%&gt;%</span> <span class='fu'>analyse</span>() <span class='kw'>%&gt;%</span> <span class='fu'>analyse_with</span>(<span class='no'>callbacks</span>)</div><div class='output co'>#&gt; $symbols
+#&gt; [1] "+" "x"
+#&gt; </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -259,6 +280,8 @@ assignment.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>
