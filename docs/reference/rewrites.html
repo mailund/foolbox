@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Object for setting up a transformation pipeline when defining functions — rewrites" />
 
 <meta property="og:description" content="Object for setting up a transformation pipeline when defining functions" />
@@ -55,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -66,6 +69,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -98,12 +104,13 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -111,16 +118,19 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Object for setting up a transformation pipeline when defining functions</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/transform-dsl.R'><code>R/transform-dsl.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mailund/foolbox/blob/master/R/transform-dsl.R'><code>R/transform-dsl.R</code></a></small>
+    <div class="hidden name"><code>rewrites.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Object for setting up a transformation pipeline when defining functions</p>
     
+    </div>
 
     <pre class="usage"><span class='no'>rewrites</span></pre>
         
@@ -129,13 +139,35 @@
     <p>An object of class <code>foolbox_rewrite_spec</code> of length 1.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># This is a very simple inline function that require we</span>
+<span class='co'># provide the function body as it should be inserted.</span>
+<span class='co'># For a more detailed version, see the Tutorial vignette.</span>
+<span class='co'># For a version that permits partial evaluation, see that vignette.</span>
+<span class='no'>inline</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>f</span>, <span class='no'>fn</span>, <span class='no'>body</span>) {
+   <span class='no'>body</span> <span class='kw'>&lt;-</span> <span class='fu'>substitute</span>(<span class='no'>body</span>)
+   <span class='fu'><a href='rewrite_with.html'>rewrite</a></span>(<span class='no'>f</span>) <span class='kw'>%&gt;%</span>
+     <span class='fu'><a href='rewrite_with.html'>rewrite_with</a></span>(
+         <span class='fu'><a href='rewrite_callbacks.html'>rewrite_callbacks</a></span>() <span class='kw'>%&gt;%</span>
+           <span class='fu'><a href='add_call_callback.html'>add_call_callback</a></span>(<span class='no'>fn</span>, <span class='kw'>function</span>(<span class='no'>expr</span>, <span class='no'>...</span>) <span class='no'>body</span>)
+     )
+}
+
+<span class='no'>g</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span>**<span class='fl'>2</span>
+<span class='no'>h</span> <span class='kw'>&lt;-</span> <span class='no'>rewrites</span>[<span class='fu'>inline</span>(<span class='no'>g</span>,<span class='no'>y</span>**<span class='fl'>2</span>)] <span class='kw'>&lt;</span> <span class='kw'>function</span>(<span class='no'>y</span>) <span class='no'>y</span> + <span class='fu'>g</span>(<span class='no'>y</span>)
+<span class='no'>h</span></div><div class='output co'>#&gt; function (y) 
+#&gt; y + y^2
+#&gt; &lt;environment: 0x11412ce78&gt;</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       
       <li><a href="#format">Format</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>
@@ -151,6 +183,8 @@
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

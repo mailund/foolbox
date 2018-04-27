@@ -30,3 +30,15 @@ the next callback in line, through the parameter \code{next_cb}. This can be
 used to propagate information through several callbacks in a pipe-like
 fashion.
 }
+\examples{
+f <- function(x) 2 + x
+cb <- rewrite_callbacks() \%>\%
+   add_call_callback(f, function(expr, ...) {
+       quote(2 + x)
+   })
+tr_f <- . \%>\% rewrite() \%>\% rewrite_with(cb)
+
+g <- function(y) y + f(y)
+tr_f(g)
+
+}

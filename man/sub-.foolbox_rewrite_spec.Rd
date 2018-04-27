@@ -16,3 +16,26 @@ allows us to use subscripts as part of the domain-specific language.}
 This subscript operator is used together with \code{\link{rewrites}} to specify
 a sequence of transformations to apply to a new function we define.
 }
+\examples{
+# This is a very simple inline function that require we
+# provide the function body as it should be inserted.
+# For a more detailed version, see the Tutorial vignette.
+inline <- function(f, fn, body) {
+   body <- substitute(body)
+   rewrite(f) \%>\%
+     rewrite_with(
+         rewrite_callbacks() \%>\%
+           add_call_callback(fn, function(expr, ...) body)
+     )
+}
+
+g <- function(x) x**2
+h <- rewrites[inline(g,y**2)] < function(y) y + g(y)
+h
+
+}
+\seealso{
+\code{<.foolbox_pipe}
+
+rewrites
+}

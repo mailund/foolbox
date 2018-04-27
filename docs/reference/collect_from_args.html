@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Collect attributes set in the arguments to a call expression. — collect_from_args" />
 
 <meta property="og:description" content="Given a call expression expr, this function scans the arguments to the
@@ -57,7 +60,7 @@ condition predicate evaluates to TRUE, and it concatenates all these." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -68,6 +71,9 @@ condition predicate evaluates to TRUE, and it concatenates all these." />
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -100,12 +106,13 @@ condition predicate evaluates to TRUE, and it concatenates all these." />
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,18 +120,21 @@ condition predicate evaluates to TRUE, and it concatenates all these." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Collect attributes set in the arguments to a call expression.</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/helpers.R'><code>R/helpers.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mailund/foolbox/blob/master/R/helpers.R'><code>R/helpers.R</code></a></small>
+    <div class="hidden name"><code>collect_from_args.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Given a call expression <code>expr</code>, this function scans the arguments to the
 call and extracts the attribute <code>attribute</code> from each where the
 <code>condition</code> predicate evaluates to <code>TRUE</code>, and it concatenates all these.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>collect_from_args</span>(<span class='no'>expr</span>, <span class='no'>attribute</span>, <span class='kw'>condition</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>expr</span>) <span class='fl'>TRUE</span>,
   <span class='kw'>include_fun</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
@@ -181,6 +191,8 @@ the arguments.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

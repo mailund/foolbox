@@ -1,3 +1,7 @@
+## This is a resubmission where I have added examples to the documentation
+of the key functions, i.e. the entry-points to the DSL of transformations
+implemented in the framework.
+
 ## Test environments
 * local OS X install, R 3.5.0
 * ubuntu 14.04 (on travis-ci), R 3.2 - 3.4

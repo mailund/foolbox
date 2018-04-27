@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Default expression-transformation callbacks. — rewrite_callbacks" />
 
 <meta property="og:description" content="Callbacks must be functions that take three arguments: The expression to
@@ -58,7 +61,7 @@ formal parameters of the function we are translating." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -69,6 +72,9 @@ formal parameters of the function we are translating." />
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -101,12 +107,13 @@ formal parameters of the function we are translating." />
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -114,19 +121,22 @@ formal parameters of the function we are translating." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Default expression-transformation callbacks.</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/callbacks.R'><code>R/callbacks.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mailund/foolbox/blob/master/R/callbacks.R'><code>R/callbacks.R</code></a></small>
+    <div class="hidden name"><code>rewrite_callbacks.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Callbacks must be functions that take three arguments: The expression to
 rewrite, the environment of the function we are rewriting (i.e. the
 environment it is defined in, not the function call frame), and a list of
 formal parameters of the function we are translating.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>rewrite_callbacks</span>()
 
@@ -213,16 +223,36 @@ function for calls.</p></li>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>with_atomic_callback</p>
+    <div class='dont-index'><p>with_atomic_callback</p>
 <p>with_symbol_callback</p>
 <p>with_primitive_callback</p>
 <p>with_pairlist_callback</p>
 <p>with_call_callback</p>
 <p>with_topdown_pairlist_callback</p>
 <p>with_topdown_call_callback</p>
-<p>warning_flags</p>
+<p>warning_flags</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='fl'>2</span> + <span class='no'>x</span>
+<span class='no'>cb</span> <span class='kw'>&lt;-</span> <span class='fu'>rewrite_callbacks</span>() <span class='kw'>%&gt;%</span>
+   <span class='fu'><a href='add_call_callback.html'>add_call_callback</a></span>(<span class='no'>f</span>, <span class='kw'>function</span>(<span class='no'>expr</span>, <span class='no'>...</span>) {
+       <span class='fu'>quote</span>(<span class='fl'>2</span> + <span class='no'>x</span>)
+   })
+<span class='no'>tr_f</span> <span class='kw'>&lt;-</span> <span class='no'>.</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='rewrite_with.html'>rewrite</a></span>() <span class='kw'>%&gt;%</span> <span class='fu'><a href='rewrite_with.html'>rewrite_with</a></span>(<span class='no'>cb</span>)
+
+<span class='no'>g</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>y</span>) <span class='no'>y</span> + <span class='fu'>f</span>(<span class='no'>y</span>)
+<span class='fu'>tr_f</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; function (y) 
+#&gt; y + (2 + x)
+#&gt; &lt;environment: 0x11465c840&gt;</div><div class='input'>
+<span class='no'>collect_symbols</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>expr</span>, <span class='no'>...</span>) {
+   <span class='fu'>list</span>(<span class='kw'>symbols</span> <span class='kw'>=</span> <span class='fu'>as.character</span>(<span class='no'>expr</span>))
+}
+<span class='no'>callbacks</span> <span class='kw'>&lt;-</span> <span class='fu'>analysis_callbacks</span>() <span class='kw'>%&gt;%</span> <span class='fu'>with_symbol_callback</span>(<span class='no'>collect_symbols</span>)
+<span class='no'>f</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='rewrite_with.html'>analyse</a></span>() <span class='kw'>%&gt;%</span> <span class='fu'><a href='rewrite_with.html'>analyse_with</a></span>(<span class='no'>callbacks</span>)</div><div class='output co'>#&gt; $symbols
+#&gt; [1] "+" "x"
+#&gt; </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -234,7 +264,9 @@ function for calls.</p></li>
       <li><a href="#functions">Functions</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>
@@ -250,6 +282,8 @@ function for calls.</p></li>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

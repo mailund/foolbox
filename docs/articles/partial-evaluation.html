@@ -18,7 +18,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-vignette">
+    <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -29,7 +29,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -40,6 +40,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -71,7 +74,7 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
@@ -86,20 +89,20 @@
 
       
       </header><div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Partial evaluation with foolbox</h1>
                         <h4 class="author">Thomas Mailund</h4>
             
-            <h4 class="date">2018-03-29</h4>
+            <h4 class="date">2018-04-26</h4>
       
-      <small>Source: <a href="https://github.com/mailund/foolbox/blob/master/vignettes/partial-evaluation.Rmd"><code>vignettes/partial-evaluation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mailund/foolbox/blob/master/vignettes/partial-evaluation.Rmd"><code>vignettes/partial-evaluation.Rmd</code></a></small>
+      <div class="hidden name"><code>partial-evaluation.Rmd</code></div>
 
     </div>
 
     
     
-<div class="contents">
 <p>An approach to runtime optimisation is <a href="https://en.wikipedia.org/wiki/Partial_evaluation">partial evaluation</a>. It isn’t that complicated an idea; if you are computing the same thing again and again, you would be better off computing it once and remember the result. This idea is used many places, both implementations and in the design of algorithms, where we call the idea things like <em>dynamic programming</em> or <em>memorisation</em>. When it comes to functions, though, it involves evaluating the parts of a function we are able to with the parameters we can fix, and keeping the rest of the function as code that must be evaluated at a later time.</p>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
@@ -140,13 +143,13 @@
 <a class="sourceLine" id="cb4-19" data-line-number="19">)</a>
 <a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt; Unit: milliseconds</span></a>
 <a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">#&gt;                          expr       min        lq     mean    median</span></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt;         time_uncurry(rescale) 17.176775 18.881419 29.04301 22.048082</span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt;     time_curry(rescale_curry) 17.016956 19.251512 29.75858 21.483263</span></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt;  time_curry(rescale_curry_pe)  5.162787  6.042982 14.37885  7.110541</span></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt;         uq      max neval</span></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt;  30.016911 85.87950   100</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt;  29.781025 86.56278   100</span></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt;   9.573281 69.25154   100</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt;         time_uncurry(rescale) 15.046865 15.642861 21.74142 16.380228</span></a>
+<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt;     time_curry(rescale_curry) 14.997960 15.410322 20.60673 15.989984</span></a>
+<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt;  time_curry(rescale_curry_pe)  3.367868  4.878541 11.79211  5.703464</span></a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt;        uq       max neval</span></a>
+<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt;  19.74924  44.47971   100</span></a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt;  17.13966 110.54133   100</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt;  26.65673  29.77731   100</span></a></code></pre></div>
 <p>The actual performance difference depends, of course, on how many times we call the partial-evaluated function and how complex it is.</p>
 </div>
 <div id="automatic-partial-evaluation" class="section level2">
@@ -190,12 +193,12 @@
 <a class="sourceLine" id="cb7-3" data-line-number="3">    <span class="kw">time_curry</span>(<span class="cf">function</span>(x) <span class="kw">pe</span>(rescale, x, x))</a>
 <a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; Unit: milliseconds</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt;                                       expr      min       lq     mean</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;                      time_uncurry(rescale) 15.61486 18.87458 25.54064</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt;  time_curry(function(x) pe(rescale, x, x)) 23.87787 27.32894 34.94772</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt;                                       expr      min      lq     mean</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;                      time_uncurry(rescale) 14.15367 15.3082 18.67470</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt;  time_curry(function(x) pe(rescale, x, x)) 20.40191 21.9884 25.97323</span></a>
 <a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;    median       uq      max neval</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;  20.57338 23.93401 69.32531   100</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  29.47615 33.54658 90.40738   100</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;  16.02201 16.70747 46.44439   100</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  22.61048 23.66992 52.10957   100</span></a></code></pre></div>
 <p>This is perhaps not so surprising considering that we do not actually <em>evaluate</em> the <code>mean(x)</code> and <code>sd(x)</code> expressions we wanted to evaluate.</p>
 <p>We can fix this by trying to evaluate all calls if all their arguments are evaluated, i.e. if all their arguments are atomic.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">eval_attempt &lt;-<span class="st"> </span><span class="cf">function</span>(expr, env) {</a>
@@ -236,12 +239,12 @@
 <a class="sourceLine" id="cb10-3" data-line-number="3">    <span class="kw">time_curry</span>(<span class="cf">function</span>(x) <span class="kw">pe</span>(rescale, x, x))</a>
 <a class="sourceLine" id="cb10-4" data-line-number="4">)</a>
 <a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; Unit: milliseconds</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt;                                       expr      min       lq     mean</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt;                      time_uncurry(rescale) 16.24864 18.84805 22.25529</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt;  time_curry(function(x) pe(rescale, x, x)) 10.77409 13.21638 16.00058</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt;                                       expr       min       lq     mean</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt;                      time_uncurry(rescale) 14.034317 14.97801 16.83756</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt;  time_curry(function(x) pe(rescale, x, x))  9.028978 10.33661 12.24643</span></a>
 <a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt;    median       uq      max neval</span></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt;  20.43936 22.37771 62.46384   100</span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt;  14.08506 15.92888 58.49548   100</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt;  15.91812 16.40196 45.16957   100</span></a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt;  10.88464 11.52141 39.72597   100</span></a></code></pre></div>
 <p>Since we use <code>env</code> in the evaluation we also capture local variables where the function is defined:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">make_rescale &lt;-<span class="st"> </span><span class="cf">function</span>(m) {</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2">    <span class="cf">function</span>(x, y) (y <span class="op">-</span><span class="st"> </span><span class="kw">m</span>(x))<span class="op">/</span><span class="kw">sd</span>(x)</a>
@@ -250,7 +253,7 @@
 <a class="sourceLine" id="cb11-5" data-line-number="5">closure_rescale <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pe</span>(x, test_x)</a>
 <a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; function (y) </span></a>
 <a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; (y - 0.46)/0.330605505096331</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; &lt;environment: 0x7faf8bfe9110&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; &lt;environment: 0x7f8188a41188&gt;</span></a></code></pre></div>
 </div>
 <div id="function-parameters-and-local-variables" class="section level2">
 <h2 class="hasAnchor">
@@ -501,7 +504,6 @@
 <p>In any case, we are now doing so much work with the partial evaluation that we are only making the program slower, and as it is, we only barely got better than the simple <code>rescale</code> function earlier.</p>
 <p>I do not know if there is a use for partial evaluation in R. The language is not built for speed in the first place, and optimisations would be better handled in an adaptive virtual machine. If you <em>can</em> find a use for partial evaluation, though, I think you can implement it using <code>foolbox</code>.</p>
 </div>
-</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -530,6 +532,8 @@
 
       </footer>
 </div>
+
+  
 
   </body>
 </html>

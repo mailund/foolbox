@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Add a function-specific callback to the call callbacks. — add_call_callback" />
 
 <meta property="og:description" content="This function adds to the existing call callback, rather than replace it,
@@ -57,7 +60,7 @@ be invoked when the traversal sees a call to a specific function." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -68,6 +71,9 @@ be invoked when the traversal sees a call to a specific function." />
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -100,12 +106,13 @@ be invoked when the traversal sees a call to a specific function." />
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,18 +120,21 @@ be invoked when the traversal sees a call to a specific function." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Add a function-specific callback to the call callbacks.</h1>
-    <small>Source: <a href='https://github.com/mailund/foolbox/blob/master/R/callbacks.R'><code>R/callbacks.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mailund/foolbox/blob/master/R/callbacks.R'><code>R/callbacks.R</code></a></small>
+    <div class="hidden name"><code>add_call_callback.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>This function adds to the existing call callback, rather than replace it,
 by putting a callback in front of it to be tested first. The callback will
 be invoked when the traversal sees a call to a specific function.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>add_call_callback</span>(<span class='no'>callbacks</span>, <span class='no'>fn</span>, <span class='no'>cb</span>)</pre>
     
@@ -187,6 +197,8 @@ fashion.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

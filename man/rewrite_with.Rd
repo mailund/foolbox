@@ -108,7 +108,14 @@ cb <- rewrite_callbacks() \%>\%
    })
 tr_f <- . \%>\% rewrite() \%>\% rewrite_with(cb)
 
-g <- function(y) y + f(y) # body(g) is now quote(y + (2 + x))
+g <- function(y) y + f(y)
+tr_f(g)
+
+collect_symbols <- function(expr, ...) {
+   list(symbols = as.character(expr))
+}
+callbacks <- analysis_callbacks() \%>\% with_symbol_callback(collect_symbols)
+f \%>\% analyse() \%>\% analyse_with(callbacks)
 
 }
 \seealso{

@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Function reference" />
 
 
@@ -52,7 +55,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">foolbox</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
       </span>
     </div>
 
@@ -63,6 +66,9 @@
     <span class="fa fa-home"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/tutorial.html">Getting Started</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -95,12 +101,13 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/mailund/dynprog">
+  <a href="https://github.com/mailund/foolbox">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -108,156 +115,154 @@
       
       </header>
 
-      <div class="row">
-  <div class="col-md-9">
+<div class="row">
+  <div class="contents col-md-9">
     <div class="page-header">
       <h1>Reference</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    <table class="ref-index">
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <colgroup>
+      <col class="alias" />
+      <col class="title" />
+    </colgroup>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-traversals" class="hasAnchor"><a href="#section-traversals" class="anchor"></a>Traversals</h2>
-            <p class="section-desc"><p>Traversing functions or expressions for analysing or rewriting them.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="rewrite_with.html">rewrite_with()</a></code> <code><a href="rewrite_with.html">rewrite()</a></code> <code><a href="rewrite_with.html">analyse()</a></code> <code><a href="rewrite_with.html">analyse_with()</a></code> <code><a href="rewrite_with.html">rewrite_expr()</a></code> <code><a href="rewrite_with.html">rewrite_expr_with()</a></code> <code><a href="rewrite_with.html">analyse_expr()</a></code> <code><a href="rewrite_with.html">analyse_expr_with()</a></code> </p>
-          </td>
-          <td><p>Functions for applying a sequence of rewrites.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-callbacks" class="hasAnchor"><a href="#section-callbacks" class="anchor"></a>Callbacks</h2>
-            <p class="section-desc"><p>Modifying the list of callbacks used in a traversal.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="rewrite_callbacks.html">rewrite_callbacks()</a></code> <code><a href="rewrite_callbacks.html">analysis_callbacks()</a></code> <code><a href="rewrite_callbacks.html">with_atomic_callback()</a></code> <code><a href="rewrite_callbacks.html">with_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_symbol_callback()</a></code> <code><a href="rewrite_callbacks.html">with_primitive_callback()</a></code> <code><a href="rewrite_callbacks.html">with_call_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_call_callback()</a></code> </p>
-          </td>
-          <td><p>Default expression-transformation callbacks.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="add_call_callback.html">add_call_callback()</a></code> </p>
-          </td>
-          <td><p>Add a function-specific callback to the call callbacks.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="add_topdown_callback.html">add_topdown_callback()</a></code> </p>
-          </td>
-          <td><p>Add a function-specific callback to the top-down callbacks.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="identity_rewrite_callback.html">identity_rewrite_callback()</a></code> <code><a href="identity_rewrite_callback.html">identity_analysis_callback()</a></code> </p>
-          </td>
-          <td><p>A callback that does not do any transformation.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="nop_topdown_callback.html">nop_topdown_callback()</a></code> </p>
-          </td>
-          <td><p>Top-down analysis callback.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-function-annotation-transformations" class="hasAnchor"><a href="#section-function-annotation-transformations" class="anchor"></a>Function annotation transformations</h2>
-            <p class="section-desc"><p>Notation for rewriting as part of a function definition.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="rewrites.html">rewrites</a></code> </p>
-          </td>
-          <td><p>Object for setting up a transformation pipeline when defining functions</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="sub-.foolbox_rewrite_spec.html">`[`(<i>&lt;foolbox_rewrite_spec&gt;</i>)</a></code> </p>
-          </td>
-          <td><p>Provide list of rewrite transformations.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="less-than-.foolbox_pipe.html">`<`(<i>&lt;foolbox_pipe&gt;</i>)</a></code> </p>
-          </td>
-          <td><p>This operator is used together with <code>rewrites</code> to transform a function
+    <tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-traversals" class="hasAnchor"><a href="#section-traversals" class="anchor"></a>Traversals</h2>
+          <p class="section-desc"><p>Traversing functions or expressions for analysing or rewriting them.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="rewrite_with.html">rewrite_with()</a></code> <code><a href="rewrite_with.html">rewrite()</a></code> <code><a href="rewrite_with.html">analyse()</a></code> <code><a href="rewrite_with.html">analyse_with()</a></code> <code><a href="rewrite_with.html">rewrite_expr()</a></code> <code><a href="rewrite_with.html">rewrite_expr_with()</a></code> <code><a href="rewrite_with.html">analyse_expr()</a></code> <code><a href="rewrite_with.html">analyse_expr_with()</a></code> </p>
+        </td>
+        <td><p>Functions for applying a sequence of rewrites.</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-callbacks" class="hasAnchor"><a href="#section-callbacks" class="anchor"></a>Callbacks</h2>
+          <p class="section-desc"><p>Modifying the list of callbacks used in a traversal.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="rewrite_callbacks.html">rewrite_callbacks()</a></code> <code><a href="rewrite_callbacks.html">analysis_callbacks()</a></code> <code><a href="rewrite_callbacks.html">with_atomic_callback()</a></code> <code><a href="rewrite_callbacks.html">with_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_symbol_callback()</a></code> <code><a href="rewrite_callbacks.html">with_primitive_callback()</a></code> <code><a href="rewrite_callbacks.html">with_call_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_pairlist_callback()</a></code> <code><a href="rewrite_callbacks.html">with_topdown_call_callback()</a></code> </p>
+        </td>
+        <td><p>Default expression-transformation callbacks.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="add_call_callback.html">add_call_callback()</a></code> </p>
+        </td>
+        <td><p>Add a function-specific callback to the call callbacks.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="add_topdown_callback.html">add_topdown_callback()</a></code> </p>
+        </td>
+        <td><p>Add a function-specific callback to the top-down callbacks.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="identity_rewrite_callback.html">identity_rewrite_callback()</a></code> <code><a href="identity_rewrite_callback.html">identity_analysis_callback()</a></code> </p>
+        </td>
+        <td><p>A callback that does not do any transformation.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="nop_topdown_callback.html">nop_topdown_callback()</a></code> </p>
+        </td>
+        <td><p>Top-down analysis callback.</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-function-annotation-transformations" class="hasAnchor"><a href="#section-function-annotation-transformations" class="anchor"></a>Function annotation transformations</h2>
+          <p class="section-desc"><p>Notation for rewriting as part of a function definition.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="rewrites.html">rewrites</a></code> </p>
+        </td>
+        <td><p>Object for setting up a transformation pipeline when defining functions</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="sub-.foolbox_rewrite_spec.html">`[`(<i>&lt;foolbox_rewrite_spec&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Provide list of rewrite transformations.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="less-than-.foolbox_pipe.html">`<`(<i>&lt;foolbox_pipe&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>This operator is used together with <code>rewrites</code> to transform a function
 after it is defined and before it is assigned to a name.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-information-processing" class="hasAnchor"><a href="#section-information-processing" class="anchor"></a>Information processing</h2>
-            <p class="section-desc"><p>Propagating information between callbacks.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="merge_bottomup.html">merge_bottomup()</a></code> </p>
-          </td>
-          <td><p>Merge the results of several bottomup results.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="collect_from_args.html">collect_from_args()</a></code> </p>
-          </td>
-          <td><p>Collect attributes set in the arguments to a call expression.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-formals" class="hasAnchor"><a href="#section-formals" class="anchor"></a>Formals</h2>
-            <p class="section-desc"><p>Manipulations of the formal parameters of a function.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="remove_formal_.html">remove_formal_()</a></code> </p>
-          </td>
-          <td><p>Remove a parameter from the formal parameters of a function.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="remove_formal.html">remove_formal()</a></code> </p>
-          </td>
-          <td><p>Remove a parameter from the formal parameters of a function.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-warnings" class="hasAnchor"><a href="#section-warnings" class="anchor"></a>Warnings</h2>
-            <p class="section-desc"><p>Controling which warnings are raised when traversing a function.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="warning_flags.html">warning_flags()</a></code> <code><a href="warning_flags.html">set_warn_on_unknown_function()</a></code> <code><a href="warning_flags.html">unset_warn_on_unknown_function()</a></code> <code><a href="warning_flags.html">set_warn_on_local_function()</a></code> <code><a href="warning_flags.html">unset_warn_on_local_function()</a></code> </p>
-          </td>
-          <td><p>Collection of warning flags used when traversing expressions.</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-information-processing" class="hasAnchor"><a href="#section-information-processing" class="anchor"></a>Information processing</h2>
+          <p class="section-desc"><p>Propagating information between callbacks.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="merge_bottomup.html">merge_bottomup()</a></code> </p>
+        </td>
+        <td><p>Merge the results of several bottomup results.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="collect_from_args.html">collect_from_args()</a></code> </p>
+        </td>
+        <td><p>Collect attributes set in the arguments to a call expression.</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-formals" class="hasAnchor"><a href="#section-formals" class="anchor"></a>Formals</h2>
+          <p class="section-desc"><p>Manipulations of the formal parameters of a function.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="remove_formal_.html">remove_formal_()</a></code> </p>
+        </td>
+        <td><p>Remove a parameter from the formal parameters of a function.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="remove_formal.html">remove_formal()</a></code> </p>
+        </td>
+        <td><p>Remove a parameter from the formal parameters of a function.</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-warnings" class="hasAnchor"><a href="#section-warnings" class="anchor"></a>Warnings</h2>
+          <p class="section-desc"><p>Controling which warnings are raised when traversing a function.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="warning_flags.html">warning_flags()</a></code> <code><a href="warning_flags.html">set_warn_on_unknown_function()</a></code> <code><a href="warning_flags.html">unset_warn_on_unknown_function()</a></code> <code><a href="warning_flags.html">set_warn_on_local_function()</a></code> <code><a href="warning_flags.html">unset_warn_on_local_function()</a></code> </p>
+        </td>
+        <td><p>Collection of warning flags used when traversing expressions.</p></td>
+      </tr>
+    </tbody>
+    </table>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -284,6 +289,8 @@ after it is defined and before it is assigned to a name.</p></td>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>
