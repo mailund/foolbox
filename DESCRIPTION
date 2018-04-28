@@ -1,6 +1,6 @@
 Package: foolbox
 Title: Function Manipulation Toolbox
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: person("Thomas", "Mailund", email = "mailund@birc.au.dk", role = c("aut", "cre"))
 Description: Provides functionality for manipulating functions and translating them
     in metaprogramming.
