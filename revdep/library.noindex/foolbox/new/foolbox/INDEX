@@ -1,0 +1,47 @@
+<.foolbox_pipe          This operator is used together with 'rewrites'
+                        to transform a function after it is defined and
+                        before it is assigned to a name.
+[.foolbox_rewrite_spec
+                        Provide list of rewrite transformations.
+add_call_callback       Add a function-specific callback to the call
+                        callbacks.
+add_topdown_callback    Add a function-specific callback to the
+                        top-down callbacks.
+annotate_assigned_symbols_callbacks
+                        Put attribute "assigned_symbols" on expressions
+                        bottom-up
+annotate_bound_symbols_in_function
+                        Annotate sub-expressions with variables bound
+                        in their scope.
+annotate_bound_variables_callbacks
+                        Propagate parameters and local variables
+                        top-down to assign attribute "bound" to all
+                        call expressions.
+collect_assigned_symbols_in_expression
+                        Extracts all the symbols that appear on the
+                        left-hand side of an assignment.
+collect_from_args       Collect attributes set in the arguments to a
+                        call expression.
+depth_first_analyse_expr
+                        Analyse an expression.
+depth_first_analyse_function
+                        Analyse the body of function.
+depth_first_rewrite_expr
+                        Transform an expression.
+depth_first_rewrite_function
+                        Transform the body of function.
+identity_rewrite_callback
+                        A callback that does not do any transformation.
+make_with_callback      Create a function for setting callbacks.
+merge_bottomup          Merge the results of several bottomup results.
+nop_topdown_callback    Top-down analysis callback.
+remove_formal           Remove a parameter from the formal parameters
+                        of a function.
+remove_formal_          Remove a parameter from the formal parameters
+                        of a function.
+rewrite_callbacks       Default expression-transformation callbacks.
+rewrite_with            Functions for applying a sequence of rewrites.
+rewrites                Object for setting up a transformation pipeline
+                        when defining functions
+warning_flags           Collection of warning flags used when
+                        traversing expressions.

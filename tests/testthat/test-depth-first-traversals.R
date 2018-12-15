@@ -12,8 +12,8 @@ test_that("we can do simple transformations", {
         if (!rlang::is_symbol(call_expr[[1]])) return(call_expr)
         # call is to a named function
         rlang::expr({
-            calls <<- c(rlang::UQ(as.character(call_expr[[1]])), calls)
-            rlang::UQ(call_expr)
+            calls <<- c(!!as.character(call_expr[[1]]), calls)
+            !!call_expr
         })
     }
     cb <- rewrite_callbacks() %>% with_call_callback(log_calls_transform)
@@ -85,7 +85,7 @@ test_that("we can call a callback for a specific function", {
     expect_equal(body(g_tr), quote(h(y + (2 + x))))
 
     h_cb <- function(expr, ...) {
-        rlang::expr(3 * rlang::UQ(expr[[2]]))
+        rlang::expr(3 * !!expr[[2]])
     }
     cb <- cb %>% add_call_callback(fn = h, h_cb)
     g_tr <- depth_first_rewrite_function(g, cb)

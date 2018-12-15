@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Thomas Mailund" />
+
+<meta name="date" content="2018-04-26" />
+
+<title>Transforming functions with foolbox</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Transforming functions with foolbox</h1>
+<h4 class="author"><em>Thomas Mailund</em></h4>
+<h4 class="date"><em>2018-04-26</em></h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>R is a functional language that allows us to treat functions as data, but more than that, it is a language with powerful support for reflection, allowing us to examine the inner workings of objects and functions–and meta-programming–manipulating these objects and functions. We can take existing functions and build other functions from them but calling them as part of a computation or by composing functions in point-free programming, but we can <em>also</em> take existing functions, access their implementation, and <em>rewrite</em> that representation, creating a derived implementation, that can be the body of a new function.</p>
+<p>The <code>foolbox</code> package aims at making the second type of function manipulation—meta-programming on functions—easier by providing a framework for rewriting functions. The framework is based on depth-first traversals of the expression-structure a function implementation consists of that invokes user-provided callback handles that can be used to modify parts of the structure.</p>
+<p>This document describes how you can define your own callbacks and how you can apply them to analysing or rewriting functions.</p>
+</div>
+<div id="introductory-examples" class="section level2">
+<h2>Introductory examples</h2>
+<p>To get a feeling for how the framework is used, we consider two simple examples: collecting the symbols (variables) used in a function and substituting variables for values.</p>
+<div id="example-collecting-symbols" class="section level3">
+<h3>Example: collecting symbols</h3>
+<p>To get a feeling for how the framework is used, we start with a simple example: collecting the symbols (variables) used in a function. Say we have the function <code>f</code> defined as below:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">    a &lt;-<span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">    b &lt;-<span class="st"> </span>x <span class="op">-</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">    <span class="dv">2</span> <span class="op">*</span><span class="st"> </span>a <span class="op">-</span><span class="st"> </span>b<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">}</a></code></pre></div>
+<p>This is a dummy-function so we don’t care what it does, but for some reason we are interested in collecting all the symbols inside it. That is, we want to collect the variables used in the implementation of the function, which are <code>x</code>, <code>y</code>, <code>a</code>, and <code>b</code>.</p>
+<p>We can get the symbols in an expression structure by traversing it and picking all the elements where <code>is.symbol(expr)</code> or <code>clang::is_symbol(expr)</code> are <code>TRUE</code>. We can do this in a recursive function we write for this purpose, or we can use <code>foolbox</code> with a callback for symbols. To do this, we first define a callback. This is a function that must take at least one argument, <code>expr</code>, and allow additional arguments, <code>...</code>. We will use it in a traversal where it will only be called on symbols, so we can translate <code>expr</code> into a string whenever it is called, and we want to collect all such strings.</p>
+<p>We build the callbacks for the traversal from the default callbacks used in an analysis, we get it using the function <code>analysis_callbacks()</code>, and we update the symbols callback with new function using <code>with_symbols_callback</code>. We can then run an analysis by setting it up—using the <code>analyse()</code> function and then run the callbacks using <code>analyse_with(callbacks)</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">collect_symbols &lt;-<span class="st"> </span><span class="cf">function</span>(expr, ...) {</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">    <span class="kw">list</span>(<span class="dt">symbols =</span> <span class="kw">as.character</span>(expr))</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">}</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">callbacks &lt;-<span class="st"> </span><span class="kw">analysis_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(collect_symbols)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse_with</span>(callbacks)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; $symbols</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt;  [1] &quot;{&quot;  &quot;&lt;-&quot; &quot;a&quot;  &quot;+&quot;  &quot;x&quot;  &quot;y&quot;  &quot;&lt;-&quot; &quot;b&quot;  &quot;-&quot;  &quot;x&quot;  &quot;y&quot;  &quot;-&quot;  &quot;*&quot;  &quot;a&quot; </span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; [15] &quot;^&quot;  &quot;b&quot;</span></a></code></pre></div>
+<p>The symbols are collected in the order we see them in the function and since we do not remove duplications, we see each symbol as many times as it appears. We can simplify this a bit by post-processing the traversal results.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse_with</span>(callbacks) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">    </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;  [1] &quot;{&quot;  &quot;&lt;-&quot; &quot;a&quot;  &quot;+&quot;  &quot;x&quot;  &quot;y&quot;  &quot;b&quot;  &quot;-&quot;  &quot;*&quot;  &quot;^&quot;</span></a></code></pre></div>
+<p>Normally, I will not bother with naming callbacks and constructing an analysis pipeline in steps, but simply construct it using a <code>%&gt;%</code> pipeline like this:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse_with</span>(</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">    <span class="kw">analysis_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">        <span class="cf">function</span>(expr, ...) <span class="kw">list</span>(<span class="dt">symbols =</span> <span class="kw">as.character</span>(expr))</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">    )</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  [1] &quot;{&quot;  &quot;&lt;-&quot; &quot;a&quot;  &quot;+&quot;  &quot;x&quot;  &quot;y&quot;  &quot;b&quot;  &quot;-&quot;  &quot;*&quot;  &quot;^&quot;</span></a></code></pre></div>
+<p>It is a matter of taste what you prefer.</p>
+<p>I will often name a given pipeline, though, so I can reuse it later. This is something we can do by specifying the pipeline but with dot, <code>.</code>, as the initial input:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">collect_symbols &lt;-<span class="st"> </span>. <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse_with</span>(</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">    <span class="kw">analysis_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">        <span class="cf">function</span>(expr, ...) <span class="kw">list</span>(<span class="dt">symbols =</span> <span class="kw">as.character</span>(expr))</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">    )</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a></code></pre></div>
+<p>Then, when we have a function we want to analyse, we can pipe it into the analysis:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect_symbols</span>()</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt;  [1] &quot;{&quot;  &quot;&lt;-&quot; &quot;a&quot;  &quot;+&quot;  &quot;x&quot;  &quot;y&quot;  &quot;b&quot;  &quot;-&quot;  &quot;*&quot;  &quot;^&quot;</span></a></code></pre></div>
+<p>The example uses an <code>analyse()</code> traversal. Such a traversal traverses the expression structure depth-first and invoke the callbacks on each sub-expression. What these compute are passed, bottom-up, to callbacks in the parameter <code>bottomup</code>. For symbols, we are at a leaf in the expression tree, so we do not get any <code>bottomup</code> information from the recursion, but the list we created is propagated up in the recursion. We just didn’t see it in the example because the default callbacks propagate the results up and we could use those. Using callbacks for <code>call</code> expressions lets us manipulate this information to construct more complicated analyses.</p>
+</div>
+<div id="example-substitution" class="section level3">
+<h3>Example: substitution</h3>
+<p>As another example, we can consider modifying a function by replacing a given variable with a value. Here, we will use a <code>rewrite()</code> traversal instead of the <code>analyse()</code> traversal we used in the previous example. With a <code>rewrite()</code> traversal we have the same callbacks as in an analysis, and they are called with the same arguments (except for <code>bottomup</code> which is only used in <code>analysis()</code>), but they have to return an expression. The expression they return will be substituted into the result at the position where their <code>expr</code> argument sits in the input function.</p>
+<p>We want to replace symbols with values, so we will use the symbols callback again. This time around, we write a function for the transformation because we want to specify the variable we want substituted and the value we want it substituted with. We will simply collect these as expressions and then run the function through a <code>rewrite()</code> pipeline. Like this:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">subst_symbol &lt;-<span class="st"> </span><span class="cf">function</span>(fn, var, val) {</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">    var &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">enexpr</span>(var)</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">    val &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">enexpr</span>(val)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">    fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite_with</span>(</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">        <span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">            <span class="cf">function</span>(expr, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span>var) val <span class="cf">else</span> expr</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">        )</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">}</a></code></pre></div>
+<p>Then, with a function like this:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) <span class="dv">2</span> <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y <span class="op">**</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<p>we can replace <code>x</code> with <code>3</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">subst_symbol</span>(x, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; function (x, y) </span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; 2 * 3 + y^2</span></a></code></pre></div>
+<p>We have replaced <code>x</code> with <code>3</code> inside <code>f</code>’s body, but not removed the formal parameter. If you want to do this, you can do it in the <code>subst_symbol</code> function:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">subst_symbol &lt;-<span class="st"> </span><span class="cf">function</span>(fn, var, val) {</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">    var &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">enexpr</span>(var)</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">    val &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">enexpr</span>(val)</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">    fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite_with</span>(</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">        <span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">            <span class="cf">function</span>(expr, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span>var) val <span class="cf">else</span> expr</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">        )</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_formal_</span>(var)</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">subst_symbol</span>(x, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; function (y) </span></a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; 2 * 3 + y^2</span></a></code></pre></div>
+<p>In <code>foolbox</code> there is no special functionality for manipulating the <em>function</em> we rewrite. That can easily be done using base R functions. We focus on rewriting expressions.</p>
+</div>
+</div>
+<div id="callbacks-when-they-are-called-and-with-which-parameters" class="section level2">
+<h2>Callbacks: when they are called and with which parameters</h2>
+<p>There are five different expression types, and <code>foolbox</code> have a callback for each:</p>
+<ul>
+<li><strong>atomic</strong>: Literals, such as <code>12</code>, <code>&quot;foo&quot;</code>, or <code>TRUE</code>.</li>
+<li><strong>symbol</strong>: Variables, such as <code>f</code> or <code>x</code>.</li>
+<li><strong>primitive</strong>: Built in functions defined in C, such as <code>if</code> or <code>for</code> — the actual functions, not calls to them. Control structures are calls and not primitives, but the first component of a control structure call is (usually) a primitive.</li>
+<li><strong>pairlist</strong>: Parameter lists in <code>function()</code> definitions. This is a type that is only used when defining functions. The names of a pair-list is then the formal arguments of the function and the values the default parameters.</li>
+<li><strong>call</strong>: Function calls. Since control-structures, operators, indices, etc. are all considered functions in R, this captures all such expressions.</li>
+</ul>
+<p>The first three of these are base cases in expressions; they are expressions in themselves and not defined in terms of other expressions. The last two are recursive; they are expressions constructed from other expressions—the default arguments for pair-lists and the function plus its arguments for calls.</p>
+<p>When traversing a tree, we call these callbacks depth-first in traversals. In addition, there is a sixth callback, which doesn’t correspond to an expression type, but which is called top-down, i.e. it is called <em>before</em> we recurse on a composite expression (pair-lists or calls).</p>
+<p>You set a callback of type <em>type</em> using the function <code>with_</code><em>type</em><code>_callback</code>, i.e. to set a symbol callback, as we have seen in the examples, you use <code>with_symbol_callback</code>.</p>
+<p>We explore traversals in greater detail in the next section, but to understand callbacks we need to know that there are two types of traversals in <code>toolbox</code>: analyses and rewrites. The difference between the two is in what callbacks should return and how information flows bottom-up in a traversal. With analysis traversals, the callbacks should return lists. For the expression-callbacks, i.e. those that are not <strong>topdown</strong>, the lists are combined bottom-up in the traversals and provided to the callbacks higher up in the traversal. For rewrite callbacks, the expression-callbacks must return expressions. These expressions are combined bottom-up when constructing the result of a traversal.</p>
+<p>All callbacks must be defined to take a variable number of named arguments through the triple-dot notation, <code>...</code>. This allows the user to provide extra information to some callbacks, but only as long as that information is passed along down the recursion, so all callbacks must allow for it. Some arguments are provided by the traversal code, and you can choose to ignore it or exploit it in your callbacks. Those arguments are:</p>
+<ul>
+<li><strong>expr</strong>: An R expression. This is the expression we should analyse or rewrite.</li>
+<li><strong>params</strong>: Parameters of the function we are analysing or rewriting.</li>
+<li><strong>env</strong>: The environment of the function we are analysing or rewriting.</li>
+<li><strong>topdown</strong>: A list of additional information gathered in the traversal.</li>
+<li><strong>bottomup</strong>: A list of the values computed in the traversal of composite expressions’ components. Only used in analysis traversals.</li>
+<li><strong>next_cb</strong>: A handle to call the next callback in a chain (see below).</li>
+<li><strong>wflags</strong>: Warning flags. We return to those in the <a href="#miscellaneous">Miscellaneous</a> section.</li>
+</ul>
+<p>Top-down callbacks get one additional argument:</p>
+<ul>
+<li><strong>skip</strong>: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a “thunk”, i.e. a function that doesn’t take any arguments. If this function is called, the traversal does not process the expression. Instead, <strong>skip</strong> takes one argument, and that will be considered the result of the unexplored expression.</li>
+</ul>
+<div id="setting-up-callbacks" class="section level3">
+<h3>Setting up callbacks</h3>
+<p>When configuring callbacks for a traversal, you should start with the default set of functions for the traversal you have in mind. You get the default callbacks for an analysis traversal using the function <code>analysis_callbacks()</code> and the default callbacks for a rewrite traversal using the function <code>rewrite_callbacks()</code>. You can then replace a callback, of each of the six kinds, using the <code>with_</code><em>type</em><code>_callback()</code> functions, as part of a pipeline. For example, the pipeline</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">    </span><span class="kw">with_call_callback</span>(my_call_callback) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">    </span><span class="kw">with_symbol_callback</span>(my_symbol_callback)</a></code></pre></div>
+<p>will create callbacks that are defaults for rewriting for atomics, primates, pair-lists and top-down and have replaced the call and symbol callbacks with <code>my_call_callback</code> and <code>my_symbol_callback</code>, respectively.</p>
+<p>When you use the <code>with_</code><em>type</em><code>_callback</code> functions you replace the previous callback of the same type with the new function. The existing one is not lost, however. It will be provided to the function you install via the <code>next_cb</code> parameter, and you can call it if you want to chain together several callbacks of the same type.</p>
+<p>To make this concrete, consider the variable substitution from the previous section. If we try to use two different symbols callbacks to replace two different variables, we will only see the effect of the <em>last</em> callback we add, so in the example below, we replace <code>y</code> but not <code>x</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) x <span class="op">+</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite_with</span>(</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">    <span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">        <span class="cf">function</span>(expr, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span><span class="kw">quote</span>(x)) <span class="dv">1</span> <span class="cf">else</span> expr</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">        <span class="cf">function</span>(expr, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span><span class="kw">quote</span>(y)) <span class="dv">1</span> <span class="cf">else</span> expr</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8">)</a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; function (x, y) </span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; x + 1</span></a></code></pre></div>
+<p>We can remedy this using <code>next_cb</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite_with</span>(</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">    <span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3">        <span class="cf">function</span>(expr, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span><span class="kw">quote</span>(x)) <span class="dv">1</span> <span class="cf">else</span> expr</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_symbol_callback</span>(</a>
+<a class="sourceLine" id="cb13-5" data-line-number="5">        <span class="cf">function</span>(expr, next_cb, ...) <span class="cf">if</span> (expr <span class="op">==</span><span class="st"> </span><span class="kw">quote</span>(y)) <span class="dv">1</span> <span class="cf">else</span> <span class="kw">next_cb</span>(expr)</a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">    )</a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">)</a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt; function (x, y) </span></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt; 1 + 1</span></a></code></pre></div>
+<p>Notice here that the chaining goes in the opposite direction of how the callbacks are inserted. Whenever you add a callback with one of the <code>with_</code><em>type</em><code>_callback</code> functions you replace the previous one, so the callbacks configuration prefers the most recent changes over the older changes. This makes it easier to work with callbacks, because you can think of it as modifying a configuration. It does mean that the most recent specialisation is called first, so if you chain several callbacks, they will be invoked in the opposite order than the one they are added in. In many ways, the <code>next_cb</code> works for callbacks the way that <code>NextMethod</code> works for generic functions.</p>
+<p>For the substitution example, you can replace multiple variables in two ways: you can make one traversal with several, chained, symbol callbacks, or you can perform several traversals, in series, each performing one substitution. The former will work as parallel substitution since while the former will allow later transformations to modify values you have inserted in previous transformations. Both approaches have their uses, and you can implement both using <code>foolbox</code>.</p>
+<p>There are two other ways to add callbacks: <code>add_topdown_callback</code> and <code>add_call_callback</code>. These behave the same as <code>with_topdown_callback</code> and <code>add_call_callback</code> but allows you to specify a function they should be invoked on. They will only be called when we see <code>call</code> expressions to that specific function.</p>
+<p>We can see this in use in a variation of the function we wrote earlier for extracting the symbols used in a function. Instead of extracting <em>all</em> symbols, we might be interested in only those that are assigned to within a function. We can get those by processing the assignments in the function; these are calls to <code>&lt;-</code> and <code>=</code> (calls to <code>-&gt;</code> are translated into calls to <code>&lt;-</code> by the parser so you never see them in the expression structures).</p>
+<p>We <em>could</em> capture these by installing a callback that will be called for all calls and then check if the call is to the specific function, but using <code>add_call_callback</code> that check is done for us. We can write the function for collecting symbols assigned to like this:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">get_symbol &lt;-<span class="st"> </span><span class="cf">function</span>(expr, bottomup, ...) {</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">    bottomup &lt;-<span class="st"> </span><span class="kw">merge_bottomup</span>(bottomup)</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">    <span class="cf">if</span> (rlang<span class="op">::</span><span class="kw">is_symbol</span>(expr[[<span class="dv">2</span>]]))</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">        bottomup<span class="op">$</span>variables &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">as.character</span>(expr[[<span class="dv">2</span>]]), bottomup<span class="op">$</span>variables)</a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">    bottomup</a>
+<a class="sourceLine" id="cb14-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb14-7" data-line-number="7">collect_symbols &lt;-<span class="st"> </span>. <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">analyse_with</span>(</a>
+<a class="sourceLine" id="cb14-8" data-line-number="8">    <span class="kw">analysis_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="st">        </span><span class="kw">add_call_callback</span>(<span class="st">`</span><span class="dt">&lt;-</span><span class="st">`</span>, get_symbol) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-10" data-line-number="10"><span class="st">        </span><span class="kw">add_call_callback</span>(<span class="st">`</span><span class="dt">=</span><span class="st">`</span>, get_symbol)</a>
+<a class="sourceLine" id="cb14-11" data-line-number="11">    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unlist</span>(<span class="dt">use.names =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unique</span>()</a></code></pre></div>
+<p>This function will only extract those variables we assign to and not formal arguments or variables that are simply used in expressions.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">    z &lt;-<span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">    x <span class="op">+</span><span class="st"> </span>y <span class="op">+</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">}</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">collect_symbols</span>()</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; [1] &quot;z&quot;</span></a></code></pre></div>
+</div>
+</div>
+<div id="traversals" class="section level2">
+<h2>Traversals</h2>
+<p>Actual traversals, as we have seen in examples earlier, can be thought of as pipelines that a function flows through. You start with a call to either <code>analyse()</code> or <code>rewrite()</code>—for analysis and rewrite traversals, respectively—and then add further traversals using <code>analyse_with</code> and <code>rewrite_with</code>. These are designed so you can pipe the result of one <code>rewrite_with</code> into another to create a series of transformations. You can end a series of transformations with an <code>analyse_with</code>, but you cannot continue from one; the result of an analysis is not an expression structure but whatever you compute in the analysis.</p>
+<div id="initial-annotation-transformations" class="section level3">
+<h3>Initial annotation transformations</h3>
+<p>The <code>analyse()</code> and <code>rewrite()</code> functions are actually the same function and they both perform a rewrite of their input to prepare it for user-specified traversals. They perform an analysis of their input that computes which variables are assigned to in each scope in the expression-structure and which variables are bound in each scope (bound means they are either variables that are assigned to or parameters of functions in enclosing scopes). This information is added to each expression in the structure as attributes <code>&quot;assigned_symbols&quot;</code> and <code>&quot;bound&quot;</code>, respectively.</p>
+<p>Consider this function:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">    a &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">    g &lt;-<span class="st"> </span><span class="cf">function</span>(z) {</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4">        a <span class="op">-</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb16-5" data-line-number="5">    }</a>
+<a class="sourceLine" id="cb16-6" data-line-number="6">    <span class="kw">g</span>(<span class="op">-</span>x)</a>
+<a class="sourceLine" id="cb16-7" data-line-number="7">}</a></code></pre></div>
+<p>If we pipe it through <code>rewrite()</code> (or <code>analyse()</code>, the result is the same) we get an annotated function.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">annotated_f &lt;-<span class="st"> </span>f <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>()</a></code></pre></div>
+<p>At the top-level, the body of the annotated <code>f</code>, we see that <code>a</code> and <code>g</code> are assigned to in that scope, but that we also have <code>x</code> and <code>y</code> as bound variables, since these are parameters of <code>f</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">attr</span>(<span class="kw">body</span>(annotated_f), <span class="st">&quot;assigned_symbols&quot;</span>)</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; [1] &quot;a&quot; &quot;g&quot;</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="kw">attr</span>(<span class="kw">body</span>(annotated_f), <span class="st">&quot;bound&quot;</span>)</a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; [1] &quot;x&quot; &quot;y&quot; &quot;a&quot; &quot;g&quot;</span></a></code></pre></div>
+<p>We can extract the body of <code>f</code> inside <code>f</code>. Inside <code>g</code> we do not assign to any new local variables, but since <code>g</code> is nested inside <code>f</code>, all the symbols that are bound in <code>f</code> are also bound in <code>g</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">g_body &lt;-<span class="st"> </span><span class="kw">body</span>(annotated_f)[[<span class="dv">3</span>]][[<span class="dv">3</span>]][[<span class="dv">3</span>]]</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">g_body</a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="co">#&gt; {</span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt;     a - z</span></a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co">#&gt; }</span></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; attr(,&quot;assigned_symbols&quot;)</span></a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; character(0)</span></a>
+<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; attr(,&quot;bound&quot;)</span></a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt; [1] &quot;z&quot; &quot;x&quot; &quot;y&quot; &quot;a&quot; &quot;g&quot;</span></a></code></pre></div>
+<p>It is impossible to know before runtime whether any variable that is part of an assignment call in the body of a function will actually be assigned to. So this annotation is conservative and assumes that if it is <em>possible</em> that a variable is assigned to, then it will also be bound. Even so, R is such a dynamic language that it is possible, in many different ways, to modify the environment of a function from outside the static expressions in its body, that the best we can do is heuristics. The heuristics used are described in the documentation for the <code>rewrite()</code> function that implements them:</p>
+<blockquote>
+<p>Since R does not require that we declare local variables, and since the variables that are assigned to a local scope depend on the runtime execution of functions, we cannot determine with any certainty which variables will be assigned to in any given scope at any given program point. So the best we can do is figure out which variables are <em>potentially</em> assigned to. Which is what this function does.</p>
+<p>The rules for when we are assigning to a local variable are a bit complicated. For control structures, we can assume that assignments will be to the local scope. People can change the implementation of these so it isn’t, but then they are only hurting themselves and deserve the extra pain we can give them. For other call arguments, it gets a little more complicated. With standard-evaluation, if we have an arrow assignment in a function argument, then the assignment happens in the calling scope. So we will assume this happens unless we are handling cases we know have NSE, such as <code>with</code>. If an assignment is inside a block, however, we will assume that NSE <em>is</em> in play, by default, and not consider it a local assignment.</p>
+</blockquote>
+<p>It is quite likely that these rules will be updated in the future as I experiment more with the package, but this is what I have come up with so far.</p>
+<p>In any case, the annotation before the user-defined traversals is used to guide the dispatching on specific functions in the <code>add_topdown_callback</code> and <code>add_call_callback</code> callbacks. It prevents these callbacks to transform local functions that just happen to share the name with one that is used in one of those two functions.</p>
+</div>
+<div id="setting-up-a-traversal" class="section level3">
+<h3>Setting up a traversal</h3>
+<p>Specifying an actual traversal, once we understand how callbacks work, is fairly simple. After calling one of the <code>rewrite()</code> or <code>analyse()</code> functions you follow up with <code>rewrite_with()</code> or <code>analyse_with()</code>. These take at least one argument, which should be a callback configuration, and might take more. If you provide more arguments to them, make them named. Then they will be passed along to all the callbacks in the traversal.</p>
+<p>We have already seen several examples of this, so I will not provide more, but simply stress that whenever you build a transformation pipeline you have the choice between adding more callbacks to one transformation or making more transformations with the output of one becoming the input of another.</p>
+<p>If you specify a sequence of transformations, you can pass information along with expressions using attributes. Consider, for example, this dummy-example where we inline a function by replacing calls to it with its body (ignoring the remapping of variables a real inline function should consider, but see <a href="https://mailund.github.io/foolbox/#inline">this example</a> for a more detailed example of inlining functions). We save, together with the transformed expression, the old function call. In a second traversal we can use this information, for example to reverse the inlining.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">inline &lt;-<span class="st"> </span><span class="cf">function</span>(fn, f) {</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">    fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite_with</span>(</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">        <span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">add_call_callback</span>(</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">            f, <span class="cf">function</span>(expr, ...) {</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">                new_expr &lt;-<span class="st"> </span><span class="kw">body</span>(f)</a>
+<a class="sourceLine" id="cb20-6" data-line-number="6">                <span class="kw">attr</span>(new_expr, <span class="st">&quot;old_expr&quot;</span>) &lt;-<span class="st"> </span>expr</a>
+<a class="sourceLine" id="cb20-7" data-line-number="7">                new_expr</a>
+<a class="sourceLine" id="cb20-8" data-line-number="8">            }</a>
+<a class="sourceLine" id="cb20-9" data-line-number="9">        )</a>
+<a class="sourceLine" id="cb20-10" data-line-number="10">    )</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11">}</a>
+<a class="sourceLine" id="cb20-12" data-line-number="12">reverse &lt;-<span class="st"> </span><span class="cf">function</span>(fn) {</a>
+<a class="sourceLine" id="cb20-13" data-line-number="13">    fn <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite_with</span>(</a>
+<a class="sourceLine" id="cb20-14" data-line-number="14">        <span class="kw">rewrite_callbacks</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">with_call_callback</span>(</a>
+<a class="sourceLine" id="cb20-15" data-line-number="15">            <span class="cf">function</span>(expr, ...) {</a>
+<a class="sourceLine" id="cb20-16" data-line-number="16">                old_expr &lt;-<span class="st"> </span><span class="kw">attr</span>(expr, <span class="st">&quot;old_expr&quot;</span>)</a>
+<a class="sourceLine" id="cb20-17" data-line-number="17">                <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(old_expr)) old_expr</a>
+<a class="sourceLine" id="cb20-18" data-line-number="18">                <span class="cf">else</span> expr</a>
+<a class="sourceLine" id="cb20-19" data-line-number="19">            }</a>
+<a class="sourceLine" id="cb20-20" data-line-number="20">        )</a>
+<a class="sourceLine" id="cb20-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb20-22" data-line-number="22">}</a></code></pre></div>
+<p>We can thus run the first transformation to inline a function:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) x <span class="op">+</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">g &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">f</span>(x, <span class="dv">2</span><span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">h &lt;-<span class="st"> </span>g <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">inline</span>(f)</a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">h</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt; function (x) </span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt; x + y</span></a></code></pre></div>
+<p>And then turn around and reverse that operation because we have the old expressions stored in the tree:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">h <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">reverse</span>()</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="co">#&gt; function (x) </span></a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="co">#&gt; f(x, 2 * x)</span></a></code></pre></div>
+<p>Inlining and then reversing is, obviously, a nonsensical use of transformations, but storing information about symbols in scope is how we handle <code>add_topdown_callback</code> and <code>add_call_callback</code> callbacks correctly, and I suspect it can have other uses in static analysis.</p>
+</div>
+<div id="information-flow-in-traversals" class="section level3">
+<h3>Information-flow in traversals</h3>
+<p>The actual expression-tree traversals are handled by functions in the <code>foolbox</code> package, and you only have access to it via callbacks. You therefore need a way of passing information between callbacks. You have four options here:</p>
+<ul>
+<li>You can pass any fixed information along the traversal as extra parameters to the <code>rewrite_with</code> or <code>analyse_with</code> functions. Any named parameter, not on the list of parameters automatically passed to callbacks as described above, will get passed to the callbacks.</li>
+<li>You can provide information top-down using the <code>topdown</code> parameter. You can provide this parameter to <code>rewrite_with</code> and <code>analyse_with</code> to specify an initial value, and any value returned by a top-down callback will be passed to callbacks deeper in the traversal via this parameter.</li>
+<li>In analysis traversals, every callback must return a list. When going bottom-up in the traversal, the recursive types—pair-lists and call expressions—will have such a list for each of the constituent expressions, and this list will be passed along via the <code>bottomup</code> parameter. You can use the function <code>merge_bottomup</code> to merge this list-of-lists into a single list.</li>
+<li>In rewrite traversals, you can set attributes on expressions. Since the traversal is depth-first, these attributes will be available in the constituents of for composite expressions. You can use the function <code>collect_from_args</code> to merge information from sub-expressions.</li>
+</ul>
+</div>
+</div>
+<div id="transformations-as-annotations" class="section level2">
+<h2>Transformations as annotations</h2>
+<p>The rewrite transformations we now know how to define translate one function into another, but this mean that you have to define a function before you transform it. The pattern has to be something like</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">cool_function &lt;-<span class="st"> </span><span class="cf">function</span>(...) { <span class="kw">cool_stuff</span>() }</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">cool_function &lt;-<span class="st"> </span><span class="kw">rewrite</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">cool_rewrite</span>()</a></code></pre></div>
+<p>Reassigning to a variable always hurt the eyes of a functional programmer, so <code>foolbox</code> has some syntax for making transformations part of a function definition, similar to how you can transform functions and methods in Python using <code>@</code> notation. If you want to apply a series of transformations to a function, you can use the syntax</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">cool_function &lt;-<span class="st"> </span>rewrites[cool_rewrite] <span class="op">&lt;</span><span class="st"> </span><span class="cf">function</span>(...) {</a>
+<a class="sourceLine" id="cb24-2" data-line-number="2">    <span class="kw">cool_stuff</span>()</a>
+<a class="sourceLine" id="cb24-3" data-line-number="3">}</a></code></pre></div>
+<p>Between the square brackets following <code>rewrites</code> you can provide a list of rewrite functions. These will be run, one after another, from left to right, piping the output of one into the input of the next. After the <code>rewrites[...]</code> you write <code>&lt;</code> and then the function definition. It is not possible, with R’s syntax, to write the function definition immediately after the <code>rewrites[...]</code> expression, and <code>&lt;</code> is as close as I can get to an assignment without using <code>&lt;-</code> (which we cannot overload).</p>
+<p>This is how it would look for the inline function:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">h &lt;-<span class="st"> </span>rewrites[<span class="kw">inline</span>(f)] <span class="op">&lt;</span><span class="st"> </span><span class="cf">function</span>(x) <span class="kw">f</span>(x, <span class="dv">2</span><span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">h</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="co">#&gt; function (x) </span></a>
+<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="co">#&gt; x + y</span></a></code></pre></div>
+<p>The <code>inline</code> function takes two arguments, the function to transform and the function to inline, but in this expression we only need to provide the second argument. This is because the <code>rewrites[...]</code> function transforms its input by putting them in <code>%&gt;%</code> pipelines, so you can use the syntax you are familiar with from there, i.e. leave out the first argument and it will automatically be inserted.</p>
+<p>You can put as many transformations as you want between the square brackets.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">rewrites[<span class="kw">inline</span>(f),<span class="kw">reverse</span>()] <span class="op">&lt;</span><span class="st"> </span><span class="cf">function</span>(x) <span class="kw">f</span>(x, <span class="dv">2</span><span class="op">*</span>x)</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2"><span class="co">#&gt; function (x) </span></a>
+<a class="sourceLine" id="cb26-3" data-line-number="3"><span class="co">#&gt; f(x, 2 * x)</span></a></code></pre></div>
+</div>
+<div id="miscellaneous" class="section level2">
+<h2>Miscellaneous</h2>
+<p>You now know most of what you can do with <code>foolbox</code>, there are just some bits and pieces left. I will mention those briefly in this last section of the manual.</p>
+<div id="controlling-warnings" class="section level3">
+<h3>Controlling warnings</h3>
+<p>The traversals will warn you if it encounters a call in its traversal that calls a function that is not in scope. It will also warn if you try to transform a function that might be referring to a local variable. You can turn these warnings on and off—in the annotation done in the <code>rewrite()</code> and <code>analyse()</code> functions, we have to turn off the warning for unknown functions because we do not yet know which variables are local and which are not, so we would potentially warn on functions that <em>are</em> known in the function’s scope, just not until runtime.</p>
+<p>You can use the function <code>warning_flags()</code> to get default warnings and you can set and unset warning flags with functions named <code>set_warn_</code><em>warning-name</em> and <code>unset_warn_</code><em>warning-name</em>. See the documentation for <code>warning_flags()</code> for details.</p>
+</div>
+<div id="traversing-expressions" class="section level3">
+<h3>Traversing expressions</h3>
+<p>The documentation so far has focused on rewriting and analysing whole functions, and I would imagine that would be 99% of the uses you will have for <code>foolbox</code>. You can, however, also rewrite and analyse expressions in themselves (although you might have to provide them with <code>params</code> and <code>env</code> arguments of some sort since these cannot be taken from a function in that case).</p>
+<p>The expression version of <code>rewrite</code> and <code>rewrite_with</code> are <code>rewrite_expr</code> and <code>rewrite_expr_with</code>. The expression version of <code>analyse</code> and <code>analyse_with</code> are <code>analyse_expr</code> and <code>analyse_expr_with</code>. See the documentation for these functions for more details.</p>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

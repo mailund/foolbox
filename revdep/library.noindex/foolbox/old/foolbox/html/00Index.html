@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: Function manipulation toolbox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+<h1> Function manipulation toolbox
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;foolbox&rsquo; version 0.1.0</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+<li><a href="../doc/index.html">User guides, package vignettes and other documentation.</a></li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="less-than-.foolbox_pipe.html">&lt;.foolbox_pipe</a></td>
+<td>This operator is used together with 'rewrites' to transform a function after it is defined and before it is assigned to a name.</td></tr>
+<tr><td style="width: 25%;"><a href="add_call_callback.html">add_call_callback</a></td>
+<td>Add a function-specific callback to the call callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="add_topdown_callback.html">add_topdown_callback</a></td>
+<td>Add a function-specific callback to the top-down callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">analyse</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">analyse_expr</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">analyse_expr_with</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">analyse_with</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">analysis_callbacks</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="annotate_assigned_symbols_callbacks.html">annotate_assigned_symbols_callbacks</a></td>
+<td>Put attribute "assigned_symbols" on expressions bottom-up</td></tr>
+<tr><td style="width: 25%;"><a href="annotate_bound_symbols_in_function.html">annotate_bound_symbols_in_function</a></td>
+<td>Annotate sub-expressions with variables bound in their scope.</td></tr>
+<tr><td style="width: 25%;"><a href="annotate_bound_variables_callbacks.html">annotate_bound_variables_callbacks</a></td>
+<td>Propagate parameters and local variables top-down to assign attribute "bound" to all call expressions.</td></tr>
+<tr><td style="width: 25%;"><a href="collect_asigned_symbols_in_expression.html">collect_assigned_symbols_in_expression</a></td>
+<td>Extracts all the symbols that appear on the left-hand side of an assignment.</td></tr>
+<tr><td style="width: 25%;"><a href="collect_asigned_symbols_in_expression.html">collect_assigned_symbols_in_function</a></td>
+<td>Extracts all the symbols that appear on the left-hand side of an assignment.</td></tr>
+<tr><td style="width: 25%;"><a href="collect_from_args.html">collect_from_args</a></td>
+<td>Collect attributes set in the arguments to a call expression.</td></tr>
+<tr><td style="width: 25%;"><a href="depth_first_analyse_expr.html">depth_first_analyse_expr</a></td>
+<td>Analyse an expression.</td></tr>
+<tr><td style="width: 25%;"><a href="depth_first_analyse_function.html">depth_first_analyse_function</a></td>
+<td>Analyse the body of function.</td></tr>
+<tr><td style="width: 25%;"><a href="depth_first_rewrite_expr.html">depth_first_rewrite_expr</a></td>
+<td>Transform an expression.</td></tr>
+<tr><td style="width: 25%;"><a href="depth_first_rewrite_function.html">depth_first_rewrite_function</a></td>
+<td>Transform the body of function.</td></tr>
+<tr><td style="width: 25%;"><a href="identity_rewrite_callback.html">identity_analysis_callback</a></td>
+<td>A callback that does not do any transformation.</td></tr>
+<tr><td style="width: 25%;"><a href="identity_rewrite_callback.html">identity_rewrite_callback</a></td>
+<td>A callback that does not do any transformation.</td></tr>
+<tr><td style="width: 25%;"><a href="make_with_callback.html">make_with_callback</a></td>
+<td>Create a function for setting callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="merge_bottomup.html">merge_bottomup</a></td>
+<td>Merge the results of several bottomup results.</td></tr>
+<tr><td style="width: 25%;"><a href="nop_topdown_callback.html">nop_topdown_callback</a></td>
+<td>Top-down analysis callback.</td></tr>
+<tr><td style="width: 25%;"><a href="remove_formal.html">remove_formal</a></td>
+<td>Remove a parameter from the formal parameters of a function.</td></tr>
+<tr><td style="width: 25%;"><a href="remove_formal_.html">remove_formal_</a></td>
+<td>Remove a parameter from the formal parameters of a function.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">rewrite</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrites.html">rewrites</a></td>
+<td>Object for setting up a transformation pipeline when defining functions</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">rewrite_callbacks</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">rewrite_expr</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">rewrite_expr_with</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_with.html">rewrite_with</a></td>
+<td>Functions for applying a sequence of rewrites.</td></tr>
+<tr><td style="width: 25%;"><a href="warning_flags.html">set_warn_on_local_function</a></td>
+<td>Collection of warning flags used when traversing expressions.</td></tr>
+<tr><td style="width: 25%;"><a href="warning_flags.html">set_warn_on_unknown_function</a></td>
+<td>Collection of warning flags used when traversing expressions.</td></tr>
+<tr><td style="width: 25%;"><a href="warning_flags.html">unset_warn_on_local_function</a></td>
+<td>Collection of warning flags used when traversing expressions.</td></tr>
+<tr><td style="width: 25%;"><a href="warning_flags.html">unset_warn_on_unknown_function</a></td>
+<td>Collection of warning flags used when traversing expressions.</td></tr>
+<tr><td style="width: 25%;"><a href="warning_flags.html">warning_flags</a></td>
+<td>Collection of warning flags used when traversing expressions.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_atomic_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_call_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_pairlist_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_primitive_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_symbol_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_topdown_call_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="rewrite_callbacks.html">with_topdown_pairlist_callback</a></td>
+<td>Default expression-transformation callbacks.</td></tr>
+<tr><td style="width: 25%;"><a href="sub-.foolbox_rewrite_spec.html">[.foolbox_rewrite_spec</a></td>
+<td>Provide list of rewrite transformations.</td></tr>
+</table>
+</body></html>

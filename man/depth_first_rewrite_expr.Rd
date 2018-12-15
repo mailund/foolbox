@@ -4,8 +4,8 @@
 \alias{depth_first_rewrite_expr}
 \title{Transform an expression.}
 \usage{
-depth_first_rewrite_expr(expr, callbacks, params = list(), topdown = list(),
-  wflags = warning_flags(), ...)
+depth_first_rewrite_expr(expr, callbacks, params = list(),
+  topdown = list(), wflags = warning_flags(), ...)
 }
 \arguments{
 \item{expr}{An R expression}

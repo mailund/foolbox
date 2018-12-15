@@ -1,0 +1,408 @@
+---
+title: "Transforming functions with foolbox"
+author: "Thomas Mailund"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Transforming functions with foolbox}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(foolbox)
+```
+
+## Introduction
+
+R is a functional language that allows us to treat functions as data, but more than that, it is a language with powerful support for reflection, allowing us to examine the inner workings of objects and functions--and meta-programming--manipulating these objects and functions. We can take existing functions and build other functions from them but calling them as part of a computation or by composing functions in point-free programming, but we can *also* take existing functions, access their implementation, and *rewrite* that representation, creating a derived implementation, that can be the body of a new function.
+
+The `foolbox` package aims at making the second type of function manipulation—meta-programming on functions—easier by providing a framework for rewriting functions. The framework is based on depth-first traversals of the expression-structure a function implementation consists of that invokes user-provided callback handles that can be used to modify parts of the structure.
+
+This document describes how you can define your own callbacks and how you can apply them to analysing or rewriting functions.
+
+## Introductory examples
+
+To get a feeling for how the framework is used, we consider two simple examples: collecting the symbols (variables) used in a function and substituting variables for values.
+
+### Example: collecting symbols
+
+To get a feeling for how the framework is used, we start with a simple example: collecting the symbols (variables) used in a function. Say we have the function `f` defined as below:
+
+```{r}
+f <- function(x, y) {
+    a <- x + y
+    b <- x - y
+    2 * a - b^2
+}
+```
+
+This is a dummy-function so we don't care what it does, but for some reason we are interested in collecting all the symbols inside it. That is, we want to collect the variables used in the implementation of the function, which are `x`, `y`, `a`, and `b`.
+
+We can get the symbols in an expression structure by traversing it and picking all the elements where `is.symbol(expr)` or `clang::is_symbol(expr)` are `TRUE`. We can do this in a recursive function we write for this purpose, or we can use `foolbox` with a callback for symbols. To do this, we first define a callback. This is a function that must take at least one argument, `expr`, and allow additional arguments, `...`. We will use it in a traversal where it will only be called on symbols, so we can translate `expr` into a string whenever it is called, and we want to collect all such strings.
+
+We build the callbacks for the traversal from the default callbacks used in an analysis, we get it using the function `analysis_callbacks()`, and we update the symbols callback with new function using `with_symbols_callback`. We can then run an analysis by setting it up—using the `analyse()` function and then run the callbacks using `analyse_with(callbacks)`.
+
+```{r}
+collect_symbols <- function(expr, ...) {
+    list(symbols = as.character(expr))
+}
+callbacks <- analysis_callbacks() %>% with_symbol_callback(collect_symbols)
+f %>% analyse() %>% analyse_with(callbacks)
+```
+
+The symbols are collected in the order we see them in the function and since we do not remove duplications, we see each symbol as many times as it appears. We can simplify this a bit by post-processing the traversal results.
+
+```{r}
+f %>% analyse() %>% analyse_with(callbacks) %>% 
+    unlist(use.names = FALSE) %>% unique()
+```
+
+Normally, I will not bother with naming callbacks and constructing an analysis pipeline in steps, but simply construct it using a `%>%` pipeline like this:
+
+```{r}
+f %>% analyse() %>% analyse_with(
+    analysis_callbacks() %>% with_symbol_callback(
+        function(expr, ...) list(symbols = as.character(expr))
+    )
+) %>% unlist(use.names = FALSE) %>% unique()
+```
+
+It is a matter of taste what you prefer.
+
+I will often name a given pipeline, though, so I can reuse it later. This is something we can do by specifying the pipeline but with dot, `.`, as the initial input:
+
+```{r}
+collect_symbols <- . %>% analyse() %>% analyse_with(
+    analysis_callbacks() %>% with_symbol_callback(
+        function(expr, ...) list(symbols = as.character(expr))
+    )
+) %>% unlist(use.names = FALSE) %>% unique()
+```
+
+Then, when we have a function we want to analyse, we can pipe it into the analysis:
+
+```{r}
+f %>% collect_symbols()
+```
+
+The example uses an `analyse()` traversal. Such a traversal traverses the expression structure depth-first and invoke the callbacks on each sub-expression. What these compute are passed, bottom-up, to callbacks in the parameter `bottomup`. For symbols, we are at a leaf in the expression tree, so we do not get any `bottomup` information from the recursion, but the list we created is propagated up in the recursion. We just didn't see it in the example because the default callbacks propagate the results up and we could use those. Using callbacks for `call` expressions lets us manipulate this information to construct more complicated analyses.
+
+### Example: substitution
+
+As another example, we can consider modifying a function by replacing a given variable with a value. Here, we will use a `rewrite()` traversal instead of the `analyse()` traversal we used in the previous example. With a `rewrite()` traversal we have the same callbacks as in an analysis, and they are called with the same arguments (except for `bottomup` which is only used in `analysis()`), but they have to return an expression. The expression they return will be substituted into the result at the position where their `expr` argument sits in the input function.
+
+We want to replace symbols with values, so we will use the symbols callback again. This time around, we write a function for the transformation because we want to specify the variable we want substituted and the value we want it substituted with. We will simply collect these as expressions and then run the function through a `rewrite()` pipeline. Like this:
+
+```{r}
+subst_symbol <- function(fn, var, val) {
+    var <- rlang::enexpr(var)
+    val <- rlang::enexpr(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>% with_symbol_callback(
+            function(expr, ...) if (expr == var) val else expr
+        )
+    )
+}
+```
+
+Then, with a function like this:
+
+```{r}
+f <- function(x, y) 2 * x + y ** 2
+```
+
+we can replace `x` with `3`:
+
+```{r}
+f %>% subst_symbol(x, 3)
+```
+
+We have replaced `x` with `3` inside `f`'s body, but not removed the formal parameter. If you want to do this, you can do it in the `subst_symbol` function:
+
+```{r}
+subst_symbol <- function(fn, var, val) {
+    var <- rlang::enexpr(var)
+    val <- rlang::enexpr(val)
+    fn %>% rewrite() %>% rewrite_with(
+        rewrite_callbacks() %>% with_symbol_callback(
+            function(expr, ...) if (expr == var) val else expr
+        )
+    ) %>% remove_formal_(var)
+}
+f %>% subst_symbol(x, 3)
+```
+
+In `foolbox` there is no special functionality for manipulating the *function* we rewrite. That can easily be done using base R functions. We focus on rewriting expressions.
+
+
+## Callbacks: when they are called and with which parameters
+
+There are five different expression types, and `foolbox` have a callback for each:
+
+* **atomic**: Literals, such as `12`, `"foo"`, or `TRUE`.
+* **symbol**: Variables, such as `f` or `x`.
+* **primitive**: Built in functions defined in C, such as `if` or `for` — the actual functions, not calls to them. Control structures are calls and not primitives, but the first component of a control structure call is (usually) a primitive.
+* **pairlist**: Parameter lists in `function()` definitions. This is a type that is only used when defining functions. The names of a pair-list is then the formal arguments of the function and the values the default parameters.
+* **call**: Function calls. Since control-structures, operators, indices, etc. are all considered functions in R, this captures all such expressions.
+
+The first three of these are base cases in expressions; they are expressions in themselves and not defined in terms of other expressions. The last two are recursive; they are expressions constructed from other expressions—the default arguments for pair-lists and the function plus its arguments for calls.
+
+When traversing a tree, we call these callbacks depth-first in traversals. In addition, there is a sixth callback, which doesn't correspond to an expression type, but which is called top-down, i.e. it is called *before* we recurse on a composite expression (pair-lists or calls).
+
+You set a callback of type *type* using the function `with_`*type*`_callback`, i.e. to set a symbol callback, as we have seen in the examples, you use `with_symbol_callback`.
+
+We explore traversals in greater detail in the next section, but to understand callbacks we need to know that there are two types of traversals in `toolbox`: analyses and rewrites. The difference between the two is in what callbacks should return and how information flows bottom-up in a traversal. With analysis traversals, the callbacks should return lists. For the expression-callbacks, i.e. those that are not **topdown**, the lists are combined bottom-up in the traversals and provided to the callbacks higher up in the traversal. For rewrite callbacks, the expression-callbacks must return expressions. These expressions are combined bottom-up when constructing the result of a traversal.
+
+All callbacks must be defined to take a variable number of named arguments through the triple-dot notation, `...`. This allows the user to provide extra information to some callbacks, but only as long as that information is passed along down the recursion, so all callbacks must allow for it. Some arguments are provided by the traversal code, and you can choose to ignore it or exploit it in your callbacks. Those arguments are:
+
+* **expr**: An R expression. This is the expression we should analyse or rewrite.
+* **params**: Parameters of the function we are analysing or rewriting.
+* **env**: The environment of the function we are analysing or rewriting.
+* **topdown**: A list of additional information gathered in the traversal.
+* **bottomup**: A list of the values computed in the traversal of composite expressions' components. Only used in analysis traversals.
+* **next_cb**: A handle to call the next callback in a chain (see below).
+* **wflags**: Warning flags. We return to those in the [Miscellaneous] section.
+
+Top-down callbacks get one additional argument:
+
+* **skip**: A function you can call if you do not want the recursion to continue down a composite expression. For rewrite traversals, this will be a "thunk", i.e. a function that doesn't take any arguments. If this function is called, the traversal does not process the expression. Instead, **skip** takes one argument, and that will be considered the result of the unexplored expression.
+
+### Setting up callbacks
+
+When configuring callbacks for a traversal, you should start with the default set of functions for the traversal you have in mind. You get the default callbacks for an analysis traversal using the function `analysis_callbacks()` and the default callbacks for a rewrite traversal using the function `rewrite_callbacks()`. You can then replace a callback, of each of the six kinds, using the `with_`*type*`_callback()` functions, as part of a pipeline. For example, the pipeline
+
+```r
+rewrite_callbacks() %>% 
+    with_call_callback(my_call_callback) %>%
+    with_symbol_callback(my_symbol_callback)
+```
+
+will create callbacks that are defaults for rewriting for atomics, primates, pair-lists and top-down and have replaced the call and symbol callbacks with `my_call_callback` and `my_symbol_callback`, respectively.
+
+When you use the `with_`*type*`_callback` functions you replace the previous callback of the same type with the new function. The existing one is not lost, however. It will be provided to the function you install via the `next_cb` parameter, and you can call it if you want to chain together several callbacks of the same type.
+
+To make this concrete, consider the variable substitution from the previous section. If we try to use two different symbols callbacks to replace two different variables, we will only see the effect of the *last* callback we add, so in the example below, we replace `y` but not `x`.
+
+```{r}
+f <- function(x, y) x + y
+f %>% rewrite() %>% rewrite_with(
+    rewrite_callbacks() %>% with_symbol_callback(
+        function(expr, ...) if (expr == quote(x)) 1 else expr
+    ) %>% with_symbol_callback(
+        function(expr, ...) if (expr == quote(y)) 1 else expr
+    )
+)
+```
+
+We can remedy this using `next_cb`.
+
+```{r}
+f %>% rewrite() %>% rewrite_with(
+    rewrite_callbacks() %>% with_symbol_callback(
+        function(expr, ...) if (expr == quote(x)) 1 else expr
+    ) %>% with_symbol_callback(
+        function(expr, next_cb, ...) if (expr == quote(y)) 1 else next_cb(expr)
+    )
+)
+```
+
+Notice here that the chaining goes in the opposite direction of how the callbacks are inserted. Whenever you add a callback with one of the `with_`*type*`_callback` functions you replace the previous one, so the callbacks configuration prefers the most recent changes over the older changes. This makes it easier to work with callbacks, because you can think of it as modifying a configuration. It does mean that the most recent specialisation is called first, so if you chain several callbacks, they will be invoked in the opposite order than the one they are added in. In many ways, the `next_cb` works for callbacks the way that `NextMethod` works for generic functions.
+
+For the substitution example, you can replace multiple variables in two ways: you can make one traversal with several, chained, symbol callbacks, or you can perform several traversals, in series, each performing one substitution. The former will work as parallel substitution since while the former will allow later transformations to modify values you have inserted in previous transformations. Both approaches have their uses, and you can implement both using `foolbox`.
+
+There are two other ways to add callbacks: `add_topdown_callback` and `add_call_callback`. These behave the same as `with_topdown_callback` and `add_call_callback` but allows you to specify a function they should be invoked on. They will only be called when we see `call` expressions to that specific function.
+
+We can see this in use in a variation of the function we wrote earlier for extracting the symbols used in a function. Instead of extracting *all* symbols, we might be interested in only those that are assigned to within a function. We can get those by processing the assignments in the function; these are calls to `<-` and `=` (calls to `->` are translated into calls to `<-` by the parser so you never see them in the expression structures).
+
+We *could* capture these by installing a callback that will be called for all calls and then check if the call is to the specific function, but using `add_call_callback` that check is done for us. We can write the function for collecting symbols assigned to like this:
+
+```{r}
+get_symbol <- function(expr, bottomup, ...) {
+    bottomup <- merge_bottomup(bottomup)
+    if (rlang::is_symbol(expr[[2]]))
+        bottomup$variables <- c(as.character(expr[[2]]), bottomup$variables)
+    bottomup
+}
+collect_symbols <- . %>% analyse() %>% analyse_with(
+    analysis_callbacks() %>% 
+        add_call_callback(`<-`, get_symbol) %>%
+        add_call_callback(`=`, get_symbol)
+    ) %>% unlist(use.names = FALSE) %>% unique()
+```
+
+This function will only extract those variables we assign to and not formal arguments or variables that are simply used in expressions.
+
+```{r}
+f <- function(x, y) {
+    z <- x + y
+    x + y + z
+}
+f %>% collect_symbols()
+```
+
+## Traversals
+
+Actual traversals, as we have seen in examples earlier, can be thought of as pipelines that a function flows through. You start with a call to either `analyse()` or `rewrite()`—for analysis and rewrite traversals, respectively—and then add further traversals using `analyse_with` and `rewrite_with`. These are designed so you can pipe the result of one `rewrite_with` into another to create a series of transformations. You can end a series of transformations with an `analyse_with`, but you cannot continue from one; the result of an analysis is not an expression structure but whatever you compute in the analysis.
+
+### Initial annotation transformations
+
+The `analyse()` and `rewrite()` functions are actually the same function and they both perform a rewrite of their input to prepare it for user-specified traversals. They perform an analysis of their input that computes which variables are assigned to in each scope in the expression-structure and which variables are bound in each scope (bound means they are either variables that are assigned to or parameters of functions in enclosing scopes). This information is added to each expression in the structure as attributes `"assigned_symbols"` and `"bound"`, respectively.
+
+Consider this function:
+
+```{r}
+f <- function(x, y) {
+    a <- 2 * x + y
+    g <- function(z) {
+        a - z
+    }
+    g(-x)
+}
+```
+
+If we pipe it through `rewrite()` (or `analyse()`, the result is the same) we get an annotated function.
+
+```{r}
+annotated_f <- f %>% rewrite()
+```
+
+At the top-level, the body of the annotated `f`, we see that `a` and `g` are assigned to in that scope, but that we also have `x` and `y` as bound variables, since these are parameters of `f`.
+
+```{r}
+attr(body(annotated_f), "assigned_symbols")
+attr(body(annotated_f), "bound")
+```
+
+We can extract the body of `f` inside `f`. Inside `g` we do not assign to any new local variables, but since `g` is nested inside `f`, all the symbols that are bound in `f` are also bound in `g`:
+
+```{r}
+g_body <- body(annotated_f)[[3]][[3]][[3]]
+g_body
+```
+
+It is impossible to know before runtime whether any variable that is part of an assignment call in the body of a function will actually be assigned to. So this annotation is conservative and assumes that if it is *possible* that a variable is assigned to, then it will also be bound. Even so, R is such a dynamic language that it is possible, in many different ways, to modify the environment of a function from outside the static expressions in its body, that the best we can do is heuristics. The heuristics used are described in the documentation for the `rewrite()` function that implements them:
+
+> Since R does not require that we declare local variables, and since the variables that are assigned to a local scope depend on the runtime execution of functions, we cannot determine with any certainty which variables will be assigned to in any given scope at any given program point. So the best we can do is figure out which variables are *potentially* assigned to. Which is what this function does.
+>
+> The rules for when we are assigning to a local variable are a bit complicated. For control structures, we can assume that assignments will be to the local scope. People can change the implementation of these so it isn't, but then they are only hurting themselves and deserve the extra pain we can give them. For other call arguments, it gets a little more complicated. With standard-evaluation, if we have an arrow assignment in a function argument, then the assignment happens in the calling scope. So we will assume this happens unless we are handling cases we know have NSE, such as `with`. If an assignment is inside a block, however, we will assume that NSE *is* in play, by default, and not consider it a local assignment.
+
+It is quite likely that these rules will be updated in the future as I experiment more with the package, but this is what I have come up with so far.
+
+In any case, the annotation before the user-defined traversals is used to guide the dispatching on specific functions in the `add_topdown_callback` and `add_call_callback` callbacks. It prevents these callbacks to transform local functions that just happen to share the name with one that is used in one of those two functions.
+
+### Setting up a traversal
+
+Specifying an actual traversal, once we understand how callbacks work, is fairly simple. After calling one of the `rewrite()` or `analyse()` functions you follow up with `rewrite_with()` or `analyse_with()`. These take at least one argument, which should be a callback configuration, and might take more. If you provide more arguments to them, make them named. Then they will be passed along to all the callbacks in the traversal.
+
+We have already seen several examples of this, so I will not provide more, but simply stress that whenever you build a transformation pipeline you have the choice between adding more callbacks to one transformation or making more transformations with the output of one becoming the input of another.
+
+If you specify a sequence of transformations, you can pass information along with expressions using attributes. Consider, for example, this dummy-example where we inline a function by replacing calls to it with its body (ignoring the remapping of variables a real inline function should consider, but see [this example](https://mailund.github.io/foolbox/#inline) for a more detailed example of inlining functions). We save, together with the transformed expression, the old function call. In a second traversal we can use this information, for example to reverse the inlining.
+
+```{r}
+inline <- function(fn, f) {
+    fn %>% rewrite_with(
+        rewrite_callbacks() %>% add_call_callback(
+            f, function(expr, ...) {
+                new_expr <- body(f)
+                attr(new_expr, "old_expr") <- expr
+                new_expr
+            }
+        )
+    )
+}
+reverse <- function(fn) {
+    fn %>% rewrite_with(
+        rewrite_callbacks() %>% with_call_callback(
+            function(expr, ...) {
+                old_expr <- attr(expr, "old_expr")
+                if (!is.null(old_expr)) old_expr
+                else expr
+            }
+        )
+    )
+}
+```
+
+We can thus run the first transformation to inline a function:
+
+```{r}
+f <- function(x, y) x + y
+g <- function(x) f(x, 2*x)
+h <- g %>% rewrite() %>% inline(f)
+h
+```
+
+And then turn around and reverse that operation because we have the old expressions stored in the tree:
+
+```{r}
+h %>% rewrite() %>% reverse()
+```
+
+Inlining and then reversing is, obviously, a nonsensical use of transformations, but storing information about symbols in scope is how we handle `add_topdown_callback` and `add_call_callback` callbacks correctly, and I suspect it can have other uses in static analysis.
+
+
+### Information-flow in traversals
+
+The actual expression-tree traversals are handled by functions in the `foolbox` package, and you only have access to it via callbacks. You therefore need a way of passing information between callbacks. You have four options here:
+
+* You can pass any fixed information along the traversal as extra parameters to the `rewrite_with` or `analyse_with` functions. Any named parameter, not on the list of parameters automatically passed to callbacks as described above, will get passed to the callbacks.
+* You can provide information top-down using the `topdown` parameter. You can provide this parameter to `rewrite_with` and `analyse_with` to specify an initial value, and any value returned by a top-down callback will be passed to callbacks deeper in the traversal via this parameter.
+* In analysis traversals, every callback must return a list. When going bottom-up in the traversal, the recursive types—pair-lists and call expressions—will have such a list for each of the constituent expressions, and this list will be passed along via the `bottomup` parameter. You can use the function `merge_bottomup` to merge this list-of-lists into a single list.
+* In rewrite traversals, you can set attributes on expressions. Since the traversal is depth-first, these attributes will be available in the constituents of for composite expressions. You can use the function `collect_from_args` to merge information from sub-expressions.
+
+
+## Transformations as annotations
+
+The rewrite transformations we now know how to define translate one function into another, but this mean that you have to define a function before you transform it. The pattern has to be something like
+
+```r
+cool_function <- function(...) { cool_stuff() }
+cool_function <- rewrite() %>% cool_rewrite()
+```
+
+Reassigning to a variable always hurt the eyes of a functional programmer, so `foolbox` has some syntax for making transformations part of a function definition, similar to how you can transform functions and methods in Python using `@` notation. If you want to apply a series of transformations to a function, you can use the syntax
+
+```r
+cool_function <- rewrites[cool_rewrite] < function(...) {
+    cool_stuff()
+}
+```
+
+Between the square brackets following `rewrites` you can provide a list of rewrite functions. These will be run, one after another, from left to right, piping the output of one into the input of the next. After the `rewrites[...]` you write `<` and then the function definition. It is not possible, with R's syntax, to write the function definition immediately after the `rewrites[...]` expression, and `<` is as close as I can get to an assignment without using `<-` (which we cannot overload).
+
+This is how it would look for the inline function:
+
+```{r}
+h <- rewrites[inline(f)] < function(x) f(x, 2*x)
+h
+```
+
+The `inline` function takes two arguments, the function to transform and the function to inline, but in this expression we only need to provide the second argument. This is because the `rewrites[...]` function transforms its input by putting them in `%>%` pipelines, so you can use the syntax you are familiar with from there, i.e. leave out the first argument and it will automatically be inserted.
+
+You can put as many transformations as you want between the square brackets.
+
+```{r}
+rewrites[inline(f),reverse()] < function(x) f(x, 2*x)
+```
+
+## Miscellaneous 
+
+You now know most of what you can do with `foolbox`, there are just some bits and pieces left. I will mention those briefly in this last section of the manual.
+
+### Controlling warnings
+
+The traversals will warn you if it encounters a call in its traversal that calls a function that is not in scope. It will also warn if you try to transform a function that might be referring to a local variable. You can turn these warnings on and off—in the annotation done in the `rewrite()` and `analyse()` functions, we have to turn off the warning for unknown functions because we do not yet know which variables are local and which are not, so we would potentially warn on functions that *are* known in the function's scope, just not until runtime.
+
+You can use the function `warning_flags()` to get default warnings and you can set and unset warning flags with functions named `set_warn_`*warning-name* and `unset_warn_`*warning-name*. See the documentation for `warning_flags()` for details.
+
+### Traversing expressions
+
+The documentation so far has focused on rewriting and analysing whole functions, and I would imagine that would be 99% of the uses you will have for `foolbox`. You can, however, also rewrite and analyse expressions in themselves (although you might have to provide them with `params` and `env` arguments of some sort since these cannot be taken from a function in that case).
+
+The expression version of `rewrite` and `rewrite_with` are `rewrite_expr` and `rewrite_expr_with`. The expression version of `analyse` and `analyse_with` are `analyse_expr` and `analyse_expr_with`. See the documentation for these functions for more details.

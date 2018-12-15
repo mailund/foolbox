@@ -4,8 +4,8 @@
 \alias{depth_first_analyse_expr}
 \title{Analyse an expression.}
 \usage{
-depth_first_analyse_expr(expr, callbacks, params = list(), topdown = list(),
-  wflags = warning_flags(), ...)
+depth_first_analyse_expr(expr, callbacks, params = list(),
+  topdown = list(), wflags = warning_flags(), ...)
 }
 \arguments{
 \item{expr}{An R expression}

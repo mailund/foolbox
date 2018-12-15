@@ -11,15 +11,15 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
-Imports: 
-    magrittr, 
-    rlang (>= 0.3.0)
-Suggests: 
-    covr,
-    testthat,
-    knitr,
-    rmarkdown,
-    microbenchmark
+Imports: magrittr, rlang (>= 0.3.0)
+Suggests: covr, testthat, knitr, rmarkdown, microbenchmark
 URL: https://github.com/mailund/foolbox
 BugReports: https://github.com/mailund/foolbox/issues
 VignetteBuilder: knitr
+RemoteType: local
+RemoteUrl: /Users/mailund/Projects/foolbox
+NeedsCompilation: no
+Packaged: 2018-12-15 10:33:35 UTC; mailund
+Author: Thomas Mailund [aut, cre]
+Maintainer: Thomas Mailund <mailund@birc.au.dk>
+Built: R 3.5.1; ; 2018-12-15 10:33:35 UTC; unix

@@ -9,3 +9,4 @@
 ^cleanup.R$
 ^vignettes/partial-evaluation_cache/*$
 ^cran-comments\.md$
+^revdep$
