@@ -7,8 +7,8 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2018--04--28-green.svg)](/commits/master)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.1.0.9000-green.svg?style=flat-square)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2018--12--20-green.svg)](/commits/master)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.1.1.9000-green.svg?style=flat-square)](commits/master)
 [![Travis build
 status](https://travis-ci.org/mailund/foolbox.svg?branch=master)](https://travis-ci.org/mailund/foolbox)
 [![AppVeyor build
