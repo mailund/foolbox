@@ -131,7 +131,7 @@ propagate_assigned_symbols_callback <- function(expr, ...) {
         condition <- function(expr) FALSE
     } else {
         condition <- function(expr) {
-            rlang::is_lang(expr) && expr[[1]] == "<-"
+            rlang::is_call(expr) && expr[[1]] == "<-"
         }
     }
     locals <- collect_from_args(expr, "assigned_symbols", condition) %>%
